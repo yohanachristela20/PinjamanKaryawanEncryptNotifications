@@ -20,6 +20,10 @@ import csvParser from "csv-parser";
 import db from "../config/database.js";
 import Pinjaman from "../models/PinjamanModel.js";
 import AntreanPengajuan from "../models/AntreanPengajuanModel.js";
+import nodemailer from "nodemailer"; 
+import dotenv from "dotenv";
+
+dotenv.config();
 
 const router = express.Router();
 
@@ -490,6 +494,7 @@ router.put('/pengajuan/:id_pinjaman', async (req, res) => {
       
           pinjaman.status_pengajuan = status_pengajuan;
           await pinjaman.save();
+          await sendEmailNotification(pinjaman);
       
           res.status(200).json({ message: 'Pinjaman berhasil diperbarui', pinjaman });
         } catch (error) {
@@ -497,6 +502,52 @@ router.put('/pengajuan/:id_pinjaman', async (req, res) => {
           res.status(500).json({ message: 'Server error' });
         }
 });
+
+const sendEmailNotification = async(pinjaman) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_ADMIN,
+        pass: process.env.EMAIL_PASS_ADMIN, 
+      }
+    }); 
+    const mailOptions = {
+      from: "oktavianiyohana8@gmail.com",
+      to: "yohana.oktaviani@campina.co.id", 
+      subject: "Notifikasi Pengajuan Pinjaman Diterima Admin", 
+      text: `
+      Dear Finance,\n\n
+      Pengajuan pinjaman baru dengan ID: ${pinjaman.id_pinjaman} telah DITERIMA oleh Admin.\n
+      ID Peminjam: ${pinjaman.id_peminjam}\n
+      Jumlah: ${formatRupiah(pinjaman.jumlah_pinjaman)}\n
+      Keperluan: ${pinjaman.keperluan}\n
+      Transfer pinjaman dan lakukan konfirmasi di http://10.70.10.157:3000\n\n
+      Regards,\n
+      Campina Dev Team.
+      `, 
+    };
+
+    await transporter.sendMail(mailOptions); 
+    console.log("Notifikasi berhasil dikirim ke email finance."); 
+  } catch (error) {
+    console.error("Gagal mengirim email notifikasi: ", error);
+  }
+}; 
+
+const formatRupiah = (angka) => {
+  let pinjamanString = angka.toString().replace(".00");
+  let sisa = pinjamanString.length % 3;
+  let rupiah = pinjamanString.substr(0, sisa);
+  let ribuan = pinjamanString.substr(sisa).match(/\d{3}/g);
+
+  if (ribuan) {
+      let separator = sisa ? "." : "";
+      rupiah += separator + ribuan.join(".");
+  }
+  
+  return rupiah;
+};
 
 router.put('/batal-pengajuan/:id_pinjaman', async (req, res) => {
   const { id_pinjaman } = req.params;

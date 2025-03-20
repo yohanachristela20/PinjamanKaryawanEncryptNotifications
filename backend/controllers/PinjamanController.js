@@ -5,6 +5,10 @@ import AntreanPengajuan from "../models/AntreanPengajuanModel.js";
 import PlafondUpdate from "../models/PlafondUpdateModel.js";
 import db from "../config/database.js";
 import { Sequelize, Op, where } from "sequelize";
+import nodemailer from "nodemailer"; 
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const getPinjaman = async(req, res) => {
     try {
@@ -145,6 +149,8 @@ export const createPinjaman = async (req, res) => {
 
 
         await transaction.commit();
+
+        await sendEmailNotification(newPinjaman);
         res.status(201).json({
             message: "Data Pinjaman baru dan nomor antrean berhasil dibuat.",
             data: {
@@ -166,6 +172,52 @@ export const createPinjaman = async (req, res) => {
             validationErrors: error.errors || [] 
         });
     }
+};
+
+const sendEmailNotification = async(pinjaman) => {
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_ADMIN,
+        pass: process.env.EMAIL_PASS_ADMIN, 
+      }
+    }); 
+    const mailOptions = {
+      from: "oktavianiyohana8@gmail.com",
+      to: "oktavianiyohana8@gmail.com", 
+      subject: "Notifikasi Pengajuan Pinjaman Baru", 
+      text: `
+      Dear Admin,\n\n
+      Pengajuan pinjaman baru telah dibuat dengan ID: ${pinjaman.id_pinjaman}.\n
+      ID Peminjam: ${pinjaman.id_peminjam}\n
+      Jumlah: ${formatRupiah(pinjaman.jumlah_pinjaman)}\n
+      Keperluan: ${pinjaman.keperluan}\n
+      Tinjau pengajuan pinjaman di http://10.70.10.157:3000\n\n
+      Regards,\n
+      Campina Dev Team.
+      `, 
+    };
+
+    await transporter.sendMail(mailOptions); 
+    console.log("Notifikasi berhasil dikirim ke email admin."); 
+  } catch (error) {
+    console.error("Gagal mengirim email notifikasi: ", error);
+  }
+}; 
+
+const formatRupiah = (angka) => {
+  let pinjamanString = angka.toString().replace(".00");
+  let sisa = pinjamanString.length % 3;
+  let rupiah = pinjamanString.substr(0, sisa);
+  let ribuan = pinjamanString.substr(sisa).match(/\d{3}/g);
+
+  if (ribuan) {
+      let separator = sisa ? "." : "";
+      rupiah += separator + ribuan.join(".");
+  }
+  
+  return rupiah;
 };
 
 export const getDataPinjaman = async (req, res) => {
