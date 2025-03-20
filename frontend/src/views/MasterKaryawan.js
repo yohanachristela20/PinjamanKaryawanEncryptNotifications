@@ -107,19 +107,17 @@ function MasterKaryawan() {
 
   
   const formatRupiah = (angka) => {
-    if (angka == null || angka === "") return ""; // Handle nilai null atau kosong
-    
-    let numberString = angka.toString().replace(/\D/g, ""); // Hapus karakter selain angka
-    let sisa = numberString.length % 3;
-    let rupiah = numberString.substr(0, sisa);
-    let ribuan = numberString.substr(sisa).match(/\d{3}/g);
-  
+    let pinjamanString = angka.toString().replace(".00");
+    let sisa = pinjamanString.length % 3;
+    let rupiah = pinjamanString.substr(0, sisa);
+    let ribuan = pinjamanString.substr(sisa).match(/\d{3}/g);
+
     if (ribuan) {
         let separator = sisa ? "." : "";
         rupiah += separator + ribuan.join(".");
     }
-  
-    return rupiah || ""; 
+    
+    return rupiah;
   };
 
 

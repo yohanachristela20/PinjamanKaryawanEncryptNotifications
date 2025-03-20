@@ -495,6 +495,12 @@ router.put('/pengajuan/:id_pinjaman', async (req, res) => {
           pinjaman.status_pengajuan = status_pengajuan;
           await pinjaman.save();
           await sendEmailNotification(pinjaman);
+
+          const io = req.app.get("io");
+          io.emit("pinjaman", {
+            message: `Pinjaman dengan ID: ${pinjaman.id_pinjaman} telah DITERIMA admin.`,
+            pinjaman: pinjaman,
+          });
       
           res.status(200).json({ message: 'Pinjaman berhasil diperbarui', pinjaman });
         } catch (error) {

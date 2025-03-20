@@ -156,18 +156,18 @@ const AddPengajuan = ({ showAddModal, setShowAddModal, onSuccess }) => {
     };
 
     const formatRupiah = (angka) => {
-        let jumlahString = angka.toString().replace(/\D/g, "");
-        let sisa = jumlahString.length % 3;
-        let rupiah = jumlahString.substr(0, sisa);
-        let ribuan = jumlahString.substr(sisa).match(/\d{3}/g);
-
+        let pinjamanString = angka.toString().replace(".00");
+        let sisa = pinjamanString.length % 3;
+        let rupiah = pinjamanString.substr(0, sisa);
+        let ribuan = pinjamanString.substr(sisa).match(/\d{3}/g);
+    
         if (ribuan) {
             let separator = sisa ? "." : "";
             rupiah += separator + ribuan.join(".");
         }
-
+        
         return rupiah;
-    };
+      };
 
     const handleJumlahPinjamanChange = (value) => {
         const numericValue = value.replace(/\D/g, "");

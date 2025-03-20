@@ -91,7 +91,7 @@
                 }
 
                 &:hover{
-                    color: $info-color;
+                    color: #7089f0;
                 }
             }
 
@@ -195,7 +195,8 @@
         .nav-item{
             .nav-link:not(.btn),
             .nav-link:hover:not(.btn),
-            .nav-link:focus:not(.btn),{
+            .nav-link:focus:not(.btn),
+            {
                 background-color: transparent;
                 border-radius: 3px;
                 color: $white-color;

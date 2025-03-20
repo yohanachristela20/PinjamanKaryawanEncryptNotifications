@@ -149,8 +149,14 @@ export const createPinjaman = async (req, res) => {
 
 
         await transaction.commit();
-
         await sendEmailNotification(newPinjaman);
+
+        const io = req.app.get("io");
+        io.emit("newPinjaman", {
+          message: `Pinjaman baru telah diajukan dengan ID: ${newPinjaman.id_pinjaman}.`,
+          pinjaman: newPinjaman,
+        });
+
         res.status(201).json({
             message: "Data Pinjaman baru dan nomor antrean berhasil dibuat.",
             data: {

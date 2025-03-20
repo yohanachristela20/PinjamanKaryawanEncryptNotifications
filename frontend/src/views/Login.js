@@ -90,7 +90,7 @@ function Login() {
     <Container fluid className="d-flex align-items-center justify-content-center">
       <Row className="login-row element">
         {/* Kolom Gambar */}
-        <Col xs={12} sm={6} className="p-0">
+        <Col xs={12} sm={6}>
           <img
             src={loginImage}
             alt="Login Illustration"

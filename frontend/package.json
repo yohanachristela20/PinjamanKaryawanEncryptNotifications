@@ -32,7 +32,8 @@
     "react-scripts": "5.0.1",
     "react-toastify": "^10.0.6",
     "reactstrap": "8.8.1",
-    "sass": "1.53.0"
+    "sass": "1.53.0",
+    "socket.io-client": "^4.8.1"
   },
   "optionalDependencies": {
     "jquery": "3.5.1",

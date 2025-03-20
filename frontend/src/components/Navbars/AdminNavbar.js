@@ -1,12 +1,15 @@
 import React, { Component, useEffect, useState } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { Navbar, Container, Nav, Dropdown, Button, Modal } from "react-bootstrap";
-import {FaDoorClosed, FaDoorOpen, FaKey, FaUser} from 'react-icons/fa'; 
+import {FaDoorClosed, FaDoorOpen, FaKey, FaUser, FaBell, FaCircle, FaCircleInfo, FaInfoCircle} from 'react-icons/fa'; 
 import routes from "routes.js";
 import UbahPassword from "components/ModalForm/UbahPassword.js";
 import "../../assets/scss/lbd/_logout.scss";
 import axios from "axios";
 import { stopInactivityTimer } from "views/Heartbeat";
+import io from "socket.io-client";
+
+const socket = io("http://10.70.10.157:5000");
 
 function Header() {
   const location = useLocation();
@@ -16,10 +19,12 @@ function Header() {
   const [userData, setUserData] = useState({id_karyawan: "", nama: "", divisi: ""}); 
   const token = localStorage.getItem("token");
 
+  const [notifications, setNotifications] = useState([]);
+  const [showNotifDropdown, setShowNotifDropdown] = useState(false); 
+
   useEffect(() => {
     const fetchUserData = async () => {
-
-      const username = localStorage.getItem("username");
+    const username = localStorage.getItem("username");
       if (!token || !username) return;
 
       try {
@@ -39,7 +44,44 @@ function Header() {
       }
     };
 
+    // const fetchNotifications = async() => {
+    //   try {
+    //     const response = await axios.get("http://10.70.10.157:5000/notifications", {
+    //       headers: {Authorization: `Bearer ${token}`}, 
+    //     });
+
+    //     setNotifications(response.data);
+    //   } catch (error) {
+    //     console.error("Error Fetching Notifications")
+    //   }
+    // }
+
     fetchUserData();
+    // fetchNotifications();
+
+    // const interval = setInterval(fetchNotifications, 30000)
+
+    // return() => clearInterval(interval);
+  });
+
+  useEffect(() => {
+    socket.on("newPinjaman", (data) => {
+      setNotifications((prev) => [...prev, data]);
+    });
+
+    return() => {
+      socket.off("newPinjaman");
+    };
+  }, []);
+
+  useEffect(() => {
+    socket.on("pinjaman", (data) => {
+      setNotifications((prev) => [...prev, data]);
+    });
+
+    return() => {
+      socket.off("pinjaman");
+    };
   }, []);
   
 
@@ -97,25 +139,38 @@ function Header() {
             {getBrandText()}
           </Navbar.Brand>
         </div>
-        <Navbar.Toggle aria-controls="basic-navbar-nav" className="mr-2">
+        {/* <Navbar.Toggle aria-controls="basic-navbar-nav" className="mr-2">
           <span className="navbar-toggler-bar burger-lines"></span>
           <span className="navbar-toggler-bar burger-lines"></span>
           <span className="navbar-toggler-bar burger-lines"></span>
-        </Navbar.Toggle>
+        </Navbar.Toggle> */}
         <Navbar.Collapse id="basic-navbar-nav">
-          <Nav className="nav mr-auto" navbar>
-            <Nav.Item>
-              <Nav.Link
-                data-toggle="dropdown"
-                href="#pablo"
-                onClick={(e) => e.preventDefault()}
-                className="m-0"
-              >
-              </Nav.Link>
-            </Nav.Item>
-          </Nav>
           <Nav className="ml-auto" navbar>
-          
+          <Dropdown as={Nav.Item} show={showNotifDropdown} onToggle={setShowNotifDropdown}>
+                <Dropdown.Toggle as={Nav.Link} className="position-relative">
+                  <FaBell style={{ marginTop: '9px' }} size={20} />
+                  {notifications.length > 0 && (
+                    <span className="badge badge-danger position-absolute">
+                      {notifications.length}
+                    </span>
+                  )}
+                </Dropdown.Toggle>
+                <Dropdown.Menu style={{ width: '300px' }} className="dropdown-azure">
+                  {notifications.length > 0 ? (
+                    notifications.map((notif, index) => (
+                      <Dropdown.Item key={index} className="text-wrap">
+                      <FaInfoCircle style={{ marginRight: '8px' }} />
+                        {notif.message}
+                      </Dropdown.Item>
+                    ))
+                  ) : (
+                    <Dropdown.Item>
+                      <FaInfoCircle style={{ marginRight: '8px' }} />
+                      Tidak ada notifikasi</Dropdown.Item>
+                  )}
+                </Dropdown.Menu>
+              </Dropdown>
+
             <Dropdown as={Nav.Item}>
               <Dropdown.Toggle
                 aria-expanded={false}
