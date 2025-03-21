@@ -154,6 +154,8 @@ function Login() {
                 >
                   Login
                 </Button>
+
+                <p className="text-center mb-4 font-footer">Lupa Password? Hubungi Admin</p>
               </Form>
             </Card.Body>
           </Card>

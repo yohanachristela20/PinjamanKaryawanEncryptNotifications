@@ -471,7 +471,7 @@ router.put('/pinjaman/:id_pinjaman', async (req, res) => {
           pinjaman.status_transfer = status_transfer;
           await pinjaman.save();
       
-          res.status(200).json({ message: 'Pinjaman berhasil diperbarui', pinjaman });
+          res.status(200).json({ message: 'Konfirmasi transfer pinjaman selesai.', pinjaman });
         } catch (error) {
           console.error(error);
           res.status(500).json({ message: 'Server error' });

@@ -847,9 +847,9 @@ function BerandaFinance() {
                                 handleModalOpen(pinjaman); 
                               }}
                               disabled={pinjaman.status_pengajuan === "Ditunda"}
-                              style={{width: 107, fontSize:14}}>
-                              <FaCheckSquare style={{ marginRight: '8px' }} />
-                              Terima
+                              style={{width: 107, fontSize:12}}>
+                              <FaCheckSquare style={{ marginRight: '2px' }} />
+                              Konfirmasi
                             </Button>
                             </td>
                           </tr>
@@ -902,7 +902,7 @@ function BerandaFinance() {
             ID Pinjaman: {selectedPinjaman?.id_pinjaman || "Tidak tersedia"} <br />
             Jumlah: {selectedPinjaman? formatRupiah(selectedPinjaman.jumlah_pinjaman) : "Tidak tersedia"}
           </p>
-        Apakah anda ingin melakukan transfer sekarang?
+        Apakah anda sudah melakukan transfer?
       </Modal.Body>
       <Modal.Footer className="mb-4">
         <Button variant="success"  onClick={() => handleTerimaClick(selectedPinjaman)}>

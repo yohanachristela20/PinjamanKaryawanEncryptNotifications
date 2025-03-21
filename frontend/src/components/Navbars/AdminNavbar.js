@@ -18,6 +18,8 @@ function Header() {
   const [showUbahPassword, setShowUbahPassword] = useState(false);
   const [userData, setUserData] = useState({id_karyawan: "", nama: "", divisi: ""}); 
   const token = localStorage.getItem("token");
+  const role = localStorage.getItem("role");
+  const [hidden, setHidden] = useState(false); 
 
   const [notifications, setNotifications] = useState([]);
   const [showNotifDropdown, setShowNotifDropdown] = useState(false); 
@@ -44,45 +46,56 @@ function Header() {
       }
     };
 
-    // const fetchNotifications = async() => {
-    //   try {
-    //     const response = await axios.get("http://10.70.10.157:5000/notifications", {
-    //       headers: {Authorization: `Bearer ${token}`}, 
-    //     });
-
-    //     setNotifications(response.data);
-    //   } catch (error) {
-    //     console.error("Error Fetching Notifications")
-    //   }
-    // }
-
     fetchUserData();
-    // fetchNotifications();
-
-    // const interval = setInterval(fetchNotifications, 30000)
-
-    // return() => clearInterval(interval);
   });
 
+  //newPinjaman => admin
   useEffect(() => {
-    socket.on("newPinjaman", (data) => {
+    console.log("Is it Admin or not?:", role); 
+  
+    if (role !== "Admin") {
+      console.log("Not Admin, skipping socket listener.");
+      return; 
+    }
+  
+    const handleNotifAdmin = (data) => {
+      console.log("New pinjaman received:", data); 
       setNotifications((prev) => [...prev, data]);
-    });
-
-    return() => {
-      socket.off("newPinjaman");
+      setHidden(false); 
     };
-  }, []);
+  
+    socket.on("newPinjaman", handleNotifAdmin);
+  
+    return () => {
+      console.log("Cleaning up socket listener");
+      socket.off("newPinjaman", handleNotifAdmin);
+    };
+  }, [socket, role]);
+  
+
+  //pinjaman -> finance
 
   useEffect(() => {
-    socket.on("pinjaman", (data) => {
+    console.log("Is it finance or not?:", role); 
+  
+    if (role !== "Finance") {
+      console.log("Not Finance, skipping socket listener.");
+      return; 
+    }
+  
+    const handlePinjaman = (data) => {
+      console.log("Pinjaman received:", data); 
       setNotifications((prev) => [...prev, data]);
-    });
-
-    return() => {
-      socket.off("pinjaman");
+      setHidden(false); 
     };
-  }, []);
+  
+    socket.on("pinjaman", handlePinjaman);
+  
+    return () => {
+      console.log("Cleaning up socket listener");
+      socket.off("pinjaman", handlePinjaman);
+    };
+  }, [socket, role]);
   
 
 
@@ -146,7 +159,7 @@ function Header() {
         </Navbar.Toggle> */}
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ml-auto" navbar>
-          <Dropdown as={Nav.Item} show={showNotifDropdown} onToggle={setShowNotifDropdown}>
+          <Dropdown as={Nav.Item} show={showNotifDropdown} onToggle={setShowNotifDropdown} hidden={role === "Karyawan" || role === "Super Admin"}>
                 <Dropdown.Toggle as={Nav.Link} className="position-relative">
                   <FaBell style={{ marginTop: '9px' }} size={20} />
                   {notifications.length > 0 && (
@@ -155,18 +168,20 @@ function Header() {
                     </span>
                   )}
                 </Dropdown.Toggle>
-                <Dropdown.Menu style={{ width: '300px' }} className="dropdown-azure">
+                <Dropdown.Menu style={{ width: '300px' }}>
                   {notifications.length > 0 ? (
                     notifications.map((notif, index) => (
                       <Dropdown.Item key={index} className="text-wrap">
                       <FaInfoCircle style={{ marginRight: '8px' }} />
                         {notif.message}
+                        <div className="divider"></div>
                       </Dropdown.Item>
                     ))
                   ) : (
                     <Dropdown.Item>
                       <FaInfoCircle style={{ marginRight: '8px' }} />
-                      Tidak ada notifikasi</Dropdown.Item>
+                      Tidak ada notifikasi
+                      </Dropdown.Item>
                   )}
                 </Dropdown.Menu>
               </Dropdown>
