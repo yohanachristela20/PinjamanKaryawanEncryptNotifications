@@ -42,7 +42,7 @@ const AddKaryawan = ({showAddModal, setShowAddModal, onSuccess}) => {
         }
 
         try {
-            await axios.post('http://10.70.10.157:5000/karyawan', {
+            await axios.post('http://10.70.10.110:5000/karyawan', {
                 id_karyawan,
                 nama, 
                 jenis_kelamin,
@@ -102,11 +102,11 @@ const AddKaryawan = ({showAddModal, setShowAddModal, onSuccess}) => {
             show={showAddModal}
             onHide={() => setShowAddModal(false)}
             >
-            <Modal.Header className="text-center">
-                <h3>Form Master Karyawan</h3>
+            <Modal.Header className="text-center pb-1">
+                <h3 className="mt-3 mb-0">Form Master Karyawan</h3>
                 
             </Modal.Header>
-            <Modal.Body className="text-left">
+            <Modal.Body className="text-left pt-0">
                 <hr />
                 <Form onSubmit={saveKaryawan}>
 
@@ -244,7 +244,7 @@ const AddKaryawan = ({showAddModal, setShowAddModal, onSuccess}) => {
                         {departemen === "GENERAL" && (
                             <>
                             <option value="IT SUPPORT">IT SUPPORT</option>
-                            <option value="HUMAN RESOURCE & GENERAL AFFAIR">HUMAN RESOURCE & GENERAL AFFAIR</option>
+                            <option value="HR & GENERAL AFFAIR">HR & GENERAL AFFAIR</option>
                             <option value="TEKNIK & ADM. MEKANIK">TEKNIK & ADM. MEKANIK</option>
                             </>
                         )}

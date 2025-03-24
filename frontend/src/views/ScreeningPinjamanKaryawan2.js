@@ -8,7 +8,7 @@ import { useHistory } from "react-router-dom";
 import { FaHistory} from 'react-icons/fa'; 
 import Heartbeat from "./Heartbeat.js";
 
-const BASE_URL = 'http://10.70.10.157:5000';
+const BASE_URL = 'http://10.70.10.110:5000';
 export const fetchHistoryPinjaman = async (idPeminjam) => {
   return axios.get(`${BASE_URL}/history-pinjaman/${idPeminjam}`, {
     headers: {
@@ -61,7 +61,7 @@ function ScreeningPinjamanKaryawan2() {
     try {
       if (!token || !username) return;
 
-      const response = await axios.get(`http://10.70.10.157:5000/user-details/${username}`, {
+      const response = await axios.get(`http://10.70.10.110:5000/user-details/${username}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -97,22 +97,22 @@ function ScreeningPinjamanKaryawan2() {
           responseTotalJumlahPinjaman,
           responsePlafond,
         ] = await Promise.all([
-          axios.get(`http://10.70.10.157:5000/angsuran/total-sudah-dibayar/${selectedPinjaman?.id_peminjam}`, {
+          axios.get(`http://10.70.10.110:5000/angsuran/total-sudah-dibayar/${selectedPinjaman?.id_peminjam}`, {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          axios.get(`http://10.70.10.157:5000/pinjaman/total-pinjaman/${selectedPinjaman?.id_peminjam}`, {
+          axios.get(`http://10.70.10.110:5000/pinjaman/total-pinjaman/${selectedPinjaman?.id_peminjam}`, {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          axios.get("http://10.70.10.157:5000/total-pinjaman-keseluruhan", {
+          axios.get("http://10.70.10.110:5000/total-pinjaman-keseluruhan", {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          axios.get(`http://10.70.10.157:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`, {
+          axios.get(`http://10.70.10.110:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -151,7 +151,7 @@ function ScreeningPinjamanKaryawan2() {
         });
   
         const karyawanData = responseKaryawan.data;
-        const plafondResponse = await axios.get(`http://10.70.10.157:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`, {
+        const plafondResponse = await axios.get(`http://10.70.10.110:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -160,7 +160,7 @@ function ScreeningPinjamanKaryawan2() {
         const plafondTersedia = plafondResponse.data.plafondSaatIni || null;
         setPlafondTersedia(plafondTersedia);
   
-        const pinjamanResponse = await axios.get(`http://10.70.10.157:5000/pinjaman/total-pinjaman/${karyawanData.id_karyawan}`, {
+        const pinjamanResponse = await axios.get(`http://10.70.10.110:5000/pinjaman/total-pinjaman/${karyawanData.id_karyawan}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -385,7 +385,7 @@ let totalPinjamanDapatDiambil = plafondTersediaFloat;
 
 const calculateNextPlafond = async () => {
   try {
-    const response = await axios.get('http://10.70.10.157:5000/angsuran-berikutnya', {
+    const response = await axios.get('http://10.70.10.110:5000/angsuran-berikutnya', {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -443,16 +443,16 @@ useEffect(() => {
       <Container fluid>
         <Row>
           <Col className="card-screening" style={{ maxWidth: "100%" }}>
-            <Card className="card-screening">
+            <Card className="card-screening p-4">
               <Card.Header>
-                <Card.Title as="h4" className="mt-3">Form Screening</Card.Title>
+                <Card.Title as="h4">Form Screening</Card.Title>
                 <hr></hr>
               </Card.Header>
               <Card.Body>
                 <Form>
                 <span className="text-danger required-select">(*) Wajib diisi.</span>
                 
-                  <Row>
+                  <Row className="mt-3">
                     <Col md="12">
                     <Form.Group>
                         <label>ID Karyawan</label>

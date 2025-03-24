@@ -94,16 +94,16 @@ import {
          responseTotalDibayar,
          responsePlafond,
        ] = await Promise.all([
-         axios.get("http://10.70.10.157:5000/total-pinjaman-keseluruhan", {
+         axios.get("http://10.70.10.110:5000/total-pinjaman-keseluruhan", {
            headers: { Authorization: `Bearer ${token}` },
          }),
-         axios.get("http://10.70.10.157:5000/total-peminjam", {
+         axios.get("http://10.70.10.110:5000/total-peminjam", {
            headers: { Authorization: `Bearer ${token}` },
          }),
-         axios.get("http://10.70.10.157:5000/total-dibayar", {
+         axios.get("http://10.70.10.110:5000/total-dibayar", {
            headers: { Authorization: `Bearer ${token}` },
          }),
-         axios.get("http://10.70.10.157:5000/latest-plafond-saat-ini", {
+         axios.get("http://10.70.10.110:5000/latest-plafond-saat-ini", {
            headers: { Authorization: `Bearer ${token}` },
          }),
        ]);
@@ -134,7 +134,7 @@ import {
   const getPinjaman = async () =>{
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.157:5000/pinjaman", {
+      const response = await axios.get("http://10.70.10.110:5000/pinjaman", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -150,7 +150,7 @@ import {
   const getPinjamanData = async (req, res) =>{
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.157:5000/pinjaman-data", {
+      const response = await axios.get("http://10.70.10.110:5000/pinjaman-data", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -166,7 +166,7 @@ import {
   const getPlafond = async () =>{
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.157:5000/jumlah-plafond", {
+      const response = await axios.get("http://10.70.10.110:5000/jumlah-plafond", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -538,8 +538,7 @@ import {
           </Col>
         </Row>
         
-        <Row className="mt-5">
-
+        <Row className="mt-1">
         <Button
             className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
             type="button"
@@ -574,7 +573,7 @@ import {
         
 
         <Row>
-          <Col md="12">
+          <Col md="12" className="mt-2">
             <Card className="striped-tabled-with-hover">
               <Card.Header>
                 <Card.Title as="h4">Laporan Piutang Karyawan</Card.Title>

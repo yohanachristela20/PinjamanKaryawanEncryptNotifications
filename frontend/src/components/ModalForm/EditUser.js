@@ -22,7 +22,7 @@ const EditUser = ({showEditModal, setShowEditModal, user, onSuccess}) => {
     const updateUser = async(e) => {
         e.preventDefault();
         try {
-            await axios.patch(`http://10.70.10.157:5000/user/${user.id_user}`, {
+            await axios.patch(`http://10.70.10.110:5000/user/${user.id_user}`, {
                 id_user,
                 password,
                 role
@@ -53,9 +53,9 @@ const EditUser = ({showEditModal, setShowEditModal, user, onSuccess}) => {
             onHide={() => setShowEditModal(false)}
             >
             <Modal.Header className="text-center">
-                <h3>Form Edit User</h3>
+                <h3 className="mt-2 mb-0">Form Edit User</h3>
             </Modal.Header>
-            <Modal.Body className="text-left">
+            <Modal.Body className="text-left pt-0">
                 <hr />
                 <Form onSubmit={updateUser}>
 

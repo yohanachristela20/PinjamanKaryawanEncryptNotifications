@@ -59,7 +59,7 @@ function MasterKaryawan() {
 
       setLoading(true);
       
-      const response = await axios.get("http://10.70.10.157:5000/karyawan", {
+      const response = await axios.get("http://10.70.10.110:5000/karyawan", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -74,7 +74,7 @@ function MasterKaryawan() {
 
   const deleteKaryawan = async(id_karyawan) =>{
     try {
-      await axios.delete(`http://10.70.10.157:5000/karyawan/${id_karyawan}` , {
+      await axios.delete(`http://10.70.10.110:5000/karyawan/${id_karyawan}` , {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -291,7 +291,7 @@ function MasterKaryawan() {
           <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
           
           <Col md="12">
-            <Card className="striped-tabled-with-hover mt-4">
+            <Card className="striped-tabled-with-hover mt-2">
               <Card.Header>
                 <Card.Title as="h4">Master Karyawan</Card.Title>
               </Card.Header>

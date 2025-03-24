@@ -58,7 +58,7 @@ const EditKaryawan = ({showEditModal, setShowEditModal, karyawan, onSuccess}) =>
         }
 
         try {
-            await axios.patch(`http://10.70.10.157:5000/karyawan/${karyawan.id_karyawan}`, {
+            await axios.patch(`http://10.70.10.110:5000/karyawan/${karyawan.id_karyawan}`, {
                 id_karyawan,
                 nama, 
                 jenis_kelamin,
@@ -85,7 +85,7 @@ const EditKaryawan = ({showEditModal, setShowEditModal, karyawan, onSuccess}) =>
     }
 
     const getKaryawanById = async () => {
-        const response = await axios.get(`http://10.70.10.157:5000/karyawan/${id}`, {
+        const response = await axios.get(`http://10.70.10.110:5000/karyawan/${id}`, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -271,7 +271,7 @@ const EditKaryawan = ({showEditModal, setShowEditModal, karyawan, onSuccess}) =>
                     {departemen === "GENERAL" && (
                         <>
                         <option value="IT SUPPORT">IT SUPPORT</option>
-                        <option value="HUMAN RESOURCE & GENERAL AFFAIR">HUMAN RESOURCE & GENERAL AFFAIR</option>
+                        <option value="HR & GENERAL AFFAIR">HR & GENERAL AFFAIR</option>
                         <option value="TEKNIK & ADM. MEKANIK">TEKNIK & ADM. MEKANIK</option>
                         </>
                     )}

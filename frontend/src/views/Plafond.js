@@ -58,7 +58,7 @@ function Plafond() {
   const getPlafond = async () =>{
     try {
       setLoading(true);
-      const response = await axios.get("http://10.70.10.157:5000/plafond", {
+      const response = await axios.get("http://10.70.10.110:5000/plafond", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -250,7 +250,7 @@ const downloadPDF = (data) => {
           <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange}/>
           
           <Col md="12">
-            <Card className="striped-tabled-with-hover mt-4">
+            <Card className="striped-tabled-with-hover mt-2">
               <Card.Header>
                 <Card.Title as="h4">Plafond</Card.Title>
               </Card.Header>

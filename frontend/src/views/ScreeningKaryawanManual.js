@@ -8,7 +8,7 @@ import { useHistory } from "react-router-dom";
 import {toast } from 'react-toastify';
 
 
-const BASE_URL = 'http://10.70.10.157:5000';
+const BASE_URL = 'http://10.70.10.110:5000';
 export const fetchHistoryPinjaman = async (idPeminjam) => {
   return axios.get(`${BASE_URL}/history-pinjaman/${idPeminjam}`, {
     headers: {
@@ -89,23 +89,23 @@ function ScreeningKaryawanManual() {
           responseTotalJumlahPinjaman,
           responsePlafond,
         ] = await Promise.all([
-          // axios.get(`http://10.70.10.157:5000/karyawan/${selectedPinjaman?.id_peminjam}`), 
-          axios.get(`http://10.70.10.157:5000/angsuran/total-sudah-dibayar/${selectedPinjaman?.id_peminjam}`, {
+          // axios.get(`http://10.70.10.110:5000/karyawan/${selectedPinjaman?.id_peminjam}`), 
+          axios.get(`http://10.70.10.110:5000/angsuran/total-sudah-dibayar/${selectedPinjaman?.id_peminjam}`, {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          axios.get(`http://10.70.10.157:5000/pinjaman/total-pinjaman/${selectedPinjaman?.id_peminjam}`, {
+          axios.get(`http://10.70.10.110:5000/pinjaman/total-pinjaman/${selectedPinjaman?.id_peminjam}`, {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          axios.get("http://10.70.10.157:5000/total-pinjaman-keseluruhan", {
+          axios.get("http://10.70.10.110:5000/total-pinjaman-keseluruhan", {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          // axios.get("http://10.70.10.157:5000/plafond-tersedia"),
+          // axios.get("http://10.70.10.110:5000/plafond-tersedia"),
         ]);
 
         const totalSudahDibayar = responseTotalSudahDibayar.data.total_sudah_dibayar || 0;
@@ -274,7 +274,7 @@ const handleIdKaryawanKeyPress = async (event) => {
         //   return;
         // }
 
-        const plafondResponse = await axios.get("http://10.70.10.157:5000/plafond-tersisa", {
+        const plafondResponse = await axios.get("http://10.70.10.110:5000/plafond-tersisa", {
           headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -284,7 +284,7 @@ const handleIdKaryawanKeyPress = async (event) => {
         // console.log("Plafond tersedia:", plafondTersedia);
 
 
-        const pinjamanResponse = await axios.get(`http://10.70.10.157:5000/pinjaman/total-pinjaman/${karyawanData.id_karyawan}`, {
+        const pinjamanResponse = await axios.get(`http://10.70.10.110:5000/pinjaman/total-pinjaman/${karyawanData.id_karyawan}`, {
           headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -437,9 +437,9 @@ const hasilScreening = React.useMemo(() => {
       <Container fluid>
         <Row>
           <Col className="card-screening" style={{ maxWidth: "100%" }}>
-            <Card className="card-screening">
+            <Card className="card-screening p-4">
               <Card.Header>
-                <Card.Title as="h4" className="mt-3">Form Screening</Card.Title>
+                <Card.Title as="h4">Form Screening</Card.Title>
                 <hr></hr>
               </Card.Header>
               <Card.Body>
@@ -447,7 +447,7 @@ const hasilScreening = React.useMemo(() => {
                 <span className="text-danger required-select">(*) Wajib Diisi</span>
                 <br/><span className="text-danger required-select">Enter untuk menampilkan angsuran per bulan dan hasil pembulatan</span>
 
-                  <Row>
+                  <Row className="mt-3">
                     <Col md="12">
                     <Form.Group>
                     <span className="text-danger">*</span>
@@ -495,7 +495,7 @@ const hasilScreening = React.useMemo(() => {
                       <Form.Group>
                         <label>Masa Kerja</label>
                         <Form.Control
-                          placeholder="Th"
+                          placeholder="Tahun"
                           type="text"
                           readOnly
                           value={masaKerja}
@@ -523,7 +523,7 @@ const hasilScreening = React.useMemo(() => {
                           <option value="Finance and Administration">Finance and Administration</option>
                           <option value="Quality Control">Quality Control</option>
                           <option value="Quality Assurance">Quality Assurance</option>
-                          <option value="Human Resources">Human Resources</option>
+                          <option value="HRs">HRs</option>
                         </Form.Select> */}
                         <FormControl 
                         placeholder="Departemen"

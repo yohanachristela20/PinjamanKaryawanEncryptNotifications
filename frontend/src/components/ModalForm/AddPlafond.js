@@ -13,7 +13,7 @@ const AddPlafond = ({ showAddModal, setShowAddModal, onSuccess }) => {
     useEffect(() => {
         const fetchNextId = async () => {
             try {
-                const response = await axios.get('http://10.70.10.157:5000/plafond/getNextPlafondId', {
+                const response = await axios.get('http://10.70.10.110:5000/plafond/getNextPlafondId', {
                     headers: {
                         Authorization: `Bearer ${token}`,
                     },
@@ -35,7 +35,7 @@ const AddPlafond = ({ showAddModal, setShowAddModal, onSuccess }) => {
     const savePlafond = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://10.70.10.157:5000/plafond', {
+            await axios.post('http://10.70.10.110:5000/plafond', {
                 id_plafond,
                 tanggal_penetapan,
                 jumlah_plafond,
@@ -86,10 +86,10 @@ const AddPlafond = ({ showAddModal, setShowAddModal, onSuccess }) => {
                 show={showAddModal}
                 onHide={() => setShowAddModal(false)}
             >
-                <Modal.Header className="text-center">
-                    <h3>Form Plafond</h3>
+                <Modal.Header className="text-center pb-1">
+                    <h3 className="mt-3 mb-0">Form Plafond</h3>
                 </Modal.Header>
-                <Modal.Body className="text-left">
+                <Modal.Body className="text-left pt-0">
                     <hr />
                     <Form onSubmit={savePlafond}>
                     <span className="text-danger required-select">(*) Wajib diisi.</span>

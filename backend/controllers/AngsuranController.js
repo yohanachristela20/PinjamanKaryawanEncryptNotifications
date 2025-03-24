@@ -90,6 +90,20 @@ export const createAngsuran = async (req, res) => {
             { where: { id_pinjaman: plafondTerakhir.id_pinjaman }, transaction }
         );
 
+        if (newAngsuran.status === 'Lunas') {
+            await Pinjaman.update(
+                { status_pelunasan: 'Lunas' },
+                { where: { id_pinjaman: newAngsuran.id_pinjaman }, transaction }
+            );
+        } 
+        else if (newAngsuran.status !== 'Lunas') {
+            await Pinjaman.update(
+                { status_pelunasan: 'Belum Lunas' },
+                { where: { id_pinjaman: newAngsuran.id_pinjaman }, transaction }
+            );
+        }
+
+
         let antreans = await AntreanPengajuan.findAll({
             attributes: ['nomor_antrean', 'id_pinjaman'],
             order: [['nomor_antrean', 'ASC']],

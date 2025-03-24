@@ -21,7 +21,7 @@ const ImportAngsuran = ({showImportModal, setShowImportModal, onSuccess}) => {
     const formData = new FormData();
     formData.append("csvfile", file);
 
-    fetch("http://10.70.10.157:5000/angsuran/import-csv", {
+    fetch("http://10.70.10.110:5000/angsuran/import-csv", {
       method: "POST",
       body: formData,
       headers: {
@@ -73,8 +73,8 @@ const ImportAngsuran = ({showImportModal, setShowImportModal, onSuccess}) => {
       className="modal-primary"
       show={showImportModal}
       onHide={() => setShowImportModal(false)}>
-    <Modal.Header className="text-center">
-      <h3>Import Angsuran</h3>
+    <Modal.Header className="text-center pb-1">
+      <h3 className="mt-2 mb-0">Import Angsuran</h3>
     </Modal.Header>
     <Modal.Body className="text-left">
       <hr />
@@ -92,7 +92,7 @@ const ImportAngsuran = ({showImportModal, setShowImportModal, onSuccess}) => {
       <p>Pilih file CSV yang akan diimport. </p>
         <input type="file" accept=".csv" onChange={handleFileChange} />
         <Button
-          className="btn-fill pull-right mt-4 mb-4"
+          className="btn-fill pull-right"
           type="button"
           variant="info"
           onClick={handleFileImport}

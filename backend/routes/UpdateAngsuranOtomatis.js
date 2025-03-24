@@ -420,8 +420,8 @@ const updateAngsuranOtomatis = async () => {
         const formattedToday = today.toISOString().split("T")[0];
         const dayOfMonth = today.getDate();
 
-        if (dayOfMonth !== 19) {
-            console.log("Update angsuran otomatis hanya dijalankan pada tanggal 19.");
+        if (dayOfMonth !== 2) {
+            console.log("Update angsuran otomatis hanya dijalankan pada tanggal 2.");
             return;
         }
 
@@ -619,9 +619,15 @@ const updateAngsuranOtomatis = async () => {
                     id_pinjaman: item.id_pinjaman,
                 });
 
-                if (statusBaru === "Lunas") {
+                if (statusBaru === 'Lunas') {
                     await Pinjaman.update(
-                        { status_pelunasan: "Lunas" },
+                        { status_pelunasan: 'Lunas' },
+                        { where: { id_pinjaman: item.id_pinjaman } }
+                    );
+                } 
+                else if (statusBaru !== 'Lunas') {
+                    await Pinjaman.update(
+                        { status_pelunasan: 'Belum Lunas' },
                         { where: { id_pinjaman: item.id_pinjaman } }
                     );
                 }
@@ -707,6 +713,12 @@ const updateAngsuranOtomatis = async () => {
                 if (statusBaru === 'Lunas') {
                     await Pinjaman.update(
                         { status_pelunasan: 'Lunas' },
+                        { where: { id_pinjaman: item.id_pinjaman } }
+                    );
+                } 
+                else if (statusBaru !== 'Lunas') {
+                    await Pinjaman.update(
+                        { status_pelunasan: 'Belum Lunas' },
                         { where: { id_pinjaman: item.id_pinjaman } }
                     );
                 }

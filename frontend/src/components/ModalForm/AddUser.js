@@ -16,7 +16,7 @@ const AddUser = ({showAddModal, setShowAddModal, onSuccess}) => {
         try {
             const defaultPassword = "campina123"; 
 
-            const response = await axios.get('http://10.70.10.157:5000/last-id', {
+            const response = await axios.get('http://10.70.10.110:5000/last-id', {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -29,7 +29,7 @@ const AddUser = ({showAddModal, setShowAddModal, onSuccess}) => {
                 newId = `USC${incrementedIdNumber}`;
             }
 
-            await axios.post('http://10.70.10.157:5000/user', {
+            await axios.post('http://10.70.10.110:5000/user', {
                 id_user: newId,
                 username, 
                 password: defaultPassword,
@@ -68,10 +68,10 @@ const AddUser = ({showAddModal, setShowAddModal, onSuccess}) => {
             onHide={() => setShowAddModal(false)}
             >
             <Modal.Header className="text-center">
-                <h3>Form Master User</h3>
+                <h3 className="mt-2 mb-0">Form Master User</h3>
                 
             </Modal.Header>
-            <Modal.Body className="text-left">
+            <Modal.Body className="text-left pt-0">
                 <hr />
                 <Form onSubmit={saveUser}>
 

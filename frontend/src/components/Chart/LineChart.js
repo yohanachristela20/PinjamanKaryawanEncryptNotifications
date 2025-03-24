@@ -56,7 +56,7 @@ const LineComponent = ({ chartData }) => {
   };
 
   return (
-    <div className="chart-container" style={{ height: "245px" }}>
+    <div className="chart-container" style={{ height: "242px" }}>
       <Line data={data} options={options} />
     </div>
   );

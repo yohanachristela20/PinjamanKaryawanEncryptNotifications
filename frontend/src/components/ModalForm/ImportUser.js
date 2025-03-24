@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Badge, Button, Modal, Form, Row, Col } from "react-bootstrap";
-import { FaFileImport } from "react-icons/fa";
+import { FaFileImport, FaFileCsv } from "react-icons/fa";
 import { toast } from 'react-toastify';
 
 const ImportUser = ({showImportModal, setShowImportModal, onSuccess}) => {
@@ -20,7 +20,7 @@ const ImportUser = ({showImportModal, setShowImportModal, onSuccess}) => {
     const formData = new FormData();
     formData.append("csvfile", file);
 
-    fetch("http://10.70.10.157:5000/user/import-csv", {
+    fetch("http://10.70.10.110:5000/user/import-csv", {
       method: "POST",
       body: formData,
       headers: {
@@ -49,22 +49,49 @@ const ImportUser = ({showImportModal, setShowImportModal, onSuccess}) => {
 
   };
 
+  const downloadCSV = (data) => {
+    const header = ["id_user", "username", "role"];
+  
+    const csvContent = [header]
+      .map((e) => e.join(","))
+      .join("\n");
+  
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.setAttribute("href", url);
+    link.setAttribute("download", "format-master-user.csv");
+    link.style.visibility = "hidden";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Modal 
       className="modal-primary"
       show={showImportModal}
       onHide={() => setShowImportModal(false)}>
-    <Modal.Header className="text-center">
-      <h3>Import User</h3>
+    <Modal.Header className="text-center pb-1">
+      <h3 className="mt-2 mb-0">Import User</h3>
     </Modal.Header>
-    <Modal.Body className="text-left">
+    <Modal.Body className="text-left pt-0">
       <hr />
       <div>
-      <span className="text-danger required-select">*Pastikan table headers sama dengan column name dalam database.</span>
-      <p>Pilih file CSV yang akan diimport. </p>
-        <input type="file" accept=".csv" onChange={handleFileChange} />
+      <span className="text-danger required-select">*Gunakan format CSV di bawah ini untuk mengimpor data karyawan.</span>
+      <p>Unduh format CSV disini.</p>
         <Button
-          className="btn-fill pull-right mt-4 mb-4"
+          className="btn-fill pull-right mb-4"
+          type="button"
+          variant="warning"
+          onClick={() => downloadCSV()}>
+          <FaFileCsv style={{ marginRight: '8px' }} />
+          Format CSV
+        </Button>
+      <p>Pilih file CSV yang akan diimport. </p>
+        <input type="file" accept=".csv" onChange={handleFileChange}/>
+        <Button
+          className="btn-fill pull-right"
           type="button"
           variant="info"
           onClick={handleFileImport}

@@ -24,7 +24,7 @@ function Login() {
     }
   
     try {
-      const response = await axios.post('http://10.70.10.157:5000/user-login', {
+      const response = await axios.post('http://10.70.10.110:5000/user-login', {
           username: username,
           password: password,
           role: role,
@@ -57,6 +57,11 @@ function Login() {
       console.error("Error saat login:", error);
       alert(error.response?.data?.message || "Terjadi kesalahan saat login. Silakan coba lagi.");
     }
+  };
+
+  const handleUsername = (value) => {
+    const numericValue = value.replace(/\D/g, "");
+    setUsername(numericValue);
   };
 
   const navigateToRolePage = (role) => {
@@ -109,12 +114,12 @@ function Login() {
               </div>
               <Form onSubmit={handleLogin}>
                 <Form.Group className="mb-2 mt-3" controlId="username">
-                  <Form.Label>Username</Form.Label>
+                  <Form.Label>Username (ID Karyawan)</Form.Label>
                   <Form.Control
                     type="text"
                     placeholder="Masukkan Username"
                     value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    onChange={(e) => handleUsername(e.target.value)}
                     required
                   />
                 </Form.Group>
@@ -155,7 +160,7 @@ function Login() {
                   Login
                 </Button>
 
-                <p className="text-center mb-4 font-footer">Lupa Password? Hubungi Admin</p>
+                <p className="text-center font-footer mt-2">Lupa Password? Hubungi Admin</p>
               </Form>
             </Card.Body>
           </Card>

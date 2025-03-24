@@ -26,7 +26,7 @@ const ImportPlafond = ({showImportModal, setShowImportModal, onSuccess}) => {
     const formData = new FormData();
     formData.append("csvfile", file);
 
-    fetch("http://10.70.10.157:5000/plafond/import-csv", {
+    fetch("http://10.70.10.110:5000/plafond/import-csv", {
       method: "POST",
       body: formData,
       headers: {
@@ -77,10 +77,10 @@ const ImportPlafond = ({showImportModal, setShowImportModal, onSuccess}) => {
       className="modal-primary"
       show={showImportModal}
       onHide={() => setShowImportModal(false)}>
-    <Modal.Header className="text-center">
-      <h3>Import Plafond</h3>
+    <Modal.Header className="text-center pb-1">
+      <h3 className="mt-3 mb-0">Import Plafond</h3>
     </Modal.Header>
-    <Modal.Body className="text-left">
+    <Modal.Body className="text-left pt-0">
       <hr />
       <div>
       <span className="text-danger required-select">*Gunakan format CSV di bawah ini untuk mengimpor data plafond.</span>
@@ -97,7 +97,7 @@ const ImportPlafond = ({showImportModal, setShowImportModal, onSuccess}) => {
       <p>Pilih file CSV yang akan diimport. </p>
         <input type="file" accept=".csv" onChange={handleFileChange} />
         <Button
-          className="btn-fill pull-right mt-4 mb-4"
+          className="btn-fill pull-right"
           type="button"
           variant="info"
           onClick={handleFileImport}
