@@ -12,6 +12,8 @@ import "jspdf-autotable";
 import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 import {
   Button,
@@ -53,11 +55,12 @@ function Plafond() {
 
   useEffect(()=> {
     getPlafond();
+    setTimeout(() => setLoading(false), 1000)
   }, []); 
 
   const getPlafond = async () =>{
     try {
-      setLoading(true);
+      // setLoading(true);
       const response = await axios.get("http://10.70.10.110:5000/plafond", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -67,8 +70,8 @@ function Plafond() {
       // console.log("Plafond:", response.data)
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -195,130 +198,141 @@ const downloadPDF = (data) => {
 
   return (
     <>
-      <Container fluid>
-      <Row>
-          <div>
+    {loading === false ? 
+      (<div className="App">
+        <Container fluid>
+        <Row>
+            <div>
+              <Button
+                className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+                type="button"
+                variant="success"
+                onClick={() => setShowAddModal(true)}>
+                <FaPlusCircle style={{ marginRight: '8px' }} />
+                Topup Plafond
+              </Button>
+
+              <AddPlafond showAddModal={showAddModal} setShowAddModal={setShowAddModal} onSuccess={handleAddSuccess} />
+
+              <EditPlafond
+                          showEditModal={showEditModal}
+                          setShowEditModal={setShowEditModal}
+                          plafond={selectedPlafond}
+                          onSuccess={handleEditSuccess}
+                        />
+            </div>
+
             <Button
               className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
               type="button"
-              variant="success"
-              onClick={() => setShowAddModal(true)}>
-              <FaPlusCircle style={{ marginRight: '8px' }} />
-              Topup Plafond
+              variant="info"
+              onClick={handleImportButtonClick}>
+              <FaFileImport style={{ marginRight: '8px' }} />
+              Import Data
+            </Button>
+            {/* {showImport && <ImportPlafond />} */}
+
+            <ImportPlafond showImportModal={showImportModal} setShowImportModal={setShowImportModal} onSuccess={handleImportSuccess} />
+
+            <Button
+              className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+              type="button"
+              variant="primary"
+              onClick={() => downloadCSV(plafond)}>
+              <FaFileCsv style={{ marginRight: '8px' }} />
+              Unduh CSV
             </Button>
 
-            <AddPlafond showAddModal={showAddModal} setShowAddModal={setShowAddModal} onSuccess={handleAddSuccess} />
+            <Button
+              className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+              type="button"
+              variant="primary"
+              onClick={() => downloadPDF(plafond)}>
+              <FaFilePdf style={{ marginRight: '8px' }} />
+              Unduh PDF
+            </Button>
 
-            <EditPlafond
-                        showEditModal={showEditModal}
-                        setShowEditModal={setShowEditModal}
-                        plafond={selectedPlafond}
-                        onSuccess={handleEditSuccess}
-                      />
+            <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange}/>
+            
+            <Col md="12">
+              <Card className="striped-tabled-with-hover mt-2">
+                <Card.Header>
+                  <Card.Title as="h4">Plafond</Card.Title>
+                </Card.Header>
+                <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
+                {/* {loading ? (
+                  <div className="text-center">
+                    <Spinner animation="border" variant="primary" />
+                    <p>Loading...</p>
+                  </div>
+                ) : ( */}
+                  <Table className="table-hover table-striped">
+                      <div className="table-scroll" style={{ height:'auto' }}>
+                        <table className="flex-table table table-striped table-hover">
+                          <thead>
+                        <tr>
+                          <th>ID Plafond</th>
+                          <th className="border-0">Tanggal Penetapan</th>
+                          <th className="border-0">Jumlah Plafond</th>
+                          <th className="border-0">Keterangan</th>
+                          <th className="border-0">Terakhir Dibuat</th>
+                          <th className="border-0">Terakhir Update</th>
+                          {/* <th className="border-0">Aksi</th> */}
+                        </tr>
+                          </thead>
+                          <tbody className="scroll scroller-tbody">
+                            {currentItems.map((plafond) => (
+                              <tr key={plafond.id_plafond}>
+                                <td className="text-center">{plafond.id_plafond}</td>
+                                <td className="text-center">{plafond.tanggal_penetapan}</td>
+                                <td className="text-right">{formatRupiah(plafond.jumlah_plafond)}</td>
+                                <td className="text-center">{plafond.keterangan}</td>
+                                <td className="text-center">{new Date(plafond.createdAt).toLocaleString("en-GB", { timeZone: "Asia/Jakarta" }).replace(/\//g, '-').replace(',', '')}</td>
+                                <td className="text-center">{new Date(plafond.updatedAt).toLocaleString("en-GB", { timeZone: "Asia/Jakarta" }).replace(/\//g, '-').replace(',', '')}</td>
+                                {/* <td className="text-center">
+                                  <Button className="btn-fill pull-right warning" variant="warning" onClick={() => { setShowEditModal(true); setSelectedPlafond(plafond); }} style={{ width: 96, fontSize: 14 }}>
+                                    <FaRegEdit style={{ marginRight: '8px' }} />
+                                    Ubah
+                                  </Button>
+                                </td> */}
+                                {/* <td className="text-center">
+                                  <Button className="btn-fill pull-right danger" variant="danger"  onClick={() => deletePlafond(plafond.id_plafond)} style={{ width: 96, fontSize: 14 }}>
+                                    <FaTrashAlt style={{ marginRight: '8px' }} />
+                                    Batal
+                                  </Button>
+                                </td> */}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                  </Table>
+                {/* )} */}
+              </Card.Body>
+              </Card>
+              <div className="pagination-container">
+              <Pagination
+                    activePage={currentPage}
+                    itemsCountPerPage={itemsPerPage}
+                    totalItemsCount={filteredPlafond.length}
+                    pageRangeDisplayed={5}
+                    onChange={handlePageChange}
+                    itemClass="page-item"
+                    linkClass="page-link"
+              />
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+      ):
+      ( <>
+          <div className="App-loading">
+            <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+            <span style={{paddingTop:'100px'}}>Loading...</span>
           </div>
-
-          <Button
-            className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-            type="button"
-            variant="info"
-            onClick={handleImportButtonClick}>
-            <FaFileImport style={{ marginRight: '8px' }} />
-            Import Data
-          </Button>
-           {/* {showImport && <ImportPlafond />} */}
-
-           <ImportPlafond showImportModal={showImportModal} setShowImportModal={setShowImportModal} onSuccess={handleImportSuccess} />
-
-          <Button
-            className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-            type="button"
-            variant="primary"
-            onClick={() => downloadCSV(plafond)}>
-            <FaFileCsv style={{ marginRight: '8px' }} />
-            Unduh CSV
-          </Button>
-
-          <Button
-            className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-            type="button"
-            variant="primary"
-            onClick={() => downloadPDF(plafond)}>
-            <FaFilePdf style={{ marginRight: '8px' }} />
-            Unduh PDF
-          </Button>
-
-          <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange}/>
-          
-          <Col md="12">
-            <Card className="striped-tabled-with-hover mt-2">
-              <Card.Header>
-                <Card.Title as="h4">Plafond</Card.Title>
-              </Card.Header>
-              <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
-              {loading ? (
-                <div className="text-center">
-                  <Spinner animation="border" variant="primary" />
-                  <p>Loading...</p>
-                </div>
-              ) : (
-                <Table className="table-hover table-striped">
-                    <div className="table-scroll" style={{ height:'auto' }}>
-                      <table className="flex-table table table-striped table-hover">
-                        <thead>
-                      <tr>
-                        <th>ID Plafond</th>
-                        <th className="border-0">Tanggal Penetapan</th>
-                        <th className="border-0">Jumlah Plafond</th>
-                        <th className="border-0">Keterangan</th>
-                        <th className="border-0">Terakhir Dibuat</th>
-                        <th className="border-0">Terakhir Update</th>
-                        {/* <th className="border-0">Aksi</th> */}
-                      </tr>
-                        </thead>
-                        <tbody className="scroll scroller-tbody">
-                          {currentItems.map((plafond) => (
-                            <tr key={plafond.id_plafond}>
-                              <td className="text-center">{plafond.id_plafond}</td>
-                              <td className="text-center">{plafond.tanggal_penetapan}</td>
-                              <td className="text-right">{formatRupiah(plafond.jumlah_plafond)}</td>
-                              <td className="text-center">{plafond.keterangan}</td>
-                              <td className="text-center">{new Date(plafond.createdAt).toLocaleString("en-GB", { timeZone: "Asia/Jakarta" }).replace(/\//g, '-').replace(',', '')}</td>
-                              <td className="text-center">{new Date(plafond.updatedAt).toLocaleString("en-GB", { timeZone: "Asia/Jakarta" }).replace(/\//g, '-').replace(',', '')}</td>
-                              {/* <td className="text-center">
-                                <Button className="btn-fill pull-right warning" variant="warning" onClick={() => { setShowEditModal(true); setSelectedPlafond(plafond); }} style={{ width: 96, fontSize: 14 }}>
-                                  <FaRegEdit style={{ marginRight: '8px' }} />
-                                  Ubah
-                                </Button>
-                              </td> */}
-                              {/* <td className="text-center">
-                                <Button className="btn-fill pull-right danger" variant="danger"  onClick={() => deletePlafond(plafond.id_plafond)} style={{ width: 96, fontSize: 14 }}>
-                                  <FaTrashAlt style={{ marginRight: '8px' }} />
-                                  Batal
-                                </Button>
-                              </td> */}
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                </Table>
-              )}
-            </Card.Body>
-            </Card>
-            <div className="pagination-container">
-            <Pagination
-                  activePage={currentPage}
-                  itemsCountPerPage={itemsPerPage}
-                  totalItemsCount={filteredPlafond.length}
-                  pageRangeDisplayed={5}
-                  onChange={handlePageChange}
-                  itemClass="page-item"
-                  linkClass="page-link"
-            />
-            </div>
-          </Col>
-        </Row>
-      </Container>
+        </>
+      )}
     </>
   );
 }

@@ -10,6 +10,8 @@ import "jspdf-autotable";
 import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 import {
   Button,
@@ -94,12 +96,14 @@ function AngsuranFinance() {
       getAngsuran();
       getKaryawanData();
       updateAngsuran();
+
+      setTimeout(() => setLoading(false), 1000)
     }, []);
   
   
     const getAngsuran = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await axios.get('http://10.70.10.110:5000/angsuran', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,21 +112,21 @@ function AngsuranFinance() {
         setAngsuranList(response.data);
       } catch (error) {
         console.error('Gagal mendapatkan data angsuran:', error.message);
-      } finally {
-        setLoading(false);
+      // } finally {
+      //   setLoading(false);
       }
     };
   
     const updateAngsuran = async () => {
       const today = new Date();
       if (today.getDate() !== 1) {
-        setLoading(false);
+        // setLoading(false);
         toast.info("Update angsuran otomatis hanya dapat dilakukan pada tanggal 1.");
         return;
       }
 
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await axios.put(
           `http://10.70.10.110:5000/status-update`,
           {},
@@ -137,8 +141,8 @@ function AngsuranFinance() {
         }
       } catch (error) {
         console.error("Gagal memperbarui angsuran otomatis:", error.message);
-      } finally {
-        setLoading(false);
+      // } finally {
+      //   setLoading(false);
       }
     };
       
@@ -158,7 +162,7 @@ function AngsuranFinance() {
       const token = localStorage.getItem('token'); // Ambil token dari localStorage
     
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await axios.get("http://10.70.10.110:5000/karyawan-data", {
           headers: {
             Authorization: `Bearer ${token}`, // Kirim token dalam header Authorization
@@ -171,8 +175,8 @@ function AngsuranFinance() {
         } else {
           console.error("Error fetching data:", error.message);
         }
-      } finally {
-        setLoading(false);
+      // } finally {
+      //   setLoading(false);
       }
     };
     
@@ -315,6 +319,8 @@ const downloadPDF = (data) => {
 
   return (
     <>
+    {loading === false ? 
+      (<div className="App">
       <Container fluid>
       {/* <ToastContainer /> */}
       {/* <UpdateStatusChecker /> */}
@@ -368,12 +374,12 @@ const downloadPDF = (data) => {
                 <Card.Title as="h4">Angsuran Pinjaman</Card.Title>
               </Card.Header>
               <Card.Body className="table-responsive px-0 " style={{ overflowX: 'auto' }}>
-                {loading ? (
+                {/* {loading ? (
                   <div className="text-center">
                     <Spinner animation="border" variant="primary" />
                     <p>Loading...</p>
                   </div>
-                ) : (
+                ) : ( */}
                 <Table className="table-hover table-striped">
                   <div className="table-scroll" style={{ height: 'auto' }}>
                     <table className="flex-table table table-striped table-hover">
@@ -391,8 +397,7 @@ const downloadPDF = (data) => {
                       </tr>
                       </thead>
                       <tbody className="scroll scroller-tbody">
-                        {currentItems && currentItems.length > 0? (
-                            currentItems
+                            {currentItems
                             .map((angsuran) => (
                             <tr key={angsuran.id_angsuran}>
                               <td className="text-center">{angsuran.id_angsuran}</td>
@@ -406,20 +411,21 @@ const downloadPDF = (data) => {
                               <td className="text-center">{angsuran.keterangan}</td>
                             </tr>
                           ))
-                        ) : (
-                          <tr>
+                        // ) : (
+                        //   <tr>
                             
-                            <td colSpan={10} className="text-center">
-                            <Spinner animation="border" variant="primary" />
-                              Loading...
-                            </td>
-                          </tr>
-                        )}
+                        //     <td colSpan={10} className="text-center">
+                        //     <Spinner animation="border" variant="primary" />
+                        //       Loading...
+                        //     </td>
+                        //   </tr>
+                        // )
+                        }
                       </tbody>
                     </table>
                   </div>
                 </Table>
-                )}
+                {/* )} */}
               </Card.Body>
             </Card>
             <div className="pagination-container">
@@ -436,6 +442,15 @@ const downloadPDF = (data) => {
           </Col>
         </Row>
       </Container>
+      </div>
+      ):
+      ( <>
+          <div className="App-loading">
+            <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+            <span style={{paddingTop:'100px'}}>Loading...</span>
+          </div>
+        </>
+      )}
     </>
   );
 }

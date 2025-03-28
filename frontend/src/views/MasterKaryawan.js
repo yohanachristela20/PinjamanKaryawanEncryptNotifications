@@ -12,6 +12,8 @@ import "jspdf-autotable";
 import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 
 // react-bootstrap components
@@ -99,6 +101,7 @@ function MasterKaryawan() {
       }
 
       getKaryawan();
+      
     } catch (error) {
       console.error("Error fetching data", error.message); 
     }
@@ -232,10 +235,13 @@ function MasterKaryawan() {
   
   useEffect(() => {
     getKaryawan();
+    setTimeout(() => setLoading(false), 1000)
   }, []); 
 
   return (
     <>
+    {loading === false ? 
+      (<div className="App">
       <Container fluid>
       <Row>
           <div>
@@ -384,6 +390,15 @@ function MasterKaryawan() {
         </Row>
         
       </Container>
+      </div>
+      ):
+      ( <>
+          <div className="App-loading">
+            <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+            <span style={{paddingTop:'100px'}}>Loading...</span>
+          </div>
+        </>
+      )}
     </>
   );
 }

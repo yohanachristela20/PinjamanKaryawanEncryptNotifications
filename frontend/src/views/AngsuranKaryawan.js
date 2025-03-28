@@ -10,6 +10,8 @@ import Heartbeat from "./Heartbeat.js";
 import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 import {
   Button,
@@ -89,8 +91,8 @@ function AngsuranKaryawan() {
       setAngsuranList(response.data);
     } catch (error) {
       console.error('Gagal mendapatkan data angsuran:', error.message);
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
   
@@ -128,6 +130,10 @@ function AngsuranKaryawan() {
     }
   }, [angsuranList]);
 
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 2000)
+  }, []);
+
 
   const getKaryawanData = async () => {
     const token = localStorage.getItem('token'); // Ambil token dari localStorage
@@ -145,8 +151,8 @@ function AngsuranKaryawan() {
       } else {
         console.error("Error fetching data:", error.message);
       }
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
   
@@ -235,6 +241,8 @@ const downloadPDF = (data) => {
 
   return (
     <>
+    {loading === false ? 
+      (<div className="App">
       <Container fluid>
       <ToastContainer />
       <Heartbeat/>
@@ -256,12 +264,12 @@ const downloadPDF = (data) => {
                 <Card.Title as="h4">Angsuran Pinjaman</Card.Title>
               </Card.Header>
               <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
-                 {loading ? (
+                 {/* {loading ? (
                     <div className="text-center">
                       <Spinner animation="border" variant="primary" />
                       <p>Loading...</p>
                     </div>
-                  ) : (
+                  ) : ( */}
                 <Table className="table-hover table-striped">
                   <div className="table-scroll" style={{ height: 'auto' }}>
                     <table className="flex-table table table-striped table-hover">
@@ -293,7 +301,7 @@ const downloadPDF = (data) => {
                     </table>
                   </div>
                 </Table>
-                  )}
+                  {/* )} */}
               </Card.Body>
             </Card>
             <div className="pagination-container">
@@ -310,6 +318,15 @@ const downloadPDF = (data) => {
           </Col>
         </Row>
       </Container>
+      </div>
+      ):
+      ( <>
+          <div className="App-loading">
+            <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+            <span style={{paddingTop:'100px'}}>Loading...</span>
+          </div>
+        </>
+      )}
     </>
   );
 }

@@ -21,7 +21,8 @@ import cardBeranda from "../assets/img/beranda3.png";
 import "../assets/scss/lbd/_table-header.scss";
 import Calendar from "react-calendar";
 import "../assets/scss/lbd/_calendar.scss";
-
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 // import {Link} from "react-router-dom"; 
 
@@ -118,6 +119,7 @@ function BerandaFinance() {
     getPinjamanData();
     fetchAntrean(); 
     
+    setTimeout(() => setLoading(false), 1000)
   }, []);
 
   const fetchAntrean = async () => {
@@ -281,7 +283,7 @@ function BerandaFinance() {
 
   const getPinjaman = async () =>{
     try {
-      setLoading(true);
+      // setLoading(true);
       const response = await axios.get("http://10.70.10.110:5000/pinjaman", {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -290,14 +292,14 @@ function BerandaFinance() {
       setPinjaman(response.data);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
   const getPinjamanData = async () =>{
     try {
-      setLoading(true);
+      // setLoading(true);
       const response = await axios.get("http://10.70.10.110:5000/pinjaman-data", {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -306,15 +308,15 @@ function BerandaFinance() {
       setPinjamanData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
   
   const getAntrean = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       const response = await axios.get("http://10.70.10.110:5000/antrean-pengajuan", {
         headers: {
             Authorization: `Bearer ${token}`,
@@ -324,8 +326,8 @@ function BerandaFinance() {
     } catch (error) {
       console.error("Error fetching antrean:", error.message);
       setError("Gagal mengambil antrean. Silakan coba lagi.");
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -673,10 +675,10 @@ function BerandaFinance() {
 
 
   return (
-    <>
-    {/* <h3 className="mb-5"><center>Selamat Datang Finance di Sistem Pinjaman Karyawan</center></h3> */}
-
-      <div className="home-card">
+      <>
+          {loading === false ? 
+            (<div className="App">
+                    <div className="home-card">
         <div className="card-content">
           <h2 className="card-title">Hai, {userData.nama}!</h2>
           <h4 className="card-subtitle">Pantau transaksi dan kelola pinjaman dengan sekali klik.</h4><hr/>
@@ -923,12 +925,12 @@ function BerandaFinance() {
                 <Card.Title as="h4">Antrean Pengajuan Pinjaman</Card.Title>
               </Card.Header>
               <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
-                {loading ? (
+                {/* {loading ? (
                   <div className="text-center">
                     <Spinner animation="border" variant="primary" />
                     <p>Loading...</p>
                   </div>
-                ) : (
+                ) : ( */}
                 <Table className="table-hover table-striped">
                  <div className="table-scroll" style={{ height:'auto' }}>
                     <table className="flex-table table table-striped table-hover">
@@ -1007,19 +1009,19 @@ function BerandaFinance() {
                     </table>
                  </div>
                 </Table>
-                )}
+                {/* )} */}
               </Card.Body>
             </Card>
             <div className="pagination-container">
-            <Pagination
-                  activePage={currentPage}
-                  itemsCountPerPage={itemsPerPage}
-                  totalItemsCount={filteredAndSortedPinjaman.length}
-                  pageRangeDisplayed={5}
-                  onChange={handlePageChange}
-                  itemClass="page-item"
-                  linkClass="page-link"
-            />
+              <Pagination
+                    activePage={currentPage}
+                    itemsCountPerPage={itemsPerPage}
+                    totalItemsCount={filteredAndSortedPinjaman.length}
+                    pageRangeDisplayed={5}
+                    onChange={handlePageChange}
+                    itemClass="page-item"
+                    linkClass="page-link"
+              />
             </div>
           </Col>
         </Row>
@@ -1061,7 +1063,16 @@ function BerandaFinance() {
         </Button>
       </Modal.Footer>
       </Modal>
-    </>
+            </div>
+            ):
+            ( <>
+                <div className="App-loading">
+                  <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+                  <span style={{paddingTop:'100px'}}>Loading...</span>
+                </div>
+              </>
+            )}
+      </>
   );
 }
 

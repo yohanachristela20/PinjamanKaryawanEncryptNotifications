@@ -11,6 +11,8 @@ import Heartbeat from "./Heartbeat.js";
 import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 import {
   Badge,
@@ -172,6 +174,8 @@ function RiwayatPengajuanKaryawan() {
     getPinjamanData();
     getAntrean();
     fetchAntrean();
+
+    setTimeout(() => setLoading(false), 2000)
   }, []);
 
   const data_plafond = {
@@ -199,8 +203,8 @@ function RiwayatPengajuanKaryawan() {
       setPinjaman(response.data);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -220,8 +224,8 @@ function RiwayatPengajuanKaryawan() {
       setPinjamanData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -237,8 +241,8 @@ function RiwayatPengajuanKaryawan() {
     } catch (error) {
       console.error("Error fetching antrean:", error.message);
       setError("Gagal mengambil antrean. Silakan coba lagi.");
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -375,6 +379,8 @@ const findNomorAntrean = (id_pinjaman) => {
 
   return (
     <>
+    {loading === false ? 
+      (<div className="App">
       <Container fluid>
       {/* <ToastContainer /> */}
       <Heartbeat/>
@@ -405,12 +411,12 @@ const findNomorAntrean = (id_pinjaman) => {
                 <Card.Title as="h4">Riwayat Pengajuan</Card.Title>
               </Card.Header>
               <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
-                 {loading ? (
+                 {/* {loading ? (
                     <div className="text-center">
                       <Spinner animation="border" variant="primary" />
                       <p>Loading...</p>
                     </div>
-                  ) : (
+                  ) : ( */}
                 <Table className="table-hover table-striped">
                   <div className="table-scroll" style={{height: 'auto'}}>
                     <table className="flex-table table table-striped table-hover">
@@ -501,7 +507,7 @@ const findNomorAntrean = (id_pinjaman) => {
                     </table>
                   </div>
                 </Table>
-                  )}
+                  {/* )} */}
               </Card.Body>
             </Card>
             <div className="pagination-container">
@@ -518,44 +524,51 @@ const findNomorAntrean = (id_pinjaman) => {
           </Col>
         </Row>
       </Container>
-
-
       <Modal show={showModal} onHide={() => setShowModal(false)}>
-      <Modal.Header>
-        <Modal.Title>Pembatalan Pengajuan Pinjaman</Modal.Title>
-          <button
-          type="button"
-          className="close"
-          aria-label="Close"
-          onClick={() => setShowModal(false)}
-          style={{
-            background: "none",
-            border: "none",
-            fontSize: "1.5rem",
-            fontWeight: "bold",
-            cursor: "pointer",
-          }}
-        >
-          &times; {/* Simbol 'x' */}
-        </button>
-      </Modal.Header>
-      <Modal.Body >
-        <p>{userData.divisi || "Loading..."} : {userData.id_karyawan} - {userData.nama}</p>
-        <p>
-            ID Pinjaman: {selectedPinjaman?.id_pinjaman || "Tidak tersedia"} <br />
-            Jumlah: {selectedPinjaman? formatRupiah(selectedPinjaman.jumlah_pinjaman) : "Tidak tersedia"}
-          </p>
-        Yakin ingin membatalkan pengajuan pinjaman?
-      </Modal.Body>
-      <Modal.Footer className="mb-4">
-        <Button variant="danger"  onClick={() => handleBatalPengajuan(selectedPinjaman)}>
-          Ya
-        </Button>
-        <Button variant="success" onClick={() => setShowModal(false)}>
-          Tidak
-        </Button>
-      </Modal.Footer>
+        <Modal.Header>
+          <Modal.Title>Pembatalan Pengajuan Pinjaman</Modal.Title>
+            <button
+            type="button"
+            className="close"
+            aria-label="Close"
+            onClick={() => setShowModal(false)}
+            style={{
+              background: "none",
+              border: "none",
+              fontSize: "1.5rem",
+              fontWeight: "bold",
+              cursor: "pointer",
+            }}
+          >
+            &times; {/* Simbol 'x' */}
+          </button>
+        </Modal.Header>
+        <Modal.Body >
+          <p>{userData.divisi || "Loading..."} : {userData.id_karyawan} - {userData.nama}</p>
+          <p>
+              ID Pinjaman: {selectedPinjaman?.id_pinjaman || "Tidak tersedia"} <br />
+              Jumlah: {selectedPinjaman? formatRupiah(selectedPinjaman.jumlah_pinjaman) : "Tidak tersedia"}
+            </p>
+          Yakin ingin membatalkan pengajuan pinjaman?
+        </Modal.Body>
+        <Modal.Footer className="mb-4">
+          <Button variant="danger"  onClick={() => handleBatalPengajuan(selectedPinjaman)}>
+            Ya
+          </Button>
+          <Button variant="success" onClick={() => setShowModal(false)}>
+            Tidak
+          </Button>
+        </Modal.Footer>
       </Modal>
+      </div>
+      ):
+      ( <>
+          <div className="App-loading">
+            <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+            <span style={{paddingTop:'100px'}}>Loading...</span>
+          </div>
+        </>
+      )}
     </>
   );
 }

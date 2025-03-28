@@ -10,6 +10,8 @@ import "jspdf-autotable";
 import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 
 import {
@@ -94,12 +96,14 @@ function Angsuran() {
     getAngsuran();
     getKaryawanData();
     updateAngsuran();
+
+    setTimeout(() => setLoading(false), 1000)
   }, []);
   
   
     const getAngsuran = async () => {
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await axios.get('http://10.70.10.110:5000/angsuran', {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -108,21 +112,21 @@ function Angsuran() {
         setAngsuranList(response.data);
       } catch (error) {
         console.error('Gagal mendapatkan data angsuran:', error.message);
-      } finally {
-        setLoading(false);
+      // } finally {
+      //   setLoading(false);
       }
     };
   
     const updateAngsuran = async () => {
       const today = new Date();
       if (today.getDate() !== 1) {
-        setLoading(false);
+        // setLoading(false);
         toast.info("Update angsuran otomatis hanya dapat dilakukan pada tanggal 1.");
         return;
       }
 
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await axios.put(
           `http://10.70.10.110:5000/status-update`,
           {},
@@ -137,8 +141,8 @@ function Angsuran() {
         }
       } catch (error) {
         console.error("Gagal memperbarui angsuran otomatis:", error.message);
-      } finally {
-        setLoading(false);
+      // } finally {
+      //   setLoading(false);
       }
     };
         
@@ -163,7 +167,7 @@ function Angsuran() {
       const token = localStorage.getItem('token'); // Ambil token dari localStorage
     
       try {
-        setLoading(true);
+        // setLoading(true);
         const response = await axios.get("http://10.70.10.110:5000/karyawan-data", {
           headers: {
             Authorization: `Bearer ${token}`, 
@@ -176,8 +180,8 @@ function Angsuran() {
         } else {
           console.error("Error fetching data:", error.message);
         }
-      } finally {
-        setLoading(false);
+      // } finally {
+      //   setLoading(false);
       }
     };
     
@@ -331,157 +335,169 @@ const downloadPDF = (data) => {
   doc.save("laporan angsuran.pdf");
 };
 
-
   return (
     <>
-      <Container fluid>
-      {/* <ToastContainer /> */}
-      {/* <UpdateStatusChecker /> */}
-        <Row>
-        <div>         
-          <Pelunasan
-            showPelunasanModal={showPelunasanModal}
-            setShowPelunasanModal={setShowPelunasanModal}
-            angsuran={selectedAngsuran}
-            onSuccess={handlePelunasanSuccess}
-          />
-        </div>
-         <div>
-            <Button
-              className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-              type="button"
-              variant="info"
-              onClick={handleImportButtonClick}
-              hidden={role === "Finance"}
-            >
-              <FaFileImport style={{ marginRight: "8px" }} />
-              Import Data
-            </Button>
-        </div>
-
-          <ImportAngsuran showImportModal={showImportModal} setShowImportModal={setShowImportModal} onSuccess={handleImportSuccess} />
-
-          <Button
-            className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-            type="button"
-            variant="primary"
-            onClick={() => downloadCSV(angsuranList)}>
-            <FaFileCsv style={{ marginRight: '8px' }} />
-            Unduh CSV
-          </Button>
-
-          <Button
-            className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-            type="button"
-            variant="primary"
-            onClick={downloadPDF}>
-            <FaFilePdf style={{ marginRight: '8px' }} />
-            Unduh PDF
-          </Button>
-
-          <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
-          
-          <Col md="12" className="mt-2">
-            <Card className="striped-tabled-with-hover">
-              <Card.Header>
-                <Card.Title as="h4">Angsuran Pinjaman</Card.Title>
-              </Card.Header>
-              <Card.Body className="table-responsive px-0 " style={{ overflowX: 'auto' }}>
-                {loading ? (
-                  <div className="text-center">
-                    <Spinner animation="border" variant="primary" />
-                    <p>Loading...</p>
-                  </div>
-                ) : (
-                <Table className="table-hover table-striped">
-                  <div className="table-scroll" style={{ height: 'auto' }}>
-                    <table className="flex-table table table-striped table-hover">
-                      <thead>
-                      <tr>
-                        <th className="border-0 text-wrap">ID Angsuran</th>
-                        <th className="border-0 text-wrap">Tanggal Angsuran</th>
-                        <th className="border-0 text-wrap">ID Karyawan</th>
-                        <th className="border-0 text-wrap">Nama Karyawan</th>
-                        <th className="border-0 text-wrap">ID Pinjaman</th>
-                        <th className="border-0 text-wrap">Dibayar</th>
-                        <th className="border-0 text-wrap">Belum Dibayar</th>
-                        <th className="border-0 text-wrap">Angsuran ke- (Bulan)</th>
-                        {/* <th className="border-0">Status</th> */}
-                        <th className="border-0 text-wrap">Keterangan</th>
-                        <th className="border-0 text-wrap" hidden={role === "Finance"}>Aksi</th>
-                      </tr>
-                      </thead>
-                      <tbody className="scroll scroller-tbody">
-                        {currentItems && currentItems.length > 0? (
-                            currentItems
-                            .map((angsuran) => (
-                            <tr key={angsuran.id_angsuran}>
-                              <td className="text-center">{angsuran.id_angsuran}</td>
-                              <td className="text-center">{angsuran.tanggal_angsuran}</td>
-                              <td className="text-center">{angsuran.id_peminjam}</td>
-                              <td className="text-center">{angsuran.KaryawanPeminjam && angsuran.KaryawanPeminjam.nama ? angsuran.KaryawanPeminjam.nama : 'N/A'}</td>
-                              <td className="text-center">{angsuran.id_pinjaman}</td>
-                              <td className="text-right">{formatRupiah(angsuran.sudah_dibayar)}</td>
-                              <td className="text-right">{formatRupiah(angsuran.belum_dibayar)}</td>
-                              <td className="text-center">{angsuran.bulan_angsuran}</td>
-
-                              <td className="text-center">{angsuran.keterangan}</td>
-                              <td className="text-center">
-                              <Button
-                                className="btn-fill pull-right warning"
-                                variant="warning"
-                                onClick={() => {
-                                  setShowPelunasanModal(true);
-                                  setSelectedAngsuran(angsuran); 
-                                }}
-                                style={{
-                                  display: 
-                                  hidePelunasanButton(angsuran, angsuranList)
-                                  ? 'none' 
-                                  : 'inline-block',
-                                  width: 125,
-                                  fontSize: 14,
-                                }}
-                                hidden={role === "Finance"}
-                              >
-                              <FaCoins style={{ marginRight: '8px' }}/>
-                                Pelunasan
-                              </Button>
-                              </td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            
-                            <td colSpan={10} className="text-center">
-                            <Spinner animation="border" variant="primary" />
-                              Loading...
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </Table>
-                )}
-              </Card.Body>
-            </Card>
-            <div className="pagination-container">
-            <Pagination
-                  activePage={currentPage}
-                  itemsCountPerPage={itemsPerPage}
-                  totalItemsCount={filteredAngsuran.length}
-                  pageRangeDisplayed={5}
-                  onChange={handlePageChange}
-                  itemClass="page-item"
-                  linkClass="page-link"
-            />
+      {loading === false ? 
+        (<div className="App">
+          <Container fluid>
+            {/* <ToastContainer /> */}
+            {/* <UpdateStatusChecker /> */}
+            <Row>
+            <div>         
+              <Pelunasan
+                showPelunasanModal={showPelunasanModal}
+                setShowPelunasanModal={setShowPelunasanModal}
+                angsuran={selectedAngsuran}
+                onSuccess={handlePelunasanSuccess}
+              />
             </div>
-          </Col>
-        </Row>
-      </Container>
+            <div>
+                <Button
+                  className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+                  type="button"
+                  variant="info"
+                  onClick={handleImportButtonClick}
+                  hidden={role === "Finance"}
+                >
+                  <FaFileImport style={{ marginRight: "8px" }} />
+                  Import Data
+                </Button>
+            </div>
+
+              <ImportAngsuran showImportModal={showImportModal} setShowImportModal={setShowImportModal} onSuccess={handleImportSuccess} />
+
+              <Button
+                className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+                type="button"
+                variant="primary"
+                onClick={() => downloadCSV(angsuranList)}>
+                <FaFileCsv style={{ marginRight: '8px' }} />
+                Unduh CSV
+              </Button>
+
+              <Button
+                className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+                type="button"
+                variant="primary"
+                onClick={downloadPDF}>
+                <FaFilePdf style={{ marginRight: '8px' }} />
+                Unduh PDF
+              </Button>
+
+              <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
+              
+              <Col md="12" className="mt-2">
+                <Card className="striped-tabled-with-hover">
+                  <Card.Header>
+                    <Card.Title as="h4">Angsuran Pinjaman</Card.Title>
+                  </Card.Header>
+                  <Card.Body className="table-responsive px-0 " style={{ overflowX: 'auto' }}>
+                    {/* {loading ? (
+                      <div className="text-center">
+                        <Spinner animation="border" variant="primary" />
+                        <p>Loading...</p>
+                      </div>
+                    ) : ( */}
+                    <Table className="table-hover table-striped">
+                      <div className="table-scroll" style={{ height: 'auto' }}>
+                        <table className="flex-table table table-striped table-hover">
+                          <thead>
+                          <tr>
+                            <th className="border-0 text-wrap">ID Angsuran</th>
+                            <th className="border-0 text-wrap">Tanggal Angsuran</th>
+                            <th className="border-0 text-wrap">ID Karyawan</th>
+                            <th className="border-0 text-wrap">Nama Karyawan</th>
+                            <th className="border-0 text-wrap">ID Pinjaman</th>
+                            <th className="border-0 text-wrap">Dibayar</th>
+                            <th className="border-0 text-wrap">Belum Dibayar</th>
+                            <th className="border-0 text-wrap">Angsuran ke- (Bulan)</th>
+                            {/* <th className="border-0">Status</th> */}
+                            <th className="border-0 text-wrap">Keterangan</th>
+                            <th className="border-0 text-wrap" hidden={role === "Finance"}>Aksi</th>
+                          </tr>
+                          </thead>
+                          <tbody className="scroll scroller-tbody">
+                            {
+                                currentItems
+                                .map((angsuran) => (
+                                <tr key={angsuran.id_angsuran}>
+                                  <td className="text-center">{angsuran.id_angsuran}</td>
+                                  <td className="text-center">{angsuran.tanggal_angsuran}</td>
+                                  <td className="text-center">{angsuran.id_peminjam}</td>
+                                  <td className="text-center">{angsuran.KaryawanPeminjam && angsuran.KaryawanPeminjam.nama ? angsuran.KaryawanPeminjam.nama : 'N/A'}</td>
+                                  <td className="text-center">{angsuran.id_pinjaman}</td>
+                                  <td className="text-right">{formatRupiah(angsuran.sudah_dibayar)}</td>
+                                  <td className="text-right">{formatRupiah(angsuran.belum_dibayar)}</td>
+                                  <td className="text-center">{angsuran.bulan_angsuran}</td>
+
+                                  <td className="text-center">{angsuran.keterangan}</td>
+                                  <td className="text-center">
+                                  <Button
+                                    className="btn-fill pull-right warning"
+                                    variant="warning"
+                                    onClick={() => {
+                                      setShowPelunasanModal(true);
+                                      setSelectedAngsuran(angsuran); 
+                                    }}
+                                    style={{
+                                      display: 
+                                      hidePelunasanButton(angsuran, angsuranList)
+                                      ? 'none' 
+                                      : 'inline-block',
+                                      width: 125,
+                                      fontSize: 14,
+                                    }}
+                                    hidden={role === "Finance"}
+                                  >
+                                  <FaCoins style={{ marginRight: '8px' }}/>
+                                    Pelunasan
+                                  </Button>
+                                  </td>
+                                </tr>
+                              ))
+                            // ) : (
+                            //   <tr>
+                                
+                            //     <td colSpan={10} className="text-center">
+                            //     <Spinner animation="border" variant="primary" />
+                            //       Loading...
+                            //     </td>
+                            //   </tr>
+                            // )
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </Table>
+                    {/* )} */}
+                  </Card.Body>
+                </Card>
+                <div className="pagination-container">
+                <Pagination
+                      activePage={currentPage}
+                      itemsCountPerPage={itemsPerPage}
+                      totalItemsCount={filteredAngsuran.length}
+                      pageRangeDisplayed={5}
+                      onChange={handlePageChange}
+                      itemClass="page-item"
+                      linkClass="page-link"
+                />
+                </div>
+              </Col>
+            </Row>
+          </Container>
+        </div>
+        ):
+        ( <>
+            <div className="App-loading">
+              <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+              <span style={{paddingTop:'100px'}}>Loading...</span>
+            </div>
+          </>
+        )}
     </>
   );
+
 }
 
 export default Angsuran;

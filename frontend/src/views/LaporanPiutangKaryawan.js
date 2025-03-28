@@ -10,6 +10,8 @@ import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
 import ImportAntreanPengajuan from "components/ModalForm/ImportAntreanPengajuan.js";
 import {toast } from 'react-toastify';
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 import {
   Badge,
@@ -142,8 +144,8 @@ import {
       setPinjaman(response.data);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -158,8 +160,8 @@ import {
       setPinjamanData(response.data);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -174,8 +176,8 @@ import {
       setPlafond(response.data.totalPlafond);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -184,7 +186,9 @@ import {
     getPinjamanData();
     getPlafond();
     // fetchData();
-  });
+
+    setTimeout(() => setLoading(false), 1000)
+  }, []);
 
 
   const formatRupiah = (angka) => {
@@ -380,299 +384,309 @@ import {
 
   return (
     <>
-      <Container fluid>
-        <Row>
-          <Col lg="3" sm="6">
-              <Card className="card-stats">
-              <Card.Body>
-                {loading ? (
-                  <div className="text-center">
-                    <Spinner animation="border" variant="primary" />
-                    <p>Loading...</p>
-                  </div>
-                ) : (
-                <Row>
-                  <Col xs="5">
-                    <div className="icon-big icon-warning">
-                      <FaLandmark className="text-warning" />
-                    </div>
-                  </Col>
-                  <Col xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Jumlah Plafond</p>
-                    </div>
-                  </Col>
-                  <Col>
-                  <div className="text-right">
-                    <Card.Title className="card-plafond" as="h4">Rp {formatRupiah(plafond || 0)}</Card.Title>
-                  </div>
-                  </Col>
-                </Row>
-                )}
-              </Card.Body>
-                {/* )} */}
-              <Card.Footer>
-                <hr></hr>
-                <div className="stats">
-                  Jumlah Plafond
-                </div>
-              </Card.Footer>
-            </Card>
-          </Col>
-          <Col lg="3" sm="6">
-        {plafondTersedia !== null ? (
+    {loading === false ? 
+      (<div className="App">
+        <Container fluid>
+          <Row>
+            <Col lg="3" sm="6">
                 <Card className="card-stats">
-                  <Card.Body>
-                    {loading ? (
-                      <div className="text-center">
-                        <Spinner animation="border" variant="primary" />
-                        <p>Loading...</p>
+                <Card.Body>
+                  {/* {loading ? (
+                    <div className="text-center">
+                      <Spinner animation="border" variant="primary" />
+                      <p>Loading...</p>
+                    </div>
+                  ) : ( */}
+                  <Row>
+                    <Col xs="5">
+                      <div className="icon-big icon-warning">
+                        <FaLandmark className="text-warning" />
                       </div>
-                    ) : (
-                    <Row>
-                      <Col xs="5">
-                        <div className="icon-big icon-warning">
-                          <FaCoins className="text-success" />
+                    </Col>
+                    <Col xs="7">
+                      <div className="numbers">
+                        <p className="card-category">Jumlah Plafond</p>
+                      </div>
+                    </Col>
+                    <Col>
+                    <div className="text-right">
+                      <Card.Title className="card-plafond" as="h4">Rp {formatRupiah(plafond || 0)}</Card.Title>
+                    </div>
+                    </Col>
+                  </Row>
+                  {/* )} */}
+                </Card.Body>
+                  {/* )} */}
+                <Card.Footer>
+                  <hr></hr>
+                  <div className="stats">
+                    Jumlah Plafond
+                  </div>
+                </Card.Footer>
+              </Card>
+            </Col>
+            <Col lg="3" sm="6">
+              {/* {plafondTersedia !== null ? ( */}
+                  <Card className="card-stats">
+                    <Card.Body>
+                      {/* {loading ? (
+                        <div className="text-center">
+                          <Spinner animation="border" variant="primary" />
+                          <p>Loading...</p>
                         </div>
-                      </Col>
-                      <Col xs="7">
-                        <div className="numbers">
-                          <p className="card-category">Plafond Tersedia</p>
+                      ) : ( */}
+                      <Row>
+                        <Col xs="5">
+                          <div className="icon-big icon-warning">
+                            <FaCoins className="text-success" />
+                          </div>
+                        </Col>
+                        <Col xs="7">
+                          <div className="numbers">
+                            <p className="card-category">Plafond Tersedia</p>
+                          </div>
+                        </Col>
+                        <Col>
+                        <div className="text-right">
+                          <Card.Title as="h4" className="card-plafond"> Rp
+                            {(() => {
+                              return formatRupiah(plafondTersedia); 
+                            })()}
+                            </Card.Title>
                         </div>
-                      </Col>
-                      <Col>
+                        </Col>
+                      </Row>
+                      {/* )} */}
+                    </Card.Body>
+                    <Card.Footer>
+                      <hr />
+                      <div className="stats">Plafond Tersisa</div>
+                    </Card.Footer>
+                  </Card>
+                {/* ) : (
+                  <p>Loading...</p>
+                )} */}
+            </Col>
+
+            <Col lg="3" sm="6">
+              <Card className="card-stats">
+                <Card.Body>
+                  {/* {loading ? (
+                    <div className="text-center">
+                      <Spinner animation="border" variant="primary" />
+                      <p>Loading...</p>
+                    </div>
+                  ) : ( */}
+                  <Row>
+                    <Col xs="5">
+                      <div className="icon-big icon-warning">
+                        <FaHandHoldingUsd className="text-danger" />
+                      </div>
+                    </Col>
+                    <Col xs="7">
+                      <div className="numbers">
+                        <p className="card-category">Jumlah Pinjaman</p>
+
+                      </div>
+                    </Col>
+                    <Col>
                       <div className="text-right">
-                        <Card.Title as="h4" className="card-plafond"> Rp
-                          {(() => {
-                            return formatRupiah(plafondTersedia); 
-                          })()}
-                          </Card.Title>
+                      <Card.Title as="h4" className="card-plafond">Rp {formatRupiah(totalPinjamanKeseluruhan)}</Card.Title>
                       </div>
-                      </Col>
-                    </Row>
-                    )}
-                  </Card.Body>
-                  <Card.Footer>
-                    <hr />
-                    <div className="stats">Plafond Tersisa</div>
-                  </Card.Footer>
-                </Card>
-              ) : (
-                <p>Loading...</p>
-              )}
-          </Col>
-
-          <Col lg="3" sm="6">
-            <Card className="card-stats">
-              <Card.Body>
-                {loading ? (
-                  <div className="text-center">
-                    <Spinner animation="border" variant="primary" />
-                    <p>Loading...</p>
+                    </Col>
+                  </Row>
+                  {/* )} */}
+                </Card.Body>
+                <Card.Footer>
+                  <hr></hr>
+                  <div className="stats">
+                    Jumlah Pinjaman
                   </div>
-                ) : (
-                <Row>
-                  <Col xs="5">
-                    <div className="icon-big icon-warning">
-                      <FaHandHoldingUsd className="text-danger" />
+                </Card.Footer>
+              </Card>
+            </Col>
+            <Col lg="3" sm="6">
+              <Card className="card-stats">
+                <Card.Body>
+                  {/* {loading ? (
+                    <div className="text-center">
+                      <Spinner animation="border" variant="primary" />
+                      <p>Loading...</p>
                     </div>
-                  </Col>
-                  <Col xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Jumlah Pinjaman</p>
-
-                    </div>
-                  </Col>
-                  <Col>
-                    <div className="text-right">
-                    <Card.Title as="h4" className="card-plafond">Rp {formatRupiah(totalPinjamanKeseluruhan)}</Card.Title>
-                    </div>
-                  </Col>
-                </Row>
-                )}
-              </Card.Body>
-              <Card.Footer>
-                <hr></hr>
-                <div className="stats">
-                  Jumlah Pinjaman
-                </div>
-              </Card.Footer>
-            </Card>
-          </Col>
-          <Col lg="3" sm="6">
-            <Card className="card-stats">
-              <Card.Body>
-                {loading ? (
-                  <div className="text-center">
-                    <Spinner animation="border" variant="primary" />
-                    <p>Loading...</p>
+                  ) : ( */}
+                  <Row>
+                    <Col xs="5">
+                      <div className="icon-big icon-warning">
+                        <FaUserFriends className="text-primary"/>
+                      </div>
+                    </Col>
+                    <Col xs="7">
+                      <div className="numbers">
+                        <p className="card-category">Jumlah Peminjam</p>
+                      </div>
+                    </Col>
+                    <Col>
+                      <div className="text-right">
+                      <Card.Title as="h4" className="card-plafond">{totalPeminjam}</Card.Title>
+                      </div>
+                    </Col>
+                  </Row>
+                  {/* )} */}
+                </Card.Body>
+                <Card.Footer>
+                  <hr></hr>
+                  <div className="stats">
+                    Jumlah Peminjam
                   </div>
-                ) : (
-                <Row>
-                  <Col xs="5">
-                    <div className="icon-big icon-warning">
-                      <FaUserFriends className="text-primary"/>
-                    </div>
-                  </Col>
-                  <Col xs="7">
-                    <div className="numbers">
-                      <p className="card-category">Jumlah Peminjam</p>
-                    </div>
-                  </Col>
-                  <Col>
-                    <div className="text-right">
-                    <Card.Title as="h4" className="card-plafond">{totalPeminjam}</Card.Title>
-                    </div>
-                  </Col>
-                </Row>
-                )}
-              </Card.Body>
-              <Card.Footer>
-                <hr></hr>
-                <div className="stats">
-                  Jumlah Peminjam
-                </div>
-              </Card.Footer>
-            </Card>
-          </Col>
-        </Row>
-        
-        <Row className="mt-1">
-        <Button
+                </Card.Footer>
+              </Card>
+            </Col>
+          </Row>
+          
+          <Row className="mt-1">
+          <Button
+              className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+              type="button"
+              variant="info"
+              onClick={handleImportButtonClick}
+              hidden={role === "Finance"}
+              >
+              <FaFileImport style={{ marginRight: '8px' }} />
+              Import Data
+          </Button>
+          
+          <ImportAntreanPengajuan showImportModal={showImportModal} setShowImportModal={setShowImportModal} onSuccess={handleImportSuccess} />
+
+          <Button
             className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
             type="button"
-            variant="info"
-            onClick={handleImportButtonClick}
-            hidden={role === "Finance"}
-            >
-            <FaFileImport style={{ marginRight: '8px' }} />
-            Import Data
-        </Button>
-        
-        <ImportAntreanPengajuan showImportModal={showImportModal} setShowImportModal={setShowImportModal} onSuccess={handleImportSuccess} />
-
-        <Button
-          className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-          type="button"
-          variant="primary"
-          onClick={() => downloadCSV(pinjaman)}>
-          <FaFileCsv style={{ marginRight: '8px' }} />
-          Unduh CSV
-        </Button>
-        <Button
-          className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-          type="button"
-          variant="primary"
-          onClick={downloadPDF}>
-          <FaFilePdf style={{ marginRight: '8px' }} />
-          Unduh PDF
-        </Button>
-        <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
-        </Row>
-        
-
-        <Row>
-          <Col md="12" className="mt-2">
-            <Card className="striped-tabled-with-hover">
-              <Card.Header>
-                <Card.Title as="h4">Laporan Piutang Karyawan</Card.Title>
-              </Card.Header>
-              <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
-                {loading ? (
-                  <div className="text-center">
-                    <Spinner animation="border" variant="primary" />
-                    <p>Loading...</p>
-                  </div>
-                ) : (
-                <Table className="table-hover table-striped">
-                  <div className="table-scroll" style={{ height: 'auto' }}>
-                    <table className="flex-table table table-striped table-hover">
-                      <thead>
-                      <tr>
-                        <th className="border-0 center">ID Pinjaman</th>
-                        <th className="border-0 center">ID Karyawan</th>
-                        <th className="border-0 center">Nama Karyawan</th>
-                        <th className="border-0 center">Departemen</th>
-                        <th className="border-0 center">Divisi</th>
-                        <th className="border-0 center">Tanggal Pengajuan</th>
-                        <th className="border-0 center">Jumlah Pinjaman</th>
-                        <th className="border-0 center">Ditransfer Oleh</th>
-                        <th className="border-0 center">Jumlah Angsuran</th>
-                        <th className="border-0 center">Jumlah Pinjaman Setelah Pembulatan</th>
-                        <th className="border-0 center">Rasio Angsuran</th>
-                        <th className="border-0 center">Sudah Dibayar</th>
-                        <th className="border-0 center">Belum Dibayar</th>
-                        <th className="border-0 center">Sisa Bulan</th>
-                        <th className="border-0 center">Status</th>
-                      </tr>
-                      </thead>
-                      <tbody className="scroll scroller-tbody">
-                        {currentItems
-                        .filter((item) => item.status_pengajuan !== "Ditunda" && item.status_transfer !== "Belum Ditransfer" && item.status_pengajuan !== "Dibatalkan" && item.status_transfer !== "Dibatalkan")
-                        .map((pinjaman) => {
-
-                          const totalSudahDibayar = pinjaman.SudahDibayar
-                          ? pinjaman.SudahDibayar.reduce((total, angsuran) => {
-                            const sudahDibayar = angsuran.sudah_dibayar ? parseFloat(angsuran.sudah_dibayar) : 0;
-                            return total + sudahDibayar;
-                      
-                            }, 0)
-                          : 0;
-              
-                        return ( 
-                          <tr key={pinjaman.id_pinjaman}>
-                            <td className="text-center">{pinjaman.id_pinjaman}</td>
-                            <td className="text-center">{pinjaman.id_peminjam}</td>
-                            <td className="text-center">{pinjaman.Peminjam ? pinjaman.Peminjam.nama: 'N/A'}</td>
-                            <td className="text-center">{pinjaman.Peminjam ? pinjaman.Peminjam.departemen: 'N/A'}</td>
-                            <td className="text-center">{pinjaman.Peminjam ? pinjaman.Peminjam.divisi: 'N/A'}</td>
-                            <td className="text-center">{pinjaman.tanggal_pengajuan}</td>
-                            <td className="text-right">{formatRupiah(pinjaman.jumlah_pinjaman)}</td>
-                            <td className="text-center">{pinjaman.Asesor ? pinjaman.Asesor.nama: 'N/A'}</td>
-                            <td className="text-right">{formatRupiah(pinjaman.jumlah_angsuran)}</td>
-                            <td className="text-right">{formatRupiah(pinjaman.pinjaman_setelah_pembulatan)}</td>
-                            <td className="text-right">{pinjaman.rasio_angsuran}</td>
-                            <td className="text-right">{formatRupiah(totalSudahDibayar)}</td>
-                            <td className="text-right">
-                            {formatRupiah(pinjaman.AngsuranPinjaman && pinjaman.AngsuranPinjaman.length > 0 ? pinjaman.AngsuranPinjaman[0].belum_dibayar : (pinjaman.pinjaman_setelah_pembulatan))}
-                            </td>
-                            <td className="text-center">{pinjaman.AngsuranPinjaman && pinjaman.AngsuranPinjaman.length > 0 ? 60 - pinjaman.AngsuranPinjaman[0].bulan_angsuran : '60'}</td>
+            variant="primary"
+            onClick={() => downloadCSV(pinjaman)}>
+            <FaFileCsv style={{ marginRight: '8px' }} />
+            Unduh CSV
+          </Button>
+          <Button
+            className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+            type="button"
+            variant="primary"
+            onClick={downloadPDF}>
+            <FaFilePdf style={{ marginRight: '8px' }} />
+            Unduh PDF
+          </Button>
+          <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
+          </Row>
           
-                            <td className="text-center">
-                            {pinjaman.status_pelunasan === "Lunas" ? (
-                              <Badge pill bg="success p-2">
-                              Lunas
-                              </Badge >
-                            ) : (
-                              <Badge pill bg="danger p-2">
-                              Belum Lunas
-                              </Badge >
-                            )}
-                          </td>
-                          </tr>
-                        );
-                      })}
-                      </tbody>
-                    </table>
-                  </div>
-                </Table>
-                )}
-              </Card.Body>
-            </Card>
-            <div className="pagination-container">
-            <Pagination
-                  activePage={currentPage}
-                  itemsCountPerPage={itemsPerPage}
-                  totalItemsCount={filteredLaporanPiutang.length}
-                  pageRangeDisplayed={5}
-                  onChange={handlePageChange}
-                  itemClass="page-item"
-                  linkClass="page-link"
-            />
-            </div>
-          </Col>
-        </Row>
-      </Container>
+
+          <Row>
+            <Col md="12" className="mt-2">
+              <Card className="striped-tabled-with-hover">
+                <Card.Header>
+                  <Card.Title as="h4">Laporan Piutang Karyawan</Card.Title>
+                </Card.Header>
+                <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
+                  {/* {loading ? (
+                    <div className="text-center">
+                      <Spinner animation="border" variant="primary" />
+                      <p>Loading...</p>
+                    </div>
+                  ) : ( */}
+                  <Table className="table-hover table-striped">
+                    <div className="table-scroll" style={{ height: 'auto' }}>
+                      <table className="flex-table table table-striped table-hover">
+                        <thead>
+                        <tr>
+                          <th className="border-0 center">ID Pinjaman</th>
+                          <th className="border-0 center">ID Karyawan</th>
+                          <th className="border-0 center">Nama Karyawan</th>
+                          <th className="border-0 center">Departemen</th>
+                          <th className="border-0 center">Divisi</th>
+                          <th className="border-0 center">Tanggal Pengajuan</th>
+                          <th className="border-0 center">Jumlah Pinjaman</th>
+                          <th className="border-0 center">Ditransfer Oleh</th>
+                          <th className="border-0 center">Jumlah Angsuran</th>
+                          <th className="border-0 center">Jumlah Pinjaman Setelah Pembulatan</th>
+                          <th className="border-0 center">Rasio Angsuran</th>
+                          <th className="border-0 center">Sudah Dibayar</th>
+                          <th className="border-0 center">Belum Dibayar</th>
+                          <th className="border-0 center">Sisa Bulan</th>
+                          <th className="border-0 center">Status</th>
+                        </tr>
+                        </thead>
+                        <tbody className="scroll scroller-tbody">
+                          {currentItems
+                          .filter((item) => item.status_pengajuan !== "Ditunda" && item.status_transfer !== "Belum Ditransfer" && item.status_pengajuan !== "Dibatalkan" && item.status_transfer !== "Dibatalkan")
+                          .map((pinjaman) => {
+                            const totalSudahDibayar = pinjaman.SudahDibayar
+                            ? pinjaman.SudahDibayar.reduce((total, angsuran) => {
+                              const sudahDibayar = angsuran.sudah_dibayar ? parseFloat(angsuran.sudah_dibayar) : 0;
+                              return total + sudahDibayar;
+                        
+                              }, 0)
+                            : 0;
+                
+                          return ( 
+                            <tr key={pinjaman.id_pinjaman}>
+                              <td className="text-center">{pinjaman.id_pinjaman}</td>
+                              <td className="text-center">{pinjaman.id_peminjam}</td>
+                              <td className="text-center">{pinjaman.Peminjam ? pinjaman.Peminjam.nama: 'N/A'}</td>
+                              <td className="text-center">{pinjaman.Peminjam ? pinjaman.Peminjam.departemen: 'N/A'}</td>
+                              <td className="text-center">{pinjaman.Peminjam ? pinjaman.Peminjam.divisi: 'N/A'}</td>
+                              <td className="text-center">{pinjaman.tanggal_pengajuan}</td>
+                              <td className="text-right">{formatRupiah(pinjaman.jumlah_pinjaman)}</td>
+                              <td className="text-center">{pinjaman.Asesor ? pinjaman.Asesor.nama: 'N/A'}</td>
+                              <td className="text-right">{formatRupiah(pinjaman.jumlah_angsuran)}</td>
+                              <td className="text-right">{formatRupiah(pinjaman.pinjaman_setelah_pembulatan)}</td>
+                              <td className="text-right">{pinjaman.rasio_angsuran}</td>
+                              <td className="text-right">{formatRupiah(totalSudahDibayar)}</td>
+                              <td className="text-right">
+                              {formatRupiah(pinjaman.AngsuranPinjaman && pinjaman.AngsuranPinjaman.length > 0 ? pinjaman.AngsuranPinjaman[0].belum_dibayar : (pinjaman.pinjaman_setelah_pembulatan))}
+                              </td>
+                              <td className="text-center">{pinjaman.AngsuranPinjaman && pinjaman.AngsuranPinjaman.length > 0 ? 60 - pinjaman.AngsuranPinjaman[0].bulan_angsuran : '60'}</td>
+            
+                              <td className="text-center">
+                              {pinjaman.status_pelunasan === "Lunas" ? (
+                                <Badge pill bg="success p-2">
+                                Lunas
+                                </Badge >
+                              ) : (
+                                <Badge pill bg="danger p-2">
+                                Belum Lunas
+                                </Badge >
+                              )}
+                            </td>
+                            </tr>
+                          );
+                        })}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Table>
+                  {/* )} */}
+                </Card.Body>
+              </Card>
+              <div className="pagination-container">
+              <Pagination
+                    activePage={currentPage}
+                    itemsCountPerPage={itemsPerPage}
+                    totalItemsCount={filteredLaporanPiutang.length}
+                    pageRangeDisplayed={5}
+                    onChange={handlePageChange}
+                    itemClass="page-item"
+                    linkClass="page-link"
+              />
+              </div>
+            </Col>
+          </Row>
+        </Container>
+      </div>
+      ):
+      ( <>
+          <div className="App-loading">
+            <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+            <span style={{paddingTop:'100px'}}>Loading...</span>
+          </div>
+        </>
+      )}
     </>
   );
 }

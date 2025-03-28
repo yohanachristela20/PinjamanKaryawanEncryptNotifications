@@ -10,6 +10,8 @@ import Heartbeat from "./Heartbeat.js";
 import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 import {
   Badge,
@@ -168,6 +170,8 @@ function RiwayatPinjamanKaryawan() {
     // getPinjamanData();
     getAntrean();
     fetchAntrean();
+
+    setTimeout(() => setLoading(false), 2000)
   }, []);
  
 
@@ -182,8 +186,8 @@ function RiwayatPinjamanKaryawan() {
       setPinjaman(response.data);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
   
@@ -199,8 +203,8 @@ function RiwayatPinjamanKaryawan() {
     } catch (error) {
       console.error("Error fetching antrean:", error.message);
       setError("Gagal mengambil antrean. Silakan coba lagi.");
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -343,108 +347,117 @@ function RiwayatPinjamanKaryawan() {
 
   return (
     <>
-      <Container fluid>
-      <Heartbeat/>
-      
-        <Row className="mb-4">
-          <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
-        </Row>
-          
-        <Row>
-          <Col md="12" className="mt-1">
-            <Card className="striped-tabled-with-hover">
-              <Card.Header>
-                <Card.Title as="h4">Riwayat Pinjaman</Card.Title>
+      {loading === false ? 
+        (<div className="App">
+          <Container fluid>
+            <Heartbeat/>
+            <Row className="mb-4">
+              <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
+            </Row>
+            <Row>
+              <Col md="12" className="mt-1">
+                <Card className="striped-tabled-with-hover">
+                  <Card.Header>
+                    <Card.Title as="h4">Riwayat Pinjaman</Card.Title>
 
-              </Card.Header>
-              <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
-                 {loading ? (
-                    <div className="text-center">
-                      <Spinner animation="border" variant="primary" />
-                      <p>Loading...</p>
-                    </div>
-                  ) : (
-                <Table className="table-hover table-striped">
-                  <div className="table-scroll" style={{ height: 'auto' }}>
-                    <table className="flex-table table table-striped table-hover">
-                      <thead>
-                      <tr>
-                        <th className="border-0">ID Pinjaman</th>
-                        <th className="border-0">Tanggal Pengajuan</th>
-                        <th className="border-0">Jumlah Pinjaman</th>
-                        <th className="border-0">Jumlah Angsuran</th>
-                        <th className="border-0">Jumlah Pinjaman Setelah Pembulatan</th>
-                        <th className="border-0">Keperluan</th>
-                        <th className="border-0">Ditransfer Oleh</th>
-                        <th className="border-0">Sisa Angsuran (Bulan)</th>
-                        <th className="border-0">Sudah Dibayar</th>
-                        <th className="border-0">Belum Dibayar</th>
-                        <th className="border-0">Status Pelunasan</th>
-                      </tr>
-                      </thead>
-                      <tbody className="scroll scroller-tbody">
-                        { currentItems
-                        .map((pinjaman) => {
-                          // console.log('Pinjaman AngsuranPinjaman:', pinjaman.SudahDibayar);
+                  </Card.Header>
+                  <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto' }}>
+                    {/* {loading ? (
+                        <div className="text-center">
+                          <Spinner animation="border" variant="primary" />
+                          <p>Loading...</p>
+                        </div>
+                      ) : ( */}
+                    <Table className="table-hover table-striped">
+                      <div className="table-scroll" style={{ height: 'auto' }}>
+                        <table className="flex-table table table-striped table-hover">
+                          <thead>
+                          <tr>
+                            <th className="border-0">ID Pinjaman</th>
+                            <th className="border-0">Tanggal Pengajuan</th>
+                            <th className="border-0">Jumlah Pinjaman</th>
+                            <th className="border-0">Jumlah Angsuran</th>
+                            <th className="border-0">Jumlah Pinjaman Setelah Pembulatan</th>
+                            <th className="border-0">Keperluan</th>
+                            <th className="border-0">Ditransfer Oleh</th>
+                            <th className="border-0">Sisa Angsuran (Bulan)</th>
+                            <th className="border-0">Sudah Dibayar</th>
+                            <th className="border-0">Belum Dibayar</th>
+                            <th className="border-0">Status Pelunasan</th>
+                          </tr>
+                          </thead>
+                          <tbody className="scroll scroller-tbody">
+                            { currentItems
+                            .map((pinjaman) => {
+                              // console.log('Pinjaman AngsuranPinjaman:', pinjaman.SudahDibayar);
 
-                          const totalSudahDibayar = pinjaman.SudahDibayar
-                          ? pinjaman.SudahDibayar.reduce((total, angsuran) => {
-                            const sudahDibayar = angsuran.sudah_dibayar ? parseFloat(angsuran.sudah_dibayar) : 0;
-                            return total + sudahDibayar;
-                      
-                            }, 0)
-                          : 0;
+                              const totalSudahDibayar = pinjaman.SudahDibayar
+                              ? pinjaman.SudahDibayar.reduce((total, angsuran) => {
+                                const sudahDibayar = angsuran.sudah_dibayar ? parseFloat(angsuran.sudah_dibayar) : 0;
+                                return total + sudahDibayar;
+                          
+                                }, 0)
+                              : 0;
 
-                        return(
-                          <tr key={pinjaman.id_pinjaman}>
-                          <td className="text-center">{pinjaman.id_pinjaman}</td>
-                          <td className="text-center">{pinjaman.tanggal_pengajuan}</td>
-                          <td className="text-right">{formatRupiah(pinjaman.jumlah_pinjaman)}</td>
-                          <td className="text-right">{formatRupiah(pinjaman.jumlah_angsuran)}</td>
-                          <td className="text-right">{formatRupiah(pinjaman.pinjaman_setelah_pembulatan)}</td>
-                          <td className="text-center">{pinjaman.keperluan}</td>
-                          <td className="text-center">{pinjaman.Asesor ? pinjaman.Asesor.nama: 'N/A'}</td>
-                          <td className="text-center">{pinjaman.AngsuranPinjaman && pinjaman.AngsuranPinjaman.length > 0 ? 60 - pinjaman.AngsuranPinjaman[0].bulan_angsuran : '60'}</td>
-                          <td className="text-right">{formatRupiah(totalSudahDibayar)}</td>
-                          <td className="text-right">
-                            {formatRupiah(pinjaman.AngsuranPinjaman && pinjaman.AngsuranPinjaman.length > 0 ? pinjaman.AngsuranPinjaman[0].belum_dibayar : (pinjaman.pinjaman_setelah_pembulatan))}
-                            </td>
-                          <td className="text-center">
-                            {pinjaman.status_pelunasan === "Lunas" ? (
-                              <Badge pill bg="success p-2">
-                              Lunas
-                              </Badge >
-                            ) : (
-                              <Badge pill bg="danger p-2">
-                              Belum Lunas
-                              </Badge >
-                            )}
-                          </td>
-                        </tr>
-                        );
-                        })
-                        }
-                      </tbody>
-                    </table>
-                  </div>
-                </Table>
-                  )}
-              </Card.Body>
-            </Card>
-            <div className="pagination-container">
-            <Pagination
-                  activePage={currentPage}
-                  itemsCountPerPage={itemsPerPage}
-                  totalItemsCount={filteredPinjamanFinal.length}
-                  pageRangeDisplayed={5}
-                  onChange={handlePageChange}
-                  itemClass="page-item"
-                  linkClass="page-link"
-            />
+                            return(
+                              <tr key={pinjaman.id_pinjaman}>
+                              <td className="text-center">{pinjaman.id_pinjaman}</td>
+                              <td className="text-center">{pinjaman.tanggal_pengajuan}</td>
+                              <td className="text-right">{formatRupiah(pinjaman.jumlah_pinjaman)}</td>
+                              <td className="text-right">{formatRupiah(pinjaman.jumlah_angsuran)}</td>
+                              <td className="text-right">{formatRupiah(pinjaman.pinjaman_setelah_pembulatan)}</td>
+                              <td className="text-center">{pinjaman.keperluan}</td>
+                              <td className="text-center">{pinjaman.Asesor ? pinjaman.Asesor.nama: 'N/A'}</td>
+                              <td className="text-center">{pinjaman.AngsuranPinjaman && pinjaman.AngsuranPinjaman.length > 0 ? 60 - pinjaman.AngsuranPinjaman[0].bulan_angsuran : '60'}</td>
+                              <td className="text-right">{formatRupiah(totalSudahDibayar)}</td>
+                              <td className="text-right">
+                                {formatRupiah(pinjaman.AngsuranPinjaman && pinjaman.AngsuranPinjaman.length > 0 ? pinjaman.AngsuranPinjaman[0].belum_dibayar : (pinjaman.pinjaman_setelah_pembulatan))}
+                                </td>
+                              <td className="text-center">
+                                {pinjaman.status_pelunasan === "Lunas" ? (
+                                  <Badge pill bg="success p-2">
+                                  Lunas
+                                  </Badge >
+                                ) : (
+                                  <Badge pill bg="danger p-2">
+                                  Belum Lunas
+                                  </Badge >
+                                )}
+                              </td>
+                            </tr>
+                            );
+                            })
+                            }
+                          </tbody>
+                        </table>
+                      </div>
+                    </Table>
+                      {/* )} */}
+                  </Card.Body>
+                </Card>
+                <div className="pagination-container">
+                <Pagination
+                      activePage={currentPage}
+                      itemsCountPerPage={itemsPerPage}
+                      totalItemsCount={filteredPinjamanFinal.length}
+                      pageRangeDisplayed={5}
+                      onChange={handlePageChange}
+                      itemClass="page-item"
+                      linkClass="page-link"
+                />
+                </div>
+              </Col>
+            </Row>
+          </Container>
+        </div>
+        ):
+        ( <>
+            <div className="App-loading">
+              <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+              <span style={{paddingTop:'100px'}}>Loading...</span>
             </div>
-          </Col>
-        </Row>
-      </Container>
+          </>
+        )}
     </>
   );
 }

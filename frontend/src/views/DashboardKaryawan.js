@@ -14,6 +14,9 @@ import DeclineAlert from "components/Alert/DeclineAlert.js";
 import PendingAlert from "components/Alert/PendingAlert.js";
 import AcceptedNextStepAlert from "components/Alert/AcceptedNextStepAlert.js";
 
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
+
 
 const BASE_URL = 'http://10.70.10.110:5000';
 import {
@@ -583,39 +586,39 @@ useEffect(() => {
   bulanLagi, 
 ]);
 
-const hasilScreening = React.useMemo(() => {
-  if (!isDataDiriComplete()) return null;
+  const hasilScreening = React.useMemo(() => {
+    if (!isDataDiriComplete()) return null;
 
-  // console.log("Plafond tersisa: ", plafondSaatIni); 
-  // console.log("Plafond awal: ", plafond);
-  // console.log("Jumlah pinjaman: ", jumlahPinjamanFloat); 
-  // console.log("Status pinjaman: ", statusPinjaman);
+    // console.log("Plafond tersisa: ", plafondSaatIni); 
+    // console.log("Plafond awal: ", plafond);
+    // console.log("Jumlah pinjaman: ", jumlahPinjamanFloat); 
+    // console.log("Status pinjaman: ", statusPinjaman);
 
-  const isDeclined =
-    calculateYears(tanggal_masuk) < 5 ||
+    const isDeclined =
+      calculateYears(tanggal_masuk) < 5 ||
 
-    calculaterasio_angsuran(jumlah_pinjaman, gajiPokok) > 20 ||
-    rasio_angsuran > 20 ||
-    calculatePensiun(tanggal_lahir, jenis_kelamin) < 6 
+      calculaterasio_angsuran(jumlah_pinjaman, gajiPokok) > 20 ||
+      rasio_angsuran > 20 ||
+      calculatePensiun(tanggal_lahir, jenis_kelamin) < 6 
 
-    if(isDeclined) return "Decline";
-    if(isAjukanDisabled || totalPinjaman - totalDibayar !== 0) return "Pending";
-    if(plafondFloat < jumlahPinjamanFloat) return "AcceptedNext";
+      if(isDeclined) return "Decline";
+      if(isAjukanDisabled || totalPinjaman - totalDibayar !== 0) return "Pending";
+      if(plafondFloat < jumlahPinjamanFloat) return "AcceptedNext";
 
-  return "Accepted";
-}, [
-  tanggal_masuk,
-  totalPinjaman,
-  totalDibayar,
-  plafondSaatIni,
-  jumlah_pinjaman,
-  gajiPokok,
-  tanggal_lahir,
-  jenis_kelamin,
-  keperluan,
-  rasio_angsuran, 
-  statusPinjaman,
-]);
+    return "Accepted";
+  }, [
+    tanggal_masuk,
+    totalPinjaman,
+    totalDibayar,
+    plafondSaatIni,
+    jumlah_pinjaman,
+    gajiPokok,
+    tanggal_lahir,
+    jenis_kelamin,
+    keperluan,
+    rasio_angsuran, 
+    statusPinjaman,
+  ]);
 
   const calculaterasio_angsuranMemoized = useMemo(() => {
     if (!jumlah_pinjaman || !gajiPokok) return null; 
@@ -631,7 +634,7 @@ const hasilScreening = React.useMemo(() => {
     e.preventDefault();
     try {
       // console.log("Saving pengajuan with id_pinjaman: ", id_pinjaman);
-
+      setLoadingPlafond(true);
         await axios.post("http://10.70.10.110:5000/pinjaman", {
             id_pinjaman,
             tanggal_pengajuan,
@@ -653,13 +656,14 @@ const hasilScreening = React.useMemo(() => {
             },
         });
 
-
         getNomorAntrean();
         handlePengajuanSuccess();
         setIsButtonClicked(true);
 
     } catch (error) {
         console.error("Error saat menyimpan pengajuan:", error.response?.data || error.message);
+    } finally {
+      setLoadingPlafond(false);
     }
   };
 
@@ -683,6 +687,7 @@ const hasilScreening = React.useMemo(() => {
       await getPinjaman();
     };
     fetchData();
+    setTimeout(() => setLoading(false), 1000)
   }, []);
 
   // console.log("Total pinjaman: ", totalPinjaman); 
@@ -690,442 +695,454 @@ const hasilScreening = React.useMemo(() => {
   
   return (
     <>
-    <div className="home-card">
-      <div className="card-content">
-        <h2 className="card-title">Hai, {userData.nama}!</h2>
-        <h4 className="card-subtitle">Ajukan pinjaman dengan mudah disini.</h4><hr/>
-        <p className="text-danger">*Sistem akan logout secara otomatis dalam 5 menit jika tidak terdapat aktifitas dalam sistem.</p>
-      </div>
-      <div className="card-opening">
-        <img 
-          src={cardBeranda}
-          alt="Beranda Illustration"
-        /> 
-      </div>
-    </div>
-      <Container fluid>
-      <Heartbeat/>
-        <Row>
-          <Col md="12">
-            <Card className="p-4">
-              <Card.Body>
-              <Card.Header className="px-0">
-                  <Card.Title>
-                    Form Pengajuan
-                  </Card.Title>
-                </Card.Header>
-                <hr/>
+      {loading === false ? 
+        (<div className="App">
+        <div className="home-card">
+        <div className="card-content">
+          <h2 className="card-title">Hai, {userData.nama}!</h2>
+          <h4 className="card-subtitle">Ajukan pinjaman dengan mudah disini.</h4><hr/>
+          <p className="text-danger">*Sistem akan logout secara otomatis dalam 5 menit jika tidak terdapat aktifitas dalam sistem.</p>
+        </div>
+        <div className="card-opening">
+          <img 
+            src={cardBeranda}
+            alt="Beranda Illustration"
+          /> 
+        </div>
+        </div>
+        <Container fluid>
+          <Heartbeat/>
+          <Row>
+            <Col md="12">
+              <Card className="p-4">
+                <Card.Body>
+                <Card.Header className="px-0">
+                    <Card.Title>
+                      Form Pengajuan
+                    </Card.Title>
+                  </Card.Header>
+                  <hr/>
 
-                <div className="stepper-wrapper mt-5">
-                <div className="stepper">
-                  {[1, 2].map((step) => (
-                    <div
-                      key={step}
-                      className={`step ${steps === step ? "active" : steps > step ? "completed" : ""}`}
-                    >
-                      <div className="circle">{step}</div>
-                      <div className="label">{stepTitle[step - 1].title}</div>
-                    </div>
-                  ))}
-                </div>
-                </div>
-
-                <div>
-                <Form>
-                <span className="text-danger required-select">(*) Wajib diisi.</span>
-                {loading ? (
-                  <div className="text-center">
-                    <Spinner animation="border" variant="primary" />
-                    <p>Loading...</p>
+                  <div className="stepper-wrapper mt-5">
+                  <div className="stepper">
+                    {[1, 2].map((step) => (
+                      <div
+                        key={step}
+                        className={`step ${steps === step ? "active" : steps > step ? "completed" : ""}`}
+                      >
+                        <div className="circle">{step}</div>
+                        <div className="label">{stepTitle[step - 1].title}</div>
+                      </div>
+                    ))}
                   </div>
-                ) : (
-                <>
+                  </div>
 
-                  {steps === 1 && (
-                    <>
-                      <br/><span className="text-danger required-select">Enter untuk menampilkan angsuran per bulan dan hasil pembulatan</span>
-                      <Row>
+                  <div>
+                  <Form>
+                  <span className="text-danger required-select">(*) Wajib diisi.</span>
+                  {/* {loading ? (
+                    <div className="text-center">
+                      <Spinner animation="border" variant="primary" />
+                      <p>Loading...</p>
+                    </div>
+                  ) : ( */}
+                  <>
+
+                    {steps === 1 && (
+                      <>
+                        <br/><span className="text-danger required-select">Enter untuk menampilkan angsuran per bulan dan hasil pembulatan</span>
+                        <Row>
+                          <Col md="12" className="mt-2">
+                            <Form.Group>
+                            <span className="text-danger">*</span>
+                                <label>Keperluan</label>
+                                <Form.Select 
+                                className="form-control"
+                                required
+                                value={keperluan || ""} 
+                                onChange={(e) => setKeperluan(e.target.value)}
+                                >
+                                <option className="placeholder-form" key="blankChoice" hidden value="">
+                                    Pilih Jenis Keperluan
+                                </option>
+                                <option value="Pendidikan">Pendidikan</option>
+                                <option value="Pengobatan">Pengobatan</option>
+                                <option value="Renovasi">Renovasi</option>
+                                </Form.Select>
+                            </Form.Group>
+                          </Col>
+                        </Row>
+
+                        <Row>
                         <Col md="12" className="mt-2">
                           <Form.Group>
                           <span className="text-danger">*</span>
-                              <label>Keperluan</label>
-                              <Form.Select 
-                              className="form-control"
-                              required
-                              value={keperluan || ""} 
-                              onChange={(e) => setKeperluan(e.target.value)}
-                              >
-                              <option className="placeholder-form" key="blankChoice" hidden value="">
-                                  Pilih Jenis Keperluan
-                              </option>
-                              <option value="Pendidikan">Pendidikan</option>
-                              <option value="Pengobatan">Pengobatan</option>
-                              <option value="Renovasi">Renovasi</option>
-                              </Form.Select>
+                              <label>Jumlah Pinjaman</label>
+                              <Form.Control
+                                  placeholder="Rp"
+                                  type="text"
+                                  required
+                                  value={formatRupiah(jumlah_pinjaman || "")}
+                                  onChange={(e) => handleJumlahPinjamanChange(e.target.value)}
+                                  onKeyPress={handleKeyPress}
+                              />
+                          </Form.Group>
+                        </Col>
+                        </Row>
+                        <Row>
+                            <Col md="12">
+                                <Form.Group>
+                                    <label>Angsuran per Bulan</label>
+                                    <Form.Control
+                                        placeholder="Rp"
+                                        type="text"
+                                        required
+                                        readOnly
+                                        value={formatRupiah(jumlah_angsuran || "")}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md="12">
+                                <Form.Group>
+                                    <label>Jumlah Pinjaman Setelah Pembulatan</label>
+                                    <Form.Control
+                                        placeholder="Rp"
+                                        type="text"
+                                        required
+                                        readOnly
+                                        value={formatRupiah(pinjaman_setelah_pembulatan || "")}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col md="12">
+                                <Form.Group>
+                                    <label>Tanggal Pengajuan</label>
+                                    <Form.Control
+                                        type="text"
+                                        required
+                                        readOnly
+                                        value={formatTanggal(tanggal_pengajuan)}
+                                        onChange={(e) => setTanggalPengajuan(e.target.value)}
+                                    />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                      </>
+                    )}
+
+
+                    {steps === 2 && (
+                    <>
+                      <Row>
+                      <Col md="12" className="mt-2">
+                      <Form.Group>
+                        <label>ID Karyawan</label>
+                        <Form.Control
+                          type="text"
+                          // name="id_karyawan"
+                          value={id_karyawan}
+                          readOnly
+                          placeholder="ID Karyawan"
+                        />
+                      </Form.Group>
+                      </Col>
+                      </Row>
+                      <Row>
+                        <Col md="12">
+                        <Form.Group>
+                            <label>Nama Lengkap</label>
+                            <Form.Control
+                              placeholder="Nama Lengkap"
+                              type="text"
+                              readOnly
+                              value={nama || ""}
+                            ></Form.Control>
                           </Form.Group>
                         </Col>
                       </Row>
-
                       <Row>
-                      <Col md="12" className="mt-2">
+                        <Col className="pr-md--0" md="6">
                         <Form.Group>
-                        <span className="text-danger">*</span>
-                            <label>Jumlah Pinjaman</label>
+                            <label>Tanggal Lahir</label>
                             <Form.Control
-                                placeholder="Rp"
-                                type="text"
-                                required
-                                value={formatRupiah(jumlah_pinjaman || "")}
-                                onChange={(e) => handleJumlahPinjamanChange(e.target.value)}
-                                onKeyPress={handleKeyPress}
-                            />
+                              placeholder="Tanggal Lahir"
+                              type="text"
+                              readOnly
+                              value={tanggal_lahir || ""}
+                            ></Form.Control>
                         </Form.Group>
-                      </Col>
+                        </Col>
+                        <Col className="pl-md-1" md="6">
+                        <Form.Group>
+                            <label>Tanggal Masuk</label>
+                            <Form.Control
+                              placeholder="Tanggal Masuk"
+                              type="text"
+                              readOnly
+                              value={tanggal_masuk || ""}
+                            ></Form.Control>
+                        </Form.Group>
+                        </Col>
+                        {/* <Col md="12">
+                          <Form.Group>
+                              <label>Nomor Antrean</label>
+                              <Form.Control
+                                  type="text"
+                                  value={nomorAntrean || "-"}
+                                  readOnly
+                              />
+                          </Form.Group>
+                      </Col> */}
                       </Row>
-                      <Row>
-                          <Col md="12">
-                              <Form.Group>
-                                  <label>Angsuran per Bulan</label>
-                                  <Form.Control
-                                      placeholder="Rp"
-                                      type="text"
-                                      required
-                                      readOnly
-                                      value={formatRupiah(jumlah_angsuran || "")}
-                                  />
-                              </Form.Group>
-                          </Col>
-                      </Row>
-                      <Row>
-                          <Col md="12">
-                              <Form.Group>
-                                  <label>Jumlah Pinjaman Setelah Pembulatan</label>
-                                  <Form.Control
-                                      placeholder="Rp"
-                                      type="text"
-                                      required
-                                      readOnly
-                                      value={formatRupiah(pinjaman_setelah_pembulatan || "")}
-                                  />
-                              </Form.Group>
-                          </Col>
-                      </Row>
-                      <Row>
-                          <Col md="12">
-                              <Form.Group>
-                                  <label>Tanggal Pengajuan</label>
-                                  <Form.Control
-                                      type="text"
-                                      required
-                                      readOnly
-                                      value={formatTanggal(tanggal_pengajuan)}
-                                      onChange={(e) => setTanggalPengajuan(e.target.value)}
-                                  />
-                              </Form.Group>
-                          </Col>
-                      </Row>
+                    </> 
+                    )}
                     </>
-                  )}
-
-
-                  {steps === 2 && (
-                  <>
-                    <Row>
-                    <Col md="12" className="mt-2">
-                    <Form.Group>
-                      <label>ID Karyawan</label>
-                      <Form.Control
-                        type="text"
-                        // name="id_karyawan"
-                        value={id_karyawan}
-                        readOnly
-                        placeholder="ID Karyawan"
-                      />
-                    </Form.Group>
-                    </Col>
-                    </Row>
-                    <Row>
-                      <Col md="12">
-                      <Form.Group>
-                          <label>Nama Lengkap</label>
-                          <Form.Control
-                            placeholder="Nama Lengkap"
-                            type="text"
-                            readOnly
-                            value={nama || ""}
-                          ></Form.Control>
-                        </Form.Group>
-                      </Col>
-                    </Row>
-                    <Row>
-                      <Col className="pr-md--0" md="6">
-                      <Form.Group>
-                          <label>Tanggal Lahir</label>
-                          <Form.Control
-                            placeholder="Tanggal Lahir"
-                            type="text"
-                            readOnly
-                            value={tanggal_lahir || ""}
-                          ></Form.Control>
-                      </Form.Group>
-                      </Col>
-                      <Col className="pl-md-1" md="6">
-                      <Form.Group>
-                          <label>Tanggal Masuk</label>
-                          <Form.Control
-                            placeholder="Tanggal Masuk"
-                            type="text"
-                            readOnly
-                            value={tanggal_masuk || ""}
-                          ></Form.Control>
-                      </Form.Group>
-                      </Col>
-                      {/* <Col md="12">
-                        <Form.Group>
-                            <label>Nomor Antrean</label>
-                            <Form.Control
-                                type="text"
-                                value={nomorAntrean || "-"}
-                                readOnly
-                            />
-                        </Form.Group>
-                    </Col> */}
-                    </Row>
-                  </> 
-                  )}
-                  </>
-                  )}
-                
-                <div className="row gy-2 mt-3 mb-3 d-flex justify-content-center">
-                {steps === 1 ? (
-                  <>
+                    {/* )} */}
+                  
+                  <div className="row gy-2 mt-3 mb-3 d-flex justify-content-center">
+                  {steps === 1 ? (
+                    <>
+                      <div className="col-12 col-md-auto my-2">
+                      <Button
+                        className="btn-fill w-100"
+                        type="button"
+                        variant="warning"
+                        onClick={resetPengajuan}
+                        >
+                        <FaHistory style={{ marginRight: '8px' }} />
+                        Reset
+                      </Button>
+                      </div>
+                      <div className="col-12 col-md-auto my-2">
+                        <Button variant="primary" className="btn-fill w-100" onClick={handleNext} disabled={steps === 1 && keperluan === "" || jumlah_pinjaman === "0" || jumlah_angsuran === ""}>
+                          Selanjutnya
+                          <FaRegArrowAltCircleRight style={{ marginLeft: '8px' }}/>
+                        </Button>
+                      </div>
+                    </>
+                  ) : (
+                    <>
                     <div className="col-12 col-md-auto my-2">
-                    <Button
-                      className="btn-fill w-100"
-                      type="button"
-                      variant="warning"
-                      onClick={resetPengajuan}
+                      <Button
+                        className="btn-fill w-100"
+                        variant="primary"
+                        onClick={handlePrevious}
+                        disabled={steps === 1}
                       >
-                      <FaHistory style={{ marginRight: '8px' }} />
-                      Reset
-                    </Button>
-                    </div>
-                    <div className="col-12 col-md-auto my-2">
-                      <Button variant="primary" className="btn-fill w-100" onClick={handleNext} disabled={steps === 1 && keperluan === "" || jumlah_pinjaman === "0" || jumlah_angsuran === ""}>
-                        Selanjutnya
-                        <FaRegArrowAltCircleRight style={{ marginLeft: '8px' }}/>
+                      <FaRegArrowAltCircleLeft style={{ marginRight: '8px' }} />
+                        Sebelumnya
                       </Button>
                     </div>
-                  </>
-                ) : (
-                  <>
-                  <div className="col-12 col-md-auto my-2">
-                    <Button
-                      className="btn-fill w-100"
-                      variant="primary"
-                      onClick={handlePrevious}
-                      disabled={steps === 1}
-                    >
-                    <FaRegArrowAltCircleLeft style={{ marginRight: '8px' }} />
-                      Sebelumnya
-                    </Button>
+                    <div className="col-12 col-md-auto my-2">
+                      <Button variant="primary" className="btn-fill w-100" onClick={savePengajuan}  disabled={ isAjukanDisabled || hasilScreening === "Decline" || jumlah_pinjaman === "" || jumlah_angsuran === ""}>
+                      <FaRegSave style={{ marginRight: '8px' }} />
+                        Simpan
+                      </Button>
+                    </div>
+                    </>
+                  )}
                   </div>
-                  <div className="col-12 col-md-auto my-2">
-                    <Button variant="primary" className="btn-fill w-100" onClick={savePengajuan}  disabled={ isAjukanDisabled || hasilScreening === "Decline" || jumlah_pinjaman === "" || jumlah_angsuran === ""}>
-                    <FaRegSave style={{ marginRight: '8px' }} />
-                      Simpan
-                    </Button>
+                  <div className="clearfix"></div>
+                  </Form>
                   </div>
-                  </>
-                )}
-                </div>
-                <div className="clearfix"></div>
-                </Form>
-                </div>
-              </Card.Body>
-            </Card>
+                </Card.Body>
+              </Card>
 
-            <Card hidden={steps === 1}>
-            <Card.Body className="table-responsive" style={{ overflowX: 'auto' }} >
-                {loading ? (
-                  <div className="text-center">
-                    <Spinner animation="border" variant="primary" />
-                    <p>Loading...</p>
-                  </div>
-                ) : (
-                  <>
+              <Card hidden={steps === 1}>
+              <Card.Body className="table-responsive" style={{ overflowX: 'auto' }} >
+                  {loading ? (
+                    <div className="text-center">
+                      <Spinner animation="border" variant="primary" />
+                      <p>Loading...</p>
+                    </div>
+                  ) : (
+                    <>
                   <Row className="pt-3">
-                  <Col md="12">
-                  <Form.Group>
-                  <label>Persyaratan Pinjaman Karyawan</label>
-                    <br />
-                    {isDataDiriComplete() ? ( 
-                      hasilScreening === "Decline" && steps === 2 ? (
-                        <>
-                          <DeclineAlert 
-                            hidden={jumlah_angsuran === "" || keperluan === ""}
+                    <Col md="12">
+                    <Form.Group>
+                    <label>Persyaratan Pinjaman Karyawan</label>
+                      <br />
+                      {isDataDiriComplete() ? ( 
+                        hasilScreening === "Decline" && steps === 2 ? (
+                          <>
+                            <DeclineAlert 
+                              hidden={jumlah_angsuran === "" || keperluan === ""}
+                              selectedPinjaman={selectedPinjaman}
+                              totalPinjaman={totalPinjaman}
+                              totalDibayar={totalDibayar}
+                              
+                            />
+                          </>
+                        ) : steps === 2 && hasilScreening === "Accepted" ? (
+                          <AcceptedAlert
+                            hidden={steps !== 2 ||jumlah_angsuran === "" || keperluan === ""}
                             selectedPinjaman={selectedPinjaman}
                             totalPinjaman={totalPinjaman}
                             totalDibayar={totalDibayar}
-                            
                           />
-                        </>
-                      ) : steps === 2 && hasilScreening === "Accepted" ? (
-                        <AcceptedAlert
-                          hidden={steps !== 2 ||jumlah_angsuran === "" || keperluan === ""}
-                          selectedPinjaman={selectedPinjaman}
-                          totalPinjaman={totalPinjaman}
-                          totalDibayar={totalDibayar}
-                        />
-                      ) 
-                        : steps === 2 && isAjukanDisabled  && hasilScreening === "Pending" ? (
-                          <PendingAlert
-                            hidden={jumlah_angsuran === "" || jumlah_pinjaman === "" || keperluan === ""}
-                          /> 
-                      )
-                        : steps === 2 && plafondFloat < jumlahPinjamanFloat  && hasilScreening === "AcceptedNext" ? (
-                          <AcceptedNextStepAlert
-                            hidden={jumlah_angsuran === "" || jumlah_pinjaman === "" || keperluan === ""}
-                          /> 
+                        ) 
+                          : steps === 2 && isAjukanDisabled  && hasilScreening === "Pending" ? (
+                            <PendingAlert
+                              hidden={jumlah_angsuran === "" || jumlah_pinjaman === "" || keperluan === ""}
+                            /> 
+                        )
+                          : steps === 2 && plafondFloat < jumlahPinjamanFloat  && hasilScreening === "AcceptedNext" ? (
+                            <AcceptedNextStepAlert
+                              hidden={jumlah_angsuran === "" || jumlah_pinjaman === "" || keperluan === ""}
+                            /> 
+                        ) : (
+                          <p className="text-danger">*Mohon lengkapi semua data terlebih dahulu.</p>
+                        )
                       ) : (
                         <p className="text-danger">*Mohon lengkapi semua data terlebih dahulu.</p>
-                      )
-                    ) : (
-                      <p className="text-danger">*Mohon lengkapi semua data terlebih dahulu.</p>
-                    )}
-                  </Form.Group>
-                  </Col>
-                </Row>
+                      )}
+                    </Form.Group>
+                    </Col>
+                  </Row>
 
-                <Row className="pt-2">
-                  <Col md="12">
-                    <Table className="table-hover table-striped table-bordered" hidden={steps === 1 && keperluan === "" || steps === 1 && jumlah_angsuran === ""}>
-                      <thead className="table-primary text-nowwrap">
-                        <tr>
-                          <th style={{fontSize: 16}}>Syarat</th>
-                          <th style={{fontSize: 16}}>Deskripsi</th>
-                          <th style={{fontSize: 16}}>Kondisi saat ini</th>
-                          <th style={{fontSize: 16}}>Status</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td className="text-center">Masa kerja</td>
-                          <td className="text-center">Masa kerja >= 5 tahun</td>
-                          <td className="text-center">{masaKerja}</td>
-                          <td className="text-center">
-                          {
-                              tanggal_masuk
-                              ? calculateYears(tanggal_masuk) >=5 
-                              ? <FaCheckCircle style={{ color: 'green' }} />
-                              : <FaTimesCircle style={{ color: 'red' }} />
-                              : null
-                            }
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="text-center">Riwayat Pinjaman</td>
-                          <td className="text-center">Tidak memiliki pinjaman aktif</td>
-                          <td className="text-center">
-                            { totalPinjaman - totalDibayar > 0 
-                            ? "Memiliki pinjaman aktif"
-                            : "Tidak memiliki pinjaman aktif"
-                            }
-                          </td>
-                          <td className="text-center">
-                          {
-                            id_karyawan ? ( 
-                              totalPinjaman - totalDibayar !== 0 
-                              ? <FaTimesCircle style={{ color: 'red' }} /> 
-                              : <FaCheckCircle style={{ color: 'green' }} />
-                            ) : null}
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="text-center">Plafond</td>
-                          <td className="text-center">Sisa plafond mencukupi</td>
-                          <td className="text-center">
-                            {id_karyawan ? (
-                              loadingPlafond ? (
-                                <div className="text-center">
-                                  <Spinner animation="border" variant="primary" />
-                                  <p>Loading...</p>
-                                </div>
-                            ) : (
-                             <>
-                               {statusPinjaman}
-                               {pinjamanInfo && <p className="text-warning">{pinjamanInfo}</p>}
-                                  {isButtonClicked && (
-                                    <p className="text-center text-warning">Nomor antrean anda: {nomorAntrean !== null && nomorAntrean !== undefined ? nomorAntrean : 1}</p>
-                                  )}
-                             </>
-                            )
-                            ) : null}
-                          </td>
-
-                          <td className="text-center">
-                            {id_karyawan ? (
-                              loadingPlafond ? (
-                                <div className="text-center">
-                                  <Spinner animation="border" variant="primary" />
-                                  <p>Loading...</p>
-                                </div>
-                              ) : plafond >= jumlah_pinjaman ? (
-                                <FaCheckCircle style={{ color: "green" }} />
+                  <Row className="pt-2">
+                    <Col md="12">
+                      <Table className="table-hover table-striped table-bordered" hidden={steps === 1 && keperluan === "" || steps === 1 && jumlah_angsuran === ""}>
+                        <thead className="table-primary text-nowwrap">
+                          <tr>
+                            <th style={{fontSize: 16}}>Syarat</th>
+                            <th style={{fontSize: 16}}>Deskripsi</th>
+                            <th style={{fontSize: 16}}>Kondisi saat ini</th>
+                            <th style={{fontSize: 16}}>Status</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td className="text-center">Masa kerja</td>
+                            <td className="text-center">Masa kerja >= 5 tahun</td>
+                            <td className="text-center">{masaKerja}</td>
+                            <td className="text-center">
+                            {
+                                tanggal_masuk
+                                ? calculateYears(tanggal_masuk) >=5 
+                                ? <FaCheckCircle style={{ color: 'green' }} />
+                                : <FaTimesCircle style={{ color: 'red' }} />
+                                : null
+                              }
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="text-center">Riwayat Pinjaman</td>
+                            <td className="text-center">Tidak memiliki pinjaman aktif</td>
+                            <td className="text-center">
+                              { totalPinjaman - totalDibayar > 0 
+                              ? "Memiliki pinjaman aktif"
+                              : "Tidak memiliki pinjaman aktif"
+                              }
+                            </td>
+                            <td className="text-center">
+                            {
+                              id_karyawan ? ( 
+                                totalPinjaman - totalDibayar !== 0 
+                                ? <FaTimesCircle style={{ color: 'red' }} /> 
+                                : <FaCheckCircle style={{ color: 'green' }} />
+                              ) : null}
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="text-center">Plafond</td>
+                            <td className="text-center">Sisa plafond mencukupi</td>
+                            <td className="text-center">
+                              {id_karyawan ? (
+                                loadingPlafond ? (
+                                  <div className="text-center">
+                                    <Spinner animation="border" variant="primary" />
+                                    <p>Loading...</p>
+                                  </div>
                               ) : (
-                                <FaTimesCircle style={{ color: "red" }} />
+                              <>
+                                {statusPinjaman}
+                                {pinjamanInfo && <p className="text-warning">{pinjamanInfo}</p>}
+                                    {isButtonClicked && (
+                                      <p className="text-center text-warning">Nomor antrean anda: {nomorAntrean !== null && nomorAntrean !== undefined ? nomorAntrean : 1}</p>
+                                    )}
+                              </>
                               )
-                            ) : null}
-                          </td>
-                        </tr>
+                              ) : null}
+                            </td>
 
-                        <tr>
-                          <td className="text-center">Angsuran</td>
-                          <td className="text-center">Persentase angsuran max 20% dari gaji pokok</td>
-                          <td className="text-center">{rasio_angsuran} %</td>
-                          <td className="text-center">
-                          {
-                            id_karyawan ? (
-                              calculaterasio_angsuranMemoized !== null ? (
-                                calculaterasio_angsuranMemoized <= 20 ? (
+                            <td className="text-center">
+                              {id_karyawan ? (
+                                loadingPlafond ? (
+                                  <div className="text-center">
+                                    <Spinner animation="border" variant="primary" />
+                                    <p>Loading...</p>
+                                  </div>
+                                ) : plafond >= jumlah_pinjaman ? (
                                   <FaCheckCircle style={{ color: "green" }} />
                                 ) : (
                                   <FaTimesCircle style={{ color: "red" }} />
                                 )
-                              ) : (
-                                <p>Loading...</p>
-                              )
-                            ) : null
-                          }
-                          </td>
-                        </tr>
-                        <tr>
-                          <td className="text-center">Jarak Pensiun</td>
-                          <td className="text-center">Sisa Masa Kerja >= 6 tahun</td>
-                          <td className="text-center">{jarakPensiun + " Tahun"}</td>
-                          <td className="text-center">
+                              ) : null}
+                            </td>
+                          </tr>
+
+                          <tr>
+                            <td className="text-center">Angsuran</td>
+                            <td className="text-center">Persentase angsuran max 20% dari gaji pokok</td>
+                            <td className="text-center">{rasio_angsuran} %</td>
+                            <td className="text-center">
                             {
-                              tanggal_lahir && jenis_kelamin
-                              ? calculatePensiun(tanggal_lahir, jenis_kelamin) >= 6
-                                ? <FaCheckCircle style={{ color: 'green' }} />
-                                : <FaTimesCircle style={{ color: 'red' }} />  
-                              : null 
-                            } 
-                          </td>
-                        </tr>
-                      </tbody>
-                    </Table>
-                  </Col>
-  
-                </Row>
-                  </>
-                )}
-                </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
+                              id_karyawan ? (
+                                calculaterasio_angsuranMemoized !== null ? (
+                                  calculaterasio_angsuranMemoized <= 20 ? (
+                                    <FaCheckCircle style={{ color: "green" }} />
+                                  ) : (
+                                    <FaTimesCircle style={{ color: "red" }} />
+                                  )
+                                ) : (
+                                  <p>Loading...</p>
+                                )
+                              ) : null
+                            }
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="text-center">Jarak Pensiun</td>
+                            <td className="text-center">Sisa Masa Kerja >= 6 tahun</td>
+                            <td className="text-center">{jarakPensiun + " Tahun"}</td>
+                            <td className="text-center">
+                              {
+                                tanggal_lahir && jenis_kelamin
+                                ? calculatePensiun(tanggal_lahir, jenis_kelamin) >= 6
+                                  ? <FaCheckCircle style={{ color: 'green' }} />
+                                  : <FaTimesCircle style={{ color: 'red' }} />  
+                                : null 
+                              } 
+                            </td>
+                          </tr>
+                        </tbody>
+                      </Table>
+                    </Col>
+    
+                  </Row>
+                    </>
+                  )}
+                  </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+        </Container>
+        </div>
+        ):
+        ( <>
+            <div className="App-loading">
+              <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+              <span style={{paddingTop:'100px'}}>Loading...</span>
+            </div>
+          </>
+        )}
     </>
+
   );
 }
 

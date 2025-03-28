@@ -7,6 +7,9 @@ import { FaCheckCircle, FaTimesCircle} from 'react-icons/fa';
 import { useHistory } from "react-router-dom";
 import { FaHistory} from 'react-icons/fa'; 
 import Heartbeat from "./Heartbeat.js";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
+
 
 const BASE_URL = 'http://10.70.10.110:5000';
 export const fetchHistoryPinjaman = async (idPeminjam) => {
@@ -52,6 +55,7 @@ function ScreeningPinjamanKaryawan2() {
   const [totalPinjamanKeseluruhan, setTotalPinjamanKeseluruhan] = useState('');
   const [plafondTersedia, setPlafondTersedia] = useState(null);
   const [userData, setUserData] = useState({id_karyawan: "", nama: "", divisi: ""}); 
+  const [loading, setLoading] = useState(true); 
 
   const token = localStorage.getItem("token");
 
@@ -209,8 +213,11 @@ function ScreeningPinjamanKaryawan2() {
     }
 
   }, [userData.id_karyawan, selectedPinjaman?.id_peminjam]);
-  
 
+  useEffect(() => {
+    setTimeout(() => setLoading(false), 3000)
+  }, []);
+  
   const formatRupiah = (angka) => {
     let gajiString = angka.toString().replace(".00");
     let sisa = gajiString.length % 3;
@@ -439,356 +446,367 @@ useEffect(() => {
 
   return (
     <>
-      <Heartbeat />
-      <Container fluid>
-        <Row>
-          <Col className="card-screening" style={{ maxWidth: "100%" }}>
-            <Card className="card-screening p-4">
-              <Card.Header>
-                <Card.Title as="h4">Form Screening</Card.Title>
-                <hr></hr>
-              </Card.Header>
-              <Card.Body>
-                <Form>
-                <span className="text-danger required-select">(*) Wajib diisi.</span>
-                
-                  <Row className="mt-3">
-                    <Col md="12">
-                    <Form.Group>
-                        <label>ID Karyawan</label>
-                        <Form.Control
-                          // disabled
-                          placeholder="ID Karyawan"
-                          type="text"
-                          value={id_karyawan}
-                          readOnly
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md="12">
-                    <Form.Group>
-                        <label>Nama Lengkap</label>
-                        <Form.Control
-                          placeholder="Nama Lengkap"
-                          type="text"
-                          readOnly
-                          value={nama || ""}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-md--0" md="6">
-                    <Form.Group>
-                        <label>Tanggal Lahir</label>
-                        <Form.Control
-                          placeholder="Tanggal Lahir"
-                          type="text"
-                          readOnly
-                          value={tanggal_lahir || ""}
-                        ></Form.Control>
-                    </Form.Group>
-                    </Col>
-                    <Col className="pl-md-1" md="6">
-                    <Form.Group>
-                        <label>Tanggal Masuk</label>
-                        <Form.Control
-                          placeholder="Tanggal Masuk"
-                          type="text"
-                          readOnly
-                          value={tanggal_masuk || ""}
-                        ></Form.Control>
-                    </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md="12">
-                      <Form.Group>
-                        <label>Departemen</label>
-                        <FormControl 
-                        placeholder="Departemen"
-                        type="text"
-                        readOnly
-                        value={departemen}
-                        >
-                        </FormControl>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md="12">
-                    <Form.Group>
-                        <label>Gaji Pokok</label>
-                        <Form.Control
-                          placeholder="Rp "
-                          type="text"
-                          readOnly
-                          value={formatRupiah(gajiPokok)}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-md-1" md="6">
-                      <Form.Group>
-                      <span className="text-danger">*</span>
-                        <label>Jumlah Pinjaman</label>
-                        <Form.Control
-                          placeholder="Rp"
-                          type="text"
-                          required
-                          value={formatRupiah(jumlah_pinjaman)}
-                          onChange={(e) => handleJumlahPinjamanChange(e.target.value)}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                    <Col className="pl-md-1" md="6">
-                      <Form.Group>
-                      <span className="text-danger">*</span>
-                        <label>Keperluan</label>
-                        <Form.Select 
-                          className="form-control"
-                          required
-                          value={selectedPinjaman?.keperluan || ""} 
-                          onChange={(e) => {
-                            const newKeperluan = e.target.value;
-                            setSelectedPinjaman((prev) => ({
-                              ...prev,
-                              keperluan: newKeperluan,
-                            }));
-                          }} 
-                        >
-                          <option className="placeholder-form" key="blankChoice" hidden value="">
-                            Pilih Jenis Keperluan
-                          </option>
-                          <option value="Pendidikan">Pendidikan</option>
-                          <option value="Pengobatan">Pengobatan</option>
-                          <option value="Renovasi">Renovasi</option>
-                        </Form.Select>
-                      </Form.Group>
-                    </Col>
-
-                  </Row>
-                  <hr></hr>
-                  <Row>
-                    <Col className="mt-2" md="12">
-                    <Form.Group>
-                        <label>Angsuran Per Bulan</label>
-                        <Form.Control
-                          placeholder="Rp"
-                          type="text"
-                          readOnly
-                          value= {"Rp " + formatRupiah(angsuranBulanan !==null ? `${angsuranBulanan}` : "")}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md="12">
-                    <Form.Group>
-                        <label>History Pinjaman</label>
-                        <Form.Control
-                          placeholder="Rp"
-                          type="text"
-                          readOnly
-                          value={`Rp ${formatRupiah(totalPinjaman)}`}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md="12">
-                    <Form.Group>
-                        <label>Sudah Dibayar</label>
-                        <Form.Control
-                          placeholder="Rp"
-                          type="text"
-                          readOnly
-                          value={`Rp ${formatRupiah(totalSudahDibayar)}`}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md="12">
-                    <Form.Group>
-                        <label>Belum Dibayar</label>
-                        <Form.Control
-                          placeholder="Rp"
-                          type="text"
-                          readOnly
-                          value={`Rp ${formatRupiah(totalPinjaman - totalSudahDibayar)}`}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-
-                  <hr></hr>
-
-                  <Row>
-                    <Col md="12">
-                    <Form.Group>
-                    <label>Hasil Screening</label>
-                      <br />
-                      {isDataComplete() ? (
-                        hasilScreening === "Decline" ? (
-                         <>
-                            <DeclineAlert/>
-                          </>
-                        ) : (
-                          <AcceptedAlert
-                            selectedPinjaman={selectedPinjaman}
-                            totalPinjaman={totalPinjaman}
-                            totalSudahDibayar={totalSudahDibayar}
-                          />
-                        )
-                      ) : (
-                        <p className="text-danger">*Mohon lengkapi semua data terlebih dahulu.</p>
-                      )}
-                    </Form.Group>
-                    </Col>
-                  </Row>
-                  
-                  <Row>
-                    <Col md="9">
-                      <label>Syarat Pinjaman Karyawan</label>
-                      <Table className="table-hover table-striped table-bordered">
-                        <thead className="table-primary text-nowwrap">
-                          <tr>
-                            <th style={{fontSize: 16}}>Syarat</th>
-                            <th style={{fontSize: 16}}>Deskripsi</th>
-                            <th style={{fontSize: 16}}>Kondisi saat ini</th>
-                            <th style={{fontSize: 16}}>Status</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr>
-                            <td className="text-center">Masa kerja</td>
-                            <td className="text-center">Masa kerja >= 5 tahun</td>
-                            <td className="text-center">{masaKerja}</td>
-                            <td className="text-center">
-                            {
-                                tanggal_masuk
-                                ? calculateYears(tanggal_masuk) >=5 
-                                ? <FaCheckCircle style={{ color: 'green' }} />
-                                : <FaTimesCircle style={{ color: 'red' }} />
-                                : null
-                              }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="text-center">Riwayat Pinjaman</td>
-                            <td className="text-center">Tidak memiliki pinjaman aktif</td>
-                            <td className="text-center">
-                              { totalPinjaman - totalSudahDibayar > 0 
-                              ? "Memiliki pinjaman aktif"
-                              : "Tidak Memiliki pinjaman aktif"
-                              }
-                            </td>
-                            <td className="text-center">
-                            {
-                              id_karyawan ? ( 
-                                totalPinjaman - totalSudahDibayar !== 0 
-                                ? <FaTimesCircle style={{ color: 'red' }} /> 
-                                : <FaCheckCircle style={{ color: 'green' }} />
-                              ) : null}
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="text-center">Plafond</td>
-                            <td className="text-center">Sisa plafond mencukupi</td>
-                            <td className="text-center">
-                              {id_karyawan ? (
-                                calculateAngsuranBulananMemoized !== null ? (
-                                  <>
-                                    <div>
-                                      {statusPinjaman}
-                                    </div>
-                                    {pinjamanInfo}
-                                  </>
-                                ) : (
-                                  <p>Loading...</p>
-                                )
-                              ) : null}
-                            </td>
-
-                            <td className="text-center">
-                              {id_karyawan ? (
-                                calculateAngsuranBulananMemoized !== null ? (
-                                  plafondTersediaFloat >= jumlahPinjamanFloat ? (
-                                    <FaCheckCircle style={{ color: "green" }} />
-                                  ) : (
-                                    <FaTimesCircle style={{ color: "red" }} />
-                                  )
-                                ) : (
-                                  <p>Loading...</p>
-                                )
-                              ) : null}
-                            </td>
-                          </tr>
-
-
-                          <tr>
-                            <td className="text-center">Angsuran</td>
-                            <td className="text-center">Persentase angsuran max 20% dari gaji pokok</td>
-                            <td className="text-center">{rasio_angsuran} %</td>
-                            <td className="text-center">
-                            {
-                              id_karyawan ? (
-                                calculaterasio_angsuranMemoized !== null ? (
-                                  calculaterasio_angsuranMemoized <= 20 ? (
-                                    <FaCheckCircle style={{ color: "green" }} />
-                                  ) : (
-                                    <FaTimesCircle style={{ color: "red" }} />
-                                  )
-                                ) : (
-                                  <p>Loading...</p>
-                                )
-                              ) : null
-                            }
-                            </td>
-                          </tr>
-                          <tr>
-                            <td className="text-center">Jarak Pensiun</td>
-                            <td className="text-center">Sisa Masa Kerja >= 6 tahun</td>
-                            <td className="text-center">{jarakPensiun + " Tahun"}</td>
-                            <td className="text-center">
-                              {
-                                tanggal_lahir && jenis_kelamin
-                                ? calculatePensiun(tanggal_lahir, jenis_kelamin) >= 6
-                                  ? <FaCheckCircle style={{ color: 'green' }} />
-                                  : <FaTimesCircle style={{ color: 'red' }} />  
-                                : null 
-                              } 
-                            </td>
-                          </tr>
-                        </tbody>
-                      </Table>
-                    </Col>
-
-                    <Col md="3">
-                      <Button
-                        className="btn-fill pull-right mt-4 btn-reset"
-                        type="submit"
-                        variant="warning">
-                        <FaHistory style={{ marginRight: '8px' }} />
-                        Reset
-                      </Button>
-                    </Col>
-
+      {loading === false ? 
+        (<div className="App">
+          <Heartbeat />
+          <Container fluid>
+            <Row>
+              <Col className="card-screening" style={{ maxWidth: "100%" }}>
+                <Card className="card-screening p-4">
+                  <Card.Header>
+                    <Card.Title as="h4">Form Screening</Card.Title>
+                    <hr></hr>
+                  </Card.Header>
+                  <Card.Body>
+                    <Form>
+                    <span className="text-danger required-select">(*) Wajib diisi.</span>
                     
-                  </Row>
+                      <Row className="mt-3">
+                        <Col md="12">
+                        <Form.Group>
+                            <label>ID Karyawan</label>
+                            <Form.Control
+                              // disabled
+                              placeholder="ID Karyawan"
+                              type="text"
+                              value={id_karyawan}
+                              readOnly
+                            ></Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md="12">
+                        <Form.Group>
+                            <label>Nama Lengkap</label>
+                            <Form.Control
+                              placeholder="Nama Lengkap"
+                              type="text"
+                              readOnly
+                              value={nama || ""}
+                            ></Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col className="pr-md--0" md="6">
+                        <Form.Group>
+                            <label>Tanggal Lahir</label>
+                            <Form.Control
+                              placeholder="Tanggal Lahir"
+                              type="text"
+                              readOnly
+                              value={tanggal_lahir || ""}
+                            ></Form.Control>
+                        </Form.Group>
+                        </Col>
+                        <Col className="pl-md-1" md="6">
+                        <Form.Group>
+                            <label>Tanggal Masuk</label>
+                            <Form.Control
+                              placeholder="Tanggal Masuk"
+                              type="text"
+                              readOnly
+                              value={tanggal_masuk || ""}
+                            ></Form.Control>
+                        </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md="12">
+                          <Form.Group>
+                            <label>Departemen</label>
+                            <FormControl 
+                            placeholder="Departemen"
+                            type="text"
+                            readOnly
+                            value={departemen}
+                            >
+                            </FormControl>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md="12">
+                        <Form.Group>
+                            <label>Gaji Pokok</label>
+                            <Form.Control
+                              placeholder="Rp "
+                              type="text"
+                              readOnly
+                              value={formatRupiah(gajiPokok)}
+                            ></Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col className="pr-md-1" md="6">
+                          <Form.Group>
+                          <span className="text-danger">*</span>
+                            <label>Jumlah Pinjaman</label>
+                            <Form.Control
+                              placeholder="Rp"
+                              type="text"
+                              required
+                              value={formatRupiah(jumlah_pinjaman)}
+                              onChange={(e) => handleJumlahPinjamanChange(e.target.value)}
+                            ></Form.Control>
+                          </Form.Group>
+                        </Col>
+                        <Col className="pl-md-1" md="6">
+                          <Form.Group>
+                          <span className="text-danger">*</span>
+                            <label>Keperluan</label>
+                            <Form.Select 
+                              className="form-control"
+                              required
+                              value={selectedPinjaman?.keperluan || ""} 
+                              onChange={(e) => {
+                                const newKeperluan = e.target.value;
+                                setSelectedPinjaman((prev) => ({
+                                  ...prev,
+                                  keperluan: newKeperluan,
+                                }));
+                              }} 
+                            >
+                              <option className="placeholder-form" key="blankChoice" hidden value="">
+                                Pilih Jenis Keperluan
+                              </option>
+                              <option value="Pendidikan">Pendidikan</option>
+                              <option value="Pengobatan">Pengobatan</option>
+                              <option value="Renovasi">Renovasi</option>
+                            </Form.Select>
+                          </Form.Group>
+                        </Col>
 
-                  <div className="clearfix"></div>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-      </Container>
-    </>
+                      </Row>
+                      <hr></hr>
+                      <Row>
+                        <Col className="mt-2" md="12">
+                        <Form.Group>
+                            <label>Angsuran Per Bulan</label>
+                            <Form.Control
+                              placeholder="Rp"
+                              type="text"
+                              readOnly
+                              value= {"Rp " + formatRupiah(angsuranBulanan !==null ? `${angsuranBulanan}` : "")}
+                            ></Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md="12">
+                        <Form.Group>
+                            <label>History Pinjaman</label>
+                            <Form.Control
+                              placeholder="Rp"
+                              type="text"
+                              readOnly
+                              value={`Rp ${formatRupiah(totalPinjaman)}`}
+                            ></Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md="12">
+                        <Form.Group>
+                            <label>Sudah Dibayar</label>
+                            <Form.Control
+                              placeholder="Rp"
+                              type="text"
+                              readOnly
+                              value={`Rp ${formatRupiah(totalSudahDibayar)}`}
+                            ></Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                      <Row>
+                        <Col md="12">
+                        <Form.Group>
+                            <label>Belum Dibayar</label>
+                            <Form.Control
+                              placeholder="Rp"
+                              type="text"
+                              readOnly
+                              value={`Rp ${formatRupiah(totalPinjaman - totalSudahDibayar)}`}
+                            ></Form.Control>
+                          </Form.Group>
+                        </Col>
+                      </Row>
+
+                      <hr></hr>
+
+                      <Row>
+                        <Col md="12">
+                        <Form.Group>
+                        <label>Hasil Screening</label>
+                          <br />
+                          {isDataComplete() ? (
+                            hasilScreening === "Decline" ? (
+                            <>
+                                <DeclineAlert/>
+                              </>
+                            ) : (
+                              <AcceptedAlert
+                                selectedPinjaman={selectedPinjaman}
+                                totalPinjaman={totalPinjaman}
+                                totalSudahDibayar={totalSudahDibayar}
+                              />
+                            )
+                          ) : (
+                            <p className="text-danger">*Mohon lengkapi semua data terlebih dahulu.</p>
+                          )}
+                        </Form.Group>
+                        </Col>
+                      </Row>
+                      
+                      <Row>
+                        <Col md="9">
+                          <label>Syarat Pinjaman Karyawan</label>
+                          <Table className="table-hover table-striped table-bordered">
+                            <thead className="table-primary text-nowwrap">
+                              <tr>
+                                <th style={{fontSize: 16}}>Syarat</th>
+                                <th style={{fontSize: 16}}>Deskripsi</th>
+                                <th style={{fontSize: 16}}>Kondisi saat ini</th>
+                                <th style={{fontSize: 16}}>Status</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              <tr>
+                                <td className="text-center">Masa kerja</td>
+                                <td className="text-center">Masa kerja >= 5 tahun</td>
+                                <td className="text-center">{masaKerja}</td>
+                                <td className="text-center">
+                                {
+                                    tanggal_masuk
+                                    ? calculateYears(tanggal_masuk) >=5 
+                                    ? <FaCheckCircle style={{ color: 'green' }} />
+                                    : <FaTimesCircle style={{ color: 'red' }} />
+                                    : null
+                                  }
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="text-center">Riwayat Pinjaman</td>
+                                <td className="text-center">Tidak memiliki pinjaman aktif</td>
+                                <td className="text-center">
+                                  { totalPinjaman - totalSudahDibayar > 0 
+                                  ? "Memiliki pinjaman aktif"
+                                  : "Tidak Memiliki pinjaman aktif"
+                                  }
+                                </td>
+                                <td className="text-center">
+                                {
+                                  id_karyawan ? ( 
+                                    totalPinjaman - totalSudahDibayar !== 0 
+                                    ? <FaTimesCircle style={{ color: 'red' }} /> 
+                                    : <FaCheckCircle style={{ color: 'green' }} />
+                                  ) : null}
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="text-center">Plafond</td>
+                                <td className="text-center">Sisa plafond mencukupi</td>
+                                <td className="text-center">
+                                  {id_karyawan ? (
+                                    calculateAngsuranBulananMemoized !== null ? (
+                                      <>
+                                        <div>
+                                          {statusPinjaman}
+                                        </div>
+                                        {pinjamanInfo}
+                                      </>
+                                    ) : (
+                                      <p>Loading...</p>
+                                    )
+                                  ) : null}
+                                </td>
+
+                                <td className="text-center">
+                                  {id_karyawan ? (
+                                    calculateAngsuranBulananMemoized !== null ? (
+                                      plafondTersediaFloat >= jumlahPinjamanFloat ? (
+                                        <FaCheckCircle style={{ color: "green" }} />
+                                      ) : (
+                                        <FaTimesCircle style={{ color: "red" }} />
+                                      )
+                                    ) : (
+                                      <p>Loading...</p>
+                                    )
+                                  ) : null}
+                                </td>
+                              </tr>
+
+
+                              <tr>
+                                <td className="text-center">Angsuran</td>
+                                <td className="text-center">Persentase angsuran max 20% dari gaji pokok</td>
+                                <td className="text-center">{rasio_angsuran} %</td>
+                                <td className="text-center">
+                                {
+                                  id_karyawan ? (
+                                    calculaterasio_angsuranMemoized !== null ? (
+                                      calculaterasio_angsuranMemoized <= 20 ? (
+                                        <FaCheckCircle style={{ color: "green" }} />
+                                      ) : (
+                                        <FaTimesCircle style={{ color: "red" }} />
+                                      )
+                                    ) : (
+                                      <p>Loading...</p>
+                                    )
+                                  ) : null
+                                }
+                                </td>
+                              </tr>
+                              <tr>
+                                <td className="text-center">Jarak Pensiun</td>
+                                <td className="text-center">Sisa Masa Kerja >= 6 tahun</td>
+                                <td className="text-center">{jarakPensiun + " Tahun"}</td>
+                                <td className="text-center">
+                                  {
+                                    tanggal_lahir && jenis_kelamin
+                                    ? calculatePensiun(tanggal_lahir, jenis_kelamin) >= 6
+                                      ? <FaCheckCircle style={{ color: 'green' }} />
+                                      : <FaTimesCircle style={{ color: 'red' }} />  
+                                    : null 
+                                  } 
+                                </td>
+                              </tr>
+                            </tbody>
+                          </Table>
+                        </Col>
+
+                        <Col md="3">
+                          <Button
+                            className="btn-fill pull-right mt-4 btn-reset"
+                            type="submit"
+                            variant="warning">
+                            <FaHistory style={{ marginRight: '8px' }} />
+                            Reset
+                          </Button>
+                        </Col>
+
+                        
+                      </Row>
+
+                      <div className="clearfix"></div>
+                    </Form>
+                  </Card.Body>
+                </Card>
+              </Col>
+            </Row>
+          </Container>
+        </div>
+        ):
+        ( <>
+            <div className="App-loading">
+              <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+              <span style={{paddingTop:'100px'}}>Loading...</span>
+            </div>
+          </>
+        )}
+      </>
   );
 }
 

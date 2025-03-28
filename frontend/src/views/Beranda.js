@@ -20,6 +20,8 @@ import cardBeranda from "../assets/img/beranda3.png";
 import "../assets/scss/lbd/_table-header.scss";
 import Calendar from "react-calendar";
 import "../assets/scss/lbd/_calendar.scss";
+import ReactLoading from "react-loading";
+import "../assets/scss/lbd/_loading.scss";
 
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 
@@ -128,12 +130,14 @@ function Beranda() {
     getPinjamanData();
     fetchAntrean(); 
     // fetchPlafondAngsuran();
+
+    setTimeout(() => setLoading(false), 1000)
   }, []);
 
 
   const getPinjaman = async () =>{
     try {
-      setLoading(true);
+      // setLoading(true);
       const response = await axios.get("http://10.70.10.110:5000/pinjaman", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -145,14 +149,14 @@ function Beranda() {
 
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
   const getPinjamanData = async () =>{
     try {
-      setLoading(true);
+      // setLoading(true);
       const response = await axios.get("http://10.70.10.110:5000/pinjaman-data", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -164,15 +168,15 @@ function Beranda() {
       // console.log("Response dari backend:", response.data);
     } catch (error) {
       console.error("Error fetching data:", error.message); 
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
   
   const getAntrean = async () => {
     try {
-      setLoading(true);
+      // setLoading(true);
       const response = await axios.get("http://10.70.10.110:5000/antrean-pengajuan", {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -183,8 +187,8 @@ function Beranda() {
     } catch (error) {
       console.error("Error fetching antrean:", error.message);
       setError("Gagal mengambil antrean. Silakan coba lagi.");
-    } finally {
-      setLoading(false);
+    // } finally {
+    //   setLoading(false);
     }
   };
 
@@ -437,9 +441,6 @@ function Beranda() {
       });
     }
   };
-
-
-
 
   const handleImportButtonClick = () => {
     setShowImportModal(true);
@@ -707,377 +708,385 @@ const dataPeminjamPerDivisi = async (selectedDepartemenPeminjam, selectedMonthPe
   }
 };
 
-// console.log("Plafond saat ini: ", latestPlafond);
-// console.log("Plafond angsuran: ", plafondAngsuran);
-// console.log("Total sudah dibayar: ", totalDibayar); 
-
   return (
     <>
-    <div className="home-card">
-      <div className="card-content">
-        <h2 className="card-title">Hai, {userData.nama}!</h2>
-        <h4 className="card-subtitle">Siap memproses pengajuan pinjaman hari ini?</h4><hr/>
-        <p className="text-danger">*Sistem akan logout secara otomatis dalam 5 menit jika tidak terdapat aktifitas dalam sistem.</p>
-      </div>
-      <div className="card-opening">
-        <img 
-          src={cardBeranda}
-          alt="Beranda Illustration"
-        /> 
-      </div>
-    </div>
+      {loading === false ? 
+        (<div className="App">
+        <div className="home-card">
+          <div className="card-content">
+            <h2 className="card-title">Hai, {userData.nama}!</h2>
+            <h4 className="card-subtitle">Siap memproses pengajuan pinjaman hari ini?</h4><hr/>
+            <p className="text-danger">*Sistem akan logout secara otomatis dalam 5 menit jika tidak terdapat aktifitas dalam sistem.</p>
+          </div>
+          <div className="card-opening">
+            <img 
+              src={cardBeranda}
+              alt="Beranda Illustration"
+            /> 
+          </div>
+        </div>
+        <Container fluid>
+          <Row>
+            <Col md="12"className="mb-lg-0">
+              <Card>
+                <Card.Header>
+                  <Card.Title as="h4">Grafik Piutang Tahunan</Card.Title>
+                </Card.Header>
+                <Card.Body className="mt-2">
+                  <div className="ct-chart" id="chartHours">
+                    <div>
+                      <label htmlFor="yearSelect">Pilih Tahun:</label>
+                      <select
+                        id="yearSelect"
+                        value={selectedYear}
+                        onChange={(e) => {
+                          setSelectedYear(e.target.value);
+                          dataPinjaman(e.target.value); 
+                        }}
+                        className="mx-2"
+                      >
+                        <option value="">Semua Tahun</option>
+                        {years.map((year) => (
+                          <option key={year} value={year}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
 
-      <Container fluid>
-        <Row>
-          <Col md="12"className="mb-lg-0">
-            <Card>
-              <Card.Header>
-                <Card.Title as="h4">Grafik Piutang Tahunan</Card.Title>
-              </Card.Header>
-              <Card.Body className="mt-2">
-                <div className="ct-chart" id="chartHours">
+                    <ChartComponent chartData={chartDataTahunan} />
+                  </div>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md="4">
+              <Card>
+                <Card.Header>
+                  <Card.Title as="h4">Jumlah Peminjam Bulanan</Card.Title>
+                </Card.Header>
+                <Card.Body className="mt-2">
+                <div>
                   <div>
-                    <label htmlFor="yearSelect">Pilih Tahun:</label>
+                    <label htmlFor="yearSelect">Tahun:</label>
+                    <span className="year-label ml-2" onClick={() => {
+                      const currentYear = new Date().getFullYear();
+                      setSelectedYear(currentYear);
+                      dataPeminjamPerDivisi(selectedDepartemenPeminjam, selectedMonthPeminjam, currentYear);
+                    }}>
+                      {new Date().getFullYear()}
+                    </span>
+                  </div>
+
+                  <div>
+                  <select
+                    id="monthSelect"
+                    value={selectedMonthPeminjam}
+                    onChange={(e) => {
+                      setSelectedMonthPeminjam(e.target.value);
+                      dataPeminjamPerDivisi(selectedDepartemen, e.target.value, selectedYear);
+                    }}
+                    className="mb-2"
+                  >
+                    <option value="">Semua Bulan</option>
+                    {getMonths().map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                    </option>
+                    ))}
+                  </select>
+                  </div>
+
+                  <div>
                     <select
-                      id="yearSelect"
-                      value={selectedYear}
+                      id="departemenSelect"
+                      value={selectedDepartemenPeminjam}
                       onChange={(e) => {
-                        setSelectedYear(e.target.value);
-                        dataPinjaman(e.target.value); 
+                        setSelectedDepartemenPeminjam(e.target.value);
+                        dataPeminjamPerDivisi(e.target.value); 
                       }}
-                      className="mx-2"
                     >
-                      <option value="">Semua Tahun</option>
-                      {years.map((year) => (
-                        <option key={year} value={year}>
-                          {year}
-                        </option>
-                      ))}
+                      <option value="">Semua Departemen</option>
+                      <option value="Direksi">Direksi</option>
+                      <option value="Finance & Administration">Finance & Administration</option>
+                      <option value="Production">Production</option>
+                      <option value="Sales & Distribution">Sales & Distribution</option>
+                      <option value="General">General</option>
                     </select>
                   </div>
 
-                  <ChartComponent chartData={chartDataTahunan} />
+                  <div>
+                    <PolarAreaComponent chartData={chartDataPeminjamBulanan}/>
+                  </div>
                 </div>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md="4" className="mt-2 mt-lg-0 mb-5 mb-lg-3">
+              <Calendar onChange={setDate} value={date}></Calendar>
+            </Col>
+            <Col md="4">
+              <Card>
+                <Card.Header>
+                  <Card.Title as="h4">Ketersediaan Plafond</Card.Title>
+                </Card.Header>
+                <Card.Body className="mt-2">
+                <div>
+                  <Doughnut data={data_plafond} options={{plugins: {centerText: {usedPercentage}}}} plugins={[centerTextPlugin]}/>
+                </div>
 
-        <Row>
-          <Col md="4">
-            <Card>
+                  <div className="legend">
+                    <i className="fas fa-circle" style={{ color: "#FF6384" }}></i>
+                    Digunakan 
+                    <i className="fas fa-circle ml-3" style={{ color: "#36A2EB" }}></i>
+                    Tersedia 
+                  </div>
+                  <hr></hr>
+                  <p className="card-category">Plafond tersedia saat ini sebesar Rp  {formatRupiah(latestPlafond)}</p>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md="12">
+              <Card className="mb-2 mb-lg-4">
               <Card.Header>
-                <Card.Title as="h4">Jumlah Peminjam Bulanan</Card.Title>
+                <Card.Title as="h4">Grafik Piutang Bulanan</Card.Title>
               </Card.Header>
-              <Card.Body className="mt-2">
-              <div>
+              <Card.Body className="mb-5">
+                <div className="ct-chart" id="chartHours">
                 <div>
                   <label htmlFor="yearSelect">Tahun:</label>
                   <span className="year-label ml-2" onClick={() => {
                     const currentYear = new Date().getFullYear();
                     setSelectedYear(currentYear);
-                    dataPeminjamPerDivisi(selectedDepartemenPeminjam, selectedMonthPeminjam, currentYear);
+                    dataPerDivisi(selectedDepartemen, selectedMonth, currentYear);
                   }}>
                     {new Date().getFullYear()}
                   </span>
                 </div>
 
                 <div>
-                <select
-                  id="monthSelect"
-                  value={selectedMonthPeminjam}
-                  onChange={(e) => {
-                    setSelectedMonthPeminjam(e.target.value);
-                    dataPeminjamPerDivisi(selectedDepartemen, e.target.value, selectedYear);
-                  }}
-                  className="mb-2"
-                >
-                  <option value="">Semua Bulan</option>
-                  {getMonths().map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                  </option>
-                  ))}
-                </select>
-                </div>
-
-                <div>
+                  <label htmlFor="monthSelect" className="mb-3">Pilih Bulan:</label>
                   <select
-                    id="departemenSelect"
-                    value={selectedDepartemenPeminjam}
+                    id="monthSelect"
+                    value={selectedMonth}
                     onChange={(e) => {
-                      setSelectedDepartemenPeminjam(e.target.value);
-                      dataPeminjamPerDivisi(e.target.value); 
-                    }}
-                  >
-                    <option value="">Semua Departemen</option>
-                    <option value="Direksi">Direksi</option>
-                    <option value="Finance & Administration">Finance & Administration</option>
-                    <option value="Production">Production</option>
-                    <option value="Sales & Distribution">Sales & Distribution</option>
-                    <option value="General">General</option>
-                  </select>
-                </div>
-
-                <div>
-                  <PolarAreaComponent chartData={chartDataPeminjamBulanan}/>
-                </div>
-              </div>
-              </Card.Body>
-            </Card>
-          </Col>
-          <Col md="4" className="mt-2 mt-lg-0 mb-5 mb-lg-3">
-            <Calendar onChange={setDate} value={date}></Calendar>
-          </Col>
-          <Col md="4">
-            <Card>
-              <Card.Header>
-                <Card.Title as="h4">Ketersediaan Plafond</Card.Title>
-              </Card.Header>
-              <Card.Body className="mt-2">
-              <div>
-                <Doughnut data={data_plafond} options={{plugins: {centerText: {usedPercentage}}}} plugins={[centerTextPlugin]}/>
-              </div>
-
-                <div className="legend">
-                  <i className="fas fa-circle" style={{ color: "#FF6384" }}></i>
-                  Digunakan 
-                  <i className="fas fa-circle ml-3" style={{ color: "#36A2EB" }}></i>
-                  Tersedia 
-                </div>
-                <hr></hr>
-                <p className="card-category">Plafond tersedia saat ini sebesar Rp  {formatRupiah(latestPlafond)}</p>
-              </Card.Body>
-            </Card>
-          </Col>
-        </Row>
-
-        <Row>
-        <Col md="12">
-            <Card className="mb-2 mb-lg-4">
-            <Card.Header>
-              <Card.Title as="h4">Grafik Piutang Bulanan</Card.Title>
-            </Card.Header>
-            <Card.Body className="mb-5">
-              <div className="ct-chart" id="chartHours">
-              <div>
-                <label htmlFor="yearSelect">Tahun:</label>
-                <span className="year-label ml-2" onClick={() => {
-                  const currentYear = new Date().getFullYear();
-                  setSelectedYear(currentYear);
-                  dataPerDivisi(selectedDepartemen, selectedMonth, currentYear);
-                }}>
-                  {new Date().getFullYear()}
-                </span>
-              </div>
-
-              <div>
-                <label htmlFor="monthSelect" className="mb-3">Pilih Bulan:</label>
-                <select
-                  id="monthSelect"
-                  value={selectedMonth}
-                  onChange={(e) => {
-                    setSelectedMonth(e.target.value);
-                    dataPerDivisi(selectedDepartemen, e.target.value, selectedYear);
-                  }}
-                  className="mx-2"
-                >
-                  <option value="">Semua Bulan</option>
-                  {getMonths().map((month) => (
-                    <option key={month.value} value={month.value}>
-                      {month.label}
-                  </option>
-                  ))}
-                </select>
-              </div>
-
-                <div>
-                  <label htmlFor="departemenSelect">Pilih Departemen:</label>
-                  <select
-                    id="departemenSelect"
-                    value={selectedDepartemen}
-                    onChange={(e) => {
-                      setSelectedDepartemen(e.target.value);
-                      dataPerDivisi(e.target.value); 
+                      setSelectedMonth(e.target.value);
+                      dataPerDivisi(selectedDepartemen, e.target.value, selectedYear);
                     }}
                     className="mx-2"
                   >
-                    <option value="">Semua Departemen</option>
-                    <option value="Direksi">Direksi</option>
-                    <option value="Finance & Administration">Finance & Administration</option>
-                    <option value="Production">Production</option>
-                    <option value="Sales & Distribution">Sales & Distribution</option>
-                    <option value="General">General</option>
+                    <option value="">Semua Bulan</option>
+                    {getMonths().map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                    </option>
+                    ))}
                   </select>
                 </div>
 
-                <LineComponent chartData={chartDataBulanan}/>
-              </div>
-            </Card.Body>
-            </Card>
-          </Col>
-        </Row>
+                  <div>
+                    <label htmlFor="departemenSelect">Pilih Departemen:</label>
+                    <select
+                      id="departemenSelect"
+                      value={selectedDepartemen}
+                      onChange={(e) => {
+                        setSelectedDepartemen(e.target.value);
+                        dataPerDivisi(e.target.value); 
+                      }}
+                      className="mx-2"
+                    >
+                      <option value="">Semua Departemen</option>
+                      <option value="Direksi">Direksi</option>
+                      <option value="Finance & Administration">Finance & Administration</option>
+                      <option value="Production">Production</option>
+                      <option value="Sales & Distribution">Sales & Distribution</option>
+                      <option value="General">General</option>
+                    </select>
+                  </div>
 
-        <Row className="mt-4">
-        {/* <Button
+                  <LineComponent chartData={chartDataBulanan}/>
+                </div>
+              </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row className="mt-4">
+          {/* <Button
+              className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+              type="button"
+              variant="info"
+              onClick={handleImportButtonClick}>
+              <FaFileImport style={{ marginRight: '8px' }} />
+              Import Data
+          </Button>
+          
+          <ImportAntreanPengajuan showImportModal={showImportModal} setShowImportModal={setShowImportModal} onSuccess={handleImportSuccess} /> */}
+
+          <Button
             className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
             type="button"
-            variant="info"
-            onClick={handleImportButtonClick}>
-            <FaFileImport style={{ marginRight: '8px' }} />
-            Import Data
-        </Button>
-        
-        <ImportAntreanPengajuan showImportModal={showImportModal} setShowImportModal={setShowImportModal} onSuccess={handleImportSuccess} /> */}
+            variant="primary"
+            onClick={() => downloadCSV(pinjaman)}>
+            <FaFileCsv style={{ marginRight: '8px' }} />
+            Unduh CSV
+          </Button>
+          <Button
+            className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
+            type="button"
+            variant="primary"
+            onClick={downloadPDF}>
+            <FaFilePdf style={{ marginRight: '8px' }} />
+            Unduh PDF
+          </Button>
+          <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
 
-        <Button
-          className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-          type="button"
-          variant="primary"
-          onClick={() => downloadCSV(pinjaman)}>
-          <FaFileCsv style={{ marginRight: '8px' }} />
-          Unduh CSV
-        </Button>
-        <Button
-          className="btn-fill pull-right ml-lg-3 ml-md-4 ml-sm-3 mb-4"
-          type="button"
-          variant="primary"
-          onClick={downloadPDF}>
-          <FaFilePdf style={{ marginRight: '8px' }} />
-          Unduh PDF
-        </Button>
-        <SearchBar searchQuery={searchQuery} handleSearchChange={handleSearchChange} />
-
-        <Col md="12">
-          <Card className="striped-tabled-with-hover">
-            <Card.Header>
-              <Card.Title as="h4">Antrean Pengajuan Pinjaman</Card.Title>
-            </Card.Header>
-            <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto'}}>
-              {loading ? (
-                <div className="text-center">
-                  <Spinner animation="border" variant="primary" />
-                  <p>Loading...</p>
-                </div>
-              ) : (
-              <Table className="table-hover table-striped">
-                <div className="table-scroll" style={{ height: 'auto' }}>
-                  <table className="flex-table table table-striped table-hover">
-                    <thead>
-                    <tr>
-                      <th className="border-0 text-wrap center">ID Pinjaman</th>
-                      <th className="border-0 text-wrap">Tanggal Pengajuan</th>
-                      <th className="border-0 text-wrap">Nomor Antrean</th>
-                      <th className="border-0 text-wrap">ID Karyawan</th>
-                      <th className="border-0 text-wrap">Nama Lengkap</th>
-                      <th className="border-0 text-wrap">Jumlah Pinjaman</th>
-                      <th className="border-0 text-wrap">Jumlah Angsuran</th>
-                      <th className="border-0 text-wrap">Jumlah Pinjaman Setelah Pembulatan</th>
-                      <th className="border-0 text-wrap">Rasio Angsuran</th>
-                      <th className="border-0 text-wrap">Keperluan</th>
-                      <th className="border-0 text-wrap">Tanggal Plafond Tersedia</th>
-                      <th className="border-0 text-wrap">Status Pengajuan</th>
-                      <th className="border-0 text-wrap">Status Transfer</th>
-                      <th className="border-0 text-wrap">Aksi</th>
-                    </tr>
-                    </thead>
-                    <tbody className="scroll scroller-tbody">
-                      { currentItems
-                      .map((pinjaman) => (
-                        <tr key={pinjaman.id_pinjaman}>
-                          <td className="text-center">{pinjaman.id_pinjaman}</td>
-                          <td className="text-center">{pinjaman.tanggal_pengajuan}</td>
-                          <td className="text-right">{findNomorAntrean(pinjaman.id_pinjaman)}</td>
-                          <td className="text-right">{pinjaman.id_peminjam}</td>
-                          <td className="text-center">{pinjaman?.Peminjam?.nama || 'N/A'}</td>
-                          <td className="text-right">{formatRupiah(pinjaman.jumlah_pinjaman)}</td>
-                          <td className="text-right">{formatRupiah(pinjaman.jumlah_angsuran)}</td>
-                          <td className="text-right">{formatRupiah(pinjaman.pinjaman_setelah_pembulatan)}</td>
-                          <td className="text-center">{pinjaman.rasio_angsuran}</td>
-                          <td className="text-center">{pinjaman.keperluan}</td>
-                          <td className="text-center">{pinjaman.UpdatePinjamanPlafond ? pinjaman.UpdatePinjamanPlafond.tanggal_plafond_tersedia: '-'}</td>
-                          <td className="text-center">
-                            {pinjaman.status_pengajuan === "Diterima" ? (
-                              <Badge pill bg="success p-2">
-                              Diterima
-                              </Badge >
-                              ) : pinjaman.status_pengajuan === "Dibatalkan" ? (
-                              <Badge pill bg="danger p-2">
-                              Dibatalkan
-                              </Badge >
-                              ) : (
-                              <Badge pill bg="secondary p-2">
-                              Ditunda
-                              </Badge >
-                            )}
-                          </td>
-                          <td className="text-center">
-                            {pinjaman.status_transfer === "Selesai" ? (
+          <Col md="12">
+            <Card className="striped-tabled-with-hover">
+              <Card.Header>
+                <Card.Title as="h4">Antrean Pengajuan Pinjaman</Card.Title>
+              </Card.Header>
+              <Card.Body className="table-responsive px-0" style={{ overflowX: 'auto'}}>
+                {/* {loading ? (
+                  <div className="text-center">
+                    <Spinner animation="border" variant="primary" />
+                    <p>Loading...</p>
+                  </div>
+                ) : ( */}
+                <Table className="table-hover table-striped">
+                  <div className="table-scroll" style={{ height: 'auto' }}>
+                    <table className="flex-table table table-striped table-hover">
+                      <thead>
+                      <tr>
+                        <th className="border-0 text-wrap center">ID Pinjaman</th>
+                        <th className="border-0 text-wrap">Tanggal Pengajuan</th>
+                        <th className="border-0 text-wrap">Nomor Antrean</th>
+                        <th className="border-0 text-wrap">ID Karyawan</th>
+                        <th className="border-0 text-wrap">Nama Lengkap</th>
+                        <th className="border-0 text-wrap">Jumlah Pinjaman</th>
+                        <th className="border-0 text-wrap">Jumlah Angsuran</th>
+                        <th className="border-0 text-wrap">Jumlah Pinjaman Setelah Pembulatan</th>
+                        <th className="border-0 text-wrap">Rasio Angsuran</th>
+                        <th className="border-0 text-wrap">Keperluan</th>
+                        <th className="border-0 text-wrap">Tanggal Plafond Tersedia</th>
+                        <th className="border-0 text-wrap">Status Pengajuan</th>
+                        <th className="border-0 text-wrap">Status Transfer</th>
+                        <th className="border-0 text-wrap">Aksi</th>
+                      </tr>
+                      </thead>
+                      <tbody className="scroll scroller-tbody">
+                        { currentItems
+                        .map((pinjaman) => (
+                          <tr key={pinjaman.id_pinjaman}>
+                            <td className="text-center">{pinjaman.id_pinjaman}</td>
+                            <td className="text-center">{pinjaman.tanggal_pengajuan}</td>
+                            <td className="text-right">{findNomorAntrean(pinjaman.id_pinjaman)}</td>
+                            <td className="text-right">{pinjaman.id_peminjam}</td>
+                            <td className="text-center">{pinjaman?.Peminjam?.nama || 'N/A'}</td>
+                            <td className="text-right">{formatRupiah(pinjaman.jumlah_pinjaman)}</td>
+                            <td className="text-right">{formatRupiah(pinjaman.jumlah_angsuran)}</td>
+                            <td className="text-right">{formatRupiah(pinjaman.pinjaman_setelah_pembulatan)}</td>
+                            <td className="text-center">{pinjaman.rasio_angsuran}</td>
+                            <td className="text-center">{pinjaman.keperluan}</td>
+                            <td className="text-center">{pinjaman.UpdatePinjamanPlafond ? pinjaman.UpdatePinjamanPlafond.tanggal_plafond_tersedia: '-'}</td>
+                            <td className="text-center">
+                              {pinjaman.status_pengajuan === "Diterima" ? (
                                 <Badge pill bg="success p-2">
-                                Selesai
+                                Diterima
                                 </Badge >
-                                ) : pinjaman.status_transfer === "Dibatalkan" ? (
+                                ) : pinjaman.status_pengajuan === "Dibatalkan" ? (
                                 <Badge pill bg="danger p-2">
                                 Dibatalkan
                                 </Badge >
                                 ) : (
-                                <Badge pill bg="secondary p-2 text-wrap">
-                                Belum Ditransfer
+                                <Badge pill bg="secondary p-2">
+                                Ditunda
                                 </Badge >
-                            )}
-                          </td>
-                          <td className="text-center">
-                          <Button
-                            className="btn-fill pull-right mb-2"
-                            type="button"
-                            variant="warning"
-                            onClick={() => handleScreeningClick(pinjaman)}
-                            style={{width: 125, fontSize:14}}>
-                            <FaUserCheck style={{ marginRight: '8px' }} />
-                            Screening
-                          </Button>
-                          <Button
-                            className="btn-fill pull-right mr-4"
-                            type="Terima"
-                            variant="info"
-                            onClick={() => handleTerimaClick(pinjaman)}
-                            disabled={pinjaman.status_pengajuan === "Diterima" || pinjaman.status_transfer === "Selesai" || pinjaman.not_compliant == 1 || pinjaman.not_compliant == null ||
-                              !isPreviousAccepted(findNomorAntrean(pinjaman.id_pinjaman))
-                            }
-                            style={{width: 107, fontSize:14}}>
-                            <FaCheckSquare style={{ marginRight: '8px' }} />
-                            Terima
-                          </Button>
-                          
-                          </td>
-                        </tr>
-                      ))
-                      }
-                    </tbody>
-                  </table>
-                </div>
-              </Table>
-              )}
-            </Card.Body>
-          </Card>
-          <div className="pagination-container">
-          <Pagination
-                activePage={currentPage}
-                itemsCountPerPage={itemsPerPage}
-                totalItemsCount={filteredAndSortedPinjaman.length}
-                pageRangeDisplayed={5}
-                onChange={handlePageChange}
-                itemClass="page-item"
-                linkClass="page-link"
-          />
-          </div>
-        </Col>
+                              )}
+                            </td>
+                            <td className="text-center">
+                              {pinjaman.status_transfer === "Selesai" ? (
+                                  <Badge pill bg="success p-2">
+                                  Selesai
+                                  </Badge >
+                                  ) : pinjaman.status_transfer === "Dibatalkan" ? (
+                                  <Badge pill bg="danger p-2">
+                                  Dibatalkan
+                                  </Badge >
+                                  ) : (
+                                  <Badge pill bg="secondary p-2 text-wrap">
+                                  Belum Ditransfer
+                                  </Badge >
+                              )}
+                            </td>
+                            <td className="text-center">
+                            <Button
+                              className="btn-fill pull-right mb-2"
+                              type="button"
+                              variant="warning"
+                              onClick={() => handleScreeningClick(pinjaman)}
+                              style={{width: 125, fontSize:14}}>
+                              <FaUserCheck style={{ marginRight: '8px' }} />
+                              Screening
+                            </Button>
+                            <Button
+                              className="btn-fill pull-right mr-4"
+                              type="Terima"
+                              variant="info"
+                              onClick={() => handleTerimaClick(pinjaman)}
+                              disabled={pinjaman.status_pengajuan === "Diterima" || pinjaman.status_transfer === "Selesai" || pinjaman.not_compliant == 1 || pinjaman.not_compliant == null ||
+                                !isPreviousAccepted(findNomorAntrean(pinjaman.id_pinjaman))
+                              }
+                              style={{width: 107, fontSize:14}}>
+                              <FaCheckSquare style={{ marginRight: '8px' }} />
+                              Terima
+                            </Button>
+                            
+                            </td>
+                          </tr>
+                        ))
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                </Table>
+                {/* )} */}
+              </Card.Body>
+            </Card>
+            <div className="pagination-container">
+            <Pagination
+                  activePage={currentPage}
+                  itemsCountPerPage={itemsPerPage}
+                  totalItemsCount={filteredAndSortedPinjaman.length}
+                  pageRangeDisplayed={5}
+                  onChange={handlePageChange}
+                  itemClass="page-item"
+                  linkClass="page-link"
+            />
+            </div>
+          </Col>
 
-        </Row>
-          
-      </Container>
+          </Row>
+            
+        </Container>
+        </div>
+        ):
+        ( <>
+            <div className="App-loading">
+              <ReactLoading type="spinningBubbles" color="#fb8379" height={150} width={150}/>
+              <span style={{paddingTop:'100px'}}>Loading...</span>
+            </div>
+          </>
+        )}
     </>
   );
+
+  
 }
 
 export default Beranda;
