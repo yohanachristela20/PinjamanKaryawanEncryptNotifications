@@ -345,6 +345,74 @@ export const getDataPerDivisi = async (req, res) => {
   }
 };
 
+export const getDataPeminjamPerDivisi = async (req, res) => {
+  try {
+    const { departemen, bulan, tahun } = req.query;
+
+    console.log("Received Query Params:", { departemen, bulan, tahun });
+
+    const whereCondition = {
+        status_pengajuan: "Diterima",
+        status_transfer: "Selesai",
+    };
+
+    if (departemen) {
+        whereCondition["$Peminjam.departemen$"] = departemen;
+    }
+
+    if (bulan && tahun) {
+      const startDate = `${tahun}-${bulan.padStart(2, '0')}-01`;
+      const endDate = new Date(tahun, bulan, 0); // Mendapatkan tanggal terakhir di bulan tersebut
+      const endDateString = endDate.toISOString().split('T')[0]; // Format 'YYYY-MM-DD'
+  
+      whereCondition["tanggal_pengajuan"] = {
+          [Sequelize.Op.gte]: startDate,
+          [Sequelize.Op.lte]: endDateString,
+      };
+    } 
+    else if (tahun) {
+      console.log(`Filtering data for entire year: ${tahun}`);
+      whereCondition["tanggal_pengajuan"] = {
+          [Sequelize.Op.gte]: `${tahun}-01-01`,
+          [Sequelize.Op.lte]: `${tahun}-12-31`,
+      };
+    }
+
+    const peminjamData = await Pinjaman.findAll({
+        where: whereCondition,
+        include: [
+            {
+                model: Karyawan,
+                as: "Peminjam",
+                attributes: ["divisi", "departemen", "id_karyawan"],
+            },
+        ],
+        attributes: [
+            [Sequelize.col("Peminjam.divisi"), "divisi"],
+            [Sequelize.fn("COUNT", Sequelize.fn("DISTINCT", Sequelize.col("Peminjam.id_karyawan"))), "jumlah_peminjam"],
+        ],
+        group: ["Peminjam.divisi"],
+        raw: true,
+    });
+
+    const dataPeminjamPerDivisi = peminjamData.map((item) => ({
+        ...item,
+        jumlah_peminjam: parseInt(item.jumlah_peminjam, 10),
+    }));
+
+    console.log("dataPeminjamPerDivisi:", dataPeminjamPerDivisi);
+
+    if (dataPeminjamPerDivisi.length > 0) {
+        res.status(200).json(dataPeminjamPerDivisi);
+    } else {
+        res.status(200).json({ message: "Data tidak ditemukan", data: [] });
+    }
+} catch (error) {
+    console.error("Error fetching data:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+}
+};
+
 export const filterPiutangTahunan = async (req, res) => {
   try {
     const pinjamanData = await Pinjaman.findAll({

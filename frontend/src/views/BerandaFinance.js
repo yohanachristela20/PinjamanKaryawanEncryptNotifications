@@ -4,6 +4,7 @@ import SearchBar from "components/Search/SearchBar.js";
 import ImportAntreanPengajuan from "components/ModalForm/ImportAntreanPengajuan.js";
 import ChartComponent from "components/Chart/BarChart.js";
 import LineComponent from "components/Chart/LineChart";
+import PolarAreaComponent from "components/Chart/PolarAreaChart";
 import axios from "axios";
 import { useHistory, useLocation } from "react-router-dom"; 
 import {toast } from 'react-toastify';
@@ -18,6 +19,8 @@ import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import cardBeranda from "../assets/img/beranda3.png";
 import "../assets/scss/lbd/_table-header.scss";
+import Calendar from "react-calendar";
+import "../assets/scss/lbd/_calendar.scss";
 
 
 // import {Link} from "react-router-dom"; 
@@ -53,8 +56,11 @@ function BerandaFinance() {
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedMonth, setSelectedMonth] = useState("");
   const [selectedDepartemen, setSelectedDepartemen] = useState("");
+  const [selectedMonthPeminjam, setSelectedMonthPeminjam] = useState("");
+  const [selectedDepartemenPeminjam, setSelectedDepartemenPeminjam] = useState("");
   const [chartDataTahunan, setChartDataTahunan] = useState({ labels: [], series: [[]] });
   const [chartDataBulanan, setChartDataBulanan] = useState({ labels: [], series: [[]] });
+  const [chartDataPeminjamBulanan, setDataPeminjamBulanan] = useState({ labels: [], series: [[]] });
 
   const [latestPlafond, setLatestPlafond] = useState("");
 
@@ -64,6 +70,8 @@ function BerandaFinance() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
+
+  const [date, setDate] = useState(new Date());
 
   const findNomorAntrean = (idPinjaman) => {
     const antreanItem = antrean.find(item => item.id_pinjaman === idPinjaman);
@@ -220,7 +228,14 @@ function BerandaFinance() {
     // Panggil dataPinjaman dengan selectedYear
     dataPinjaman(selectedYear);
     dataPerDivisi("");
+    dataPeminjamPerDivisi();
   }, [selectedYear]); // Dependency array untuk memantau perubahan pada selectedYear
+
+  const totalPinjaman = parseFloat(totalPinjamanKeseluruhan);
+  const plafondTerakhir = parseFloat(latestPlafond);
+  const total = totalPinjaman + plafondTerakhir;
+  const usedPercentage =  total > 0 ? ((totalPinjaman / total) * 100).toFixed(1) : "0";
+  console.log("usedPercentage: ", usedPercentage);
 
   const data_plafond = {
     labels: ['Digunakan', 'Tersedia'],
@@ -235,6 +250,27 @@ function BerandaFinance() {
         hoverOffset: 4
       }
     ]
+  };
+
+  const centerTextPlugin = {
+    id: 'centerText',
+    beforeDraw: (chart) => {
+      const { width, height, options } = chart;
+      const ctx = chart.ctx;
+      ctx.restore();
+      const fontSize = (height / 100).toFixed(2);
+      ctx.font = `bold ${fontSize*8}px Arial`;
+      ctx.textBaseline = 'middle';
+      ctx.textAlign = 'center';
+  
+      const x = width / 2;
+      const y = height / 2;
+  
+      ctx.fillStyle = '#333'; // Text color
+      const text = options.plugins.centerText?.usedPercentage || "0.0%";
+      ctx.fillText(`${text}%`, x, y);
+      ctx.save();
+    },
   };
 
   // console.log("Plafond saat ini: ", latestPlafond);
@@ -591,6 +627,50 @@ function BerandaFinance() {
     }
   };
 
+  const dataPeminjamPerDivisi = async (selectedDepartemenPeminjam, selectedMonthPeminjam = "", selectedYear = "") => {
+    try {
+        const tahun = selectedYear || new Date().getFullYear();
+        const bulan = selectedMonthPeminjam === "" ? undefined : selectedMonthPeminjam.padStart(2, '0');
+  
+        const response = await axios.get("http://10.70.10.110:5000/data-peminjam-per-divisi", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+            params: {
+                departemen: selectedDepartemenPeminjam || "",
+                bulan: bulan,
+                tahun: tahun,
+            },
+        });
+  
+        const data = response.data;
+        if (!data || !Array.isArray(data) || data.length === 0) {
+            console.error("Data kosong atau tidak valid");
+            setDataPeminjamBulanan({
+                labels: [],
+                series: [[]],
+            });
+            return;
+        }
+  
+        // Mengisi labels dan series dengan data yang diterima
+        const labels = data.map(item => item.divisi);
+        const seriesPinjaman = data.map(item => item.jumlah_peminjam);
+  
+        setDataPeminjamBulanan({
+            labels: labels,
+            series: [seriesPinjaman],
+        });
+  
+    } catch (error) {
+        console.error("Error fetching dataPerDivisi:", error.message);
+        setDataPeminjamBulanan({
+            labels: [],
+            series: [[]],
+        });
+    }
+  };
+
 
   return (
     <>
@@ -614,12 +694,12 @@ function BerandaFinance() {
       {/* <ToastContainer /> */}
 
       <Row>
-          <Col md="12">
+          <Col md="12"className="mb-lg-0">
             <Card>
               <Card.Header>
                 <Card.Title as="h4">Grafik Piutang Tahunan</Card.Title>
               </Card.Header>
-              <Card.Body>
+              <Card.Body className="mt-2">
                 <div className="ct-chart" id="chartHours">
                   <div>
                     <label htmlFor="yearSelect">Pilih Tahun:</label>
@@ -628,7 +708,7 @@ function BerandaFinance() {
                       value={selectedYear}
                       onChange={(e) => {
                         setSelectedYear(e.target.value);
-                        dataPinjaman(e.target.value); // Panggil fungsi dataPinjaman
+                        dataPinjaman(e.target.value); 
                       }}
                       className="mx-2"
                     >
@@ -649,8 +729,97 @@ function BerandaFinance() {
         </Row>
 
         <Row>
-        <Col md="8">
-          <Card>
+          <Col md="4">
+            <Card>
+              <Card.Header>
+                <Card.Title as="h4">Jumlah Peminjam Bulanan</Card.Title>
+              </Card.Header>
+              <Card.Body className="mt-2">
+              <div>
+                <div>
+                  <label htmlFor="yearSelect">Tahun:</label>
+                  <span className="year-label ml-2" onClick={() => {
+                    const currentYear = new Date().getFullYear();
+                    setSelectedYear(currentYear);
+                    dataPeminjamPerDivisi(selectedDepartemenPeminjam, selectedMonthPeminjam, currentYear);
+                  }}>
+                    {new Date().getFullYear()}
+                  </span>
+                </div>
+
+                <div>
+                  <select
+                      id="monthSelect"
+                      value={selectedMonthPeminjam}
+                      onChange={(e) => {
+                        setSelectedMonthPeminjam(e.target.value);
+                        dataPeminjamPerDivisi(selectedDepartemen, e.target.value, selectedYear);
+                      }}
+                      className="mb-2"
+                    >
+                      <option value="">Semua Bulan</option>
+                      {getMonths().map((month) => (
+                        <option key={month.value} value={month.value}>
+                          {month.label}
+                      </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div>
+                  <select
+                    id="departemenSelect"
+                    value={selectedDepartemenPeminjam}
+                    onChange={(e) => {
+                      setSelectedDepartemenPeminjam(e.target.value);
+                      dataPeminjamPerDivisi(e.target.value); 
+                    }}
+                  >
+                    <option value="">Semua Departemen</option>
+                    <option value="Direksi">Direksi</option>
+                    <option value="Finance & Administration">Finance & Administration</option>
+                    <option value="Production">Production</option>
+                    <option value="Sales & Distribution">Sales & Distribution</option>
+                    <option value="General">General</option>
+                  </select>
+                </div>
+
+                <div>
+                  <PolarAreaComponent chartData={chartDataPeminjamBulanan}/>
+                </div>
+              </div>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md="4" className="mt-2 mt-lg-0 mb-5 mb-lg-3">
+            <Calendar onChange={setDate} value={date}></Calendar>
+          </Col>
+          <Col md="4">
+            <Card>
+              <Card.Header>
+                <Card.Title as="h4">Ketersediaan Plafond</Card.Title>
+              </Card.Header>
+              <Card.Body className="mt-2">
+              <div>
+                <Doughnut data={data_plafond} options={{plugins: {centerText: {usedPercentage}}}} plugins={[centerTextPlugin]}/>
+              </div>
+
+                <div className="legend">
+                  <i className="fas fa-circle" style={{ color: "#FF6384" }}></i>
+                  Digunakan 
+                  <i className="fas fa-circle ml-3" style={{ color: "#36A2EB" }}></i>
+                  Tersedia 
+                </div>
+                <hr></hr>
+                <p className="card-category">Plafond tersedia saat ini sebesar Rp  {formatRupiah(latestPlafond)}</p>
+              </Card.Body>
+            </Card>
+          </Col>
+        </Row>
+
+        <Row>
+        <Col md="12">
+            <Card className="mb-2 mb-lg-4">
             <Card.Header>
               <Card.Title as="h4">Grafik Piutang Bulanan</Card.Title>
             </Card.Header>
@@ -668,7 +837,7 @@ function BerandaFinance() {
               </div>
 
               <div>
-                <label htmlFor="monthSelect">Pilih Bulan:</label>
+                <label htmlFor="monthSelect" className="mb-3">Pilih Bulan:</label>
                 <select
                   id="monthSelect"
                   value={selectedMonth}
@@ -682,7 +851,7 @@ function BerandaFinance() {
                   {getMonths().map((month) => (
                     <option key={month.value} value={month.value}>
                       {month.label}
-                    </option>
+                  </option>
                   ))}
                 </select>
               </div>
@@ -707,30 +876,9 @@ function BerandaFinance() {
                   </select>
                 </div>
 
-                <LineComponent chartData={chartDataBulanan} />
+                <LineComponent chartData={chartDataBulanan}/>
               </div>
             </Card.Body>
-          </Card>
-        </Col>
-          <Col md="4">
-            <Card>
-              <Card.Header>
-                <Card.Title as="h4">Chart Ketersediaan Plafond</Card.Title>
-              </Card.Header>
-              <Card.Body>
-              <div style={{ width: '61%', margin: '0 auto' }}>
-                <Doughnut data={data_plafond} />
-              </div>
-
-                <div className="legend">
-                  <i className="fas fa-circle" style={{ color: "#FF6384" }}></i>
-                  Tersedia 
-                  <i className="fas fa-circle ml-3" style={{ color: "#36A2EB" }}></i>
-                  Digunakan 
-                </div>
-                <hr></hr>
-                <p className="card-category">Plafond tersedia saat ini sebesar Rp  {formatRupiah(latestPlafond || 0)}</p>
-              </Card.Body>
             </Card>
           </Col>
         </Row>

@@ -10,7 +10,7 @@ function SearchBar({ searchQuery, handleSearchChange }) {
       <InputGroup className="ml-3">
         <Form.Control
           type="text"
-          placeholder="Search"
+          placeholder="Cari"
           value={searchQuery}
           onChange={handleSearchChange}
           className="search-bar"

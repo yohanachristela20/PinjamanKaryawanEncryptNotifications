@@ -6,6 +6,7 @@ import { createPinjaman,
          getDataPinjaman,
          filterPiutangTahunan,
          getDataPerDivisi,
+         getDataPeminjamPerDivisi,
  } from "../controllers/PinjamanController.js";    
 import Plafond from "../models/PlafondModel.js";
 import Angsuran from "../models/AngsuranModel.js";
@@ -52,6 +53,7 @@ router.get('/pinjaman-data', getPinjamanData);
 router.get('/data-pinjaman', getDataPinjaman);
 router.get('/filter-piutang', filterPiutangTahunan);
 router.get('/data-divisi', getDataPerDivisi); 
+router.get('/data-peminjam-per-divisi', getDataPeminjamPerDivisi);
 
 router.get("/total-pinjaman-keseluruhan", async (req, res) => {
         try {
@@ -85,14 +87,14 @@ router.get("/total-peminjam", async (req, res) => {
                 }
 
             }); 
-            console.log("Total peminjam: ", totalPeminjam); 
+            // console.log("Total peminjam: ", totalPeminjam); 
             
             if (totalPeminjam === null || totalPeminjam === undefined) {
                 return res.status(404).json({ message: "No peminjam data found" });
             } 
 
             const total_peminjam = totalPeminjam || 0;
-            console.log("Total Peminjam: ", total_peminjam); 
+            // console.log("Total Peminjam: ", total_peminjam); 
 
             res.status(200).json({ totalPeminjam: total_peminjam});
         } catch (error) {

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {FaFileCsv, FaFilePdf, FaFileImport} from 'react-icons/fa'; 
+import {FaFileCsv, FaFilePdf, FaFileImport, FaLandmark, FaCoins, FaMoneyBillWave, FaHandHoldingUsd, FaUserFriends, } from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import axios from "axios";
 import { useHistory } from "react-router-dom"; 
@@ -393,8 +393,8 @@ import {
                 ) : (
                 <Row>
                   <Col xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-chart text-warning"></i>
+                    <div className="icon-big icon-warning">
+                      <FaLandmark className="text-warning" />
                     </div>
                   </Col>
                   <Col xs="7">
@@ -431,8 +431,8 @@ import {
                     ) : (
                     <Row>
                       <Col xs="5">
-                        <div className="icon-big text-center icon-warning">
-                          <i className="nc-icon nc-money-coins text-success"></i>
+                        <div className="icon-big icon-warning">
+                          <FaCoins className="text-success" />
                         </div>
                       </Col>
                       <Col xs="7">
@@ -473,8 +473,8 @@ import {
                 ) : (
                 <Row>
                   <Col xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-notes text-danger"></i>
+                    <div className="icon-big icon-warning">
+                      <FaHandHoldingUsd className="text-danger" />
                     </div>
                   </Col>
                   <Col xs="7">
@@ -510,14 +510,13 @@ import {
                 ) : (
                 <Row>
                   <Col xs="5">
-                    <div className="icon-big text-center icon-warning">
-                      <i className="nc-icon nc-badge text-primary"></i>
+                    <div className="icon-big icon-warning">
+                      <FaUserFriends className="text-primary"/>
                     </div>
                   </Col>
                   <Col xs="7">
                     <div className="numbers">
                       <p className="card-category">Jumlah Peminjam</p>
-                     
                     </div>
                   </Col>
                   <Col>

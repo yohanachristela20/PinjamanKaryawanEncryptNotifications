@@ -137,11 +137,11 @@ const EditKaryawan = ({showEditModal, setShowEditModal, karyawan, onSuccess}) =>
             show={showEditModal}
             onHide={() => setShowEditModal(false)}
             >
-            <Modal.Header className="text-center">
-                <h3>Form Edit Karyawan</h3>
+            <Modal.Header className="text-center pb-1">
+                <h3 mt-3 mb-0>Form Edit Karyawan</h3>
                 
             </Modal.Header>
-            <Modal.Body className="text-left">
+            <Modal.Body className="text-left pt-0">
                 <hr />
                 <Form onSubmit={updateKaryawan}>
                 <Row>
