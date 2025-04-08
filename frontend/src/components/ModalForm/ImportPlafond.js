@@ -26,7 +26,7 @@ const ImportPlafond = ({showImportModal, setShowImportModal, onSuccess}) => {
     const formData = new FormData();
     formData.append("csvfile", file);
 
-    fetch("http://10.70.10.110:5000/plafond/import-csv", {
+    fetch("http://10.70.10.119:5000/plafond/import-csv", {
       method: "POST",
       body: formData,
       headers: {
@@ -78,7 +78,7 @@ const ImportPlafond = ({showImportModal, setShowImportModal, onSuccess}) => {
       show={showImportModal}
       onHide={() => setShowImportModal(false)}>
     <Modal.Header className="text-center pb-1">
-      <h3 className="mt-3 mb-0">Import Plafond</h3>
+      <h3 className="mt-2 mb-0">Import Plafond</h3>
     </Modal.Header>
     <Modal.Body className="text-left pt-0">
       <hr />
@@ -96,16 +96,18 @@ const ImportPlafond = ({showImportModal, setShowImportModal, onSuccess}) => {
       
       <p>Pilih file CSV yang akan diimport. </p>
         <input type="file" accept=".csv" onChange={handleFileChange} />
-        <Button
-          className="btn-fill pull-right"
-          type="button"
-          variant="info"
-          onClick={handleFileImport}
-          disabled={!file}
-        >
-          <FaFileImport style={{ marginRight: "8px" }} />
-          Import Data
-        </Button>
+        <div className="d-grid d-flex justify-content-end"> 
+          <Button
+            className="btn-fill pull-right mt-2 mb-2"
+            type="button"
+            variant="info"
+            onClick={handleFileImport}
+            disabled={!file}
+          >
+            <FaFileImport style={{ marginRight: "8px" }} />
+            Import Data
+          </Button>
+        </div>
       </div>
     </Modal.Body>
     </Modal>

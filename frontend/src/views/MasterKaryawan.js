@@ -61,7 +61,7 @@ function MasterKaryawan() {
 
       setLoading(true);
       
-      const response = await axios.get("http://10.70.10.110:5000/karyawan", {
+      const response = await axios.get("http://10.70.10.119:5000/karyawan", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -76,7 +76,7 @@ function MasterKaryawan() {
 
   const deleteKaryawan = async(id_karyawan) =>{
     try {
-      await axios.delete(`http://10.70.10.110:5000/karyawan/${id_karyawan}` , {
+      await axios.delete(`http://10.70.10.119:5000/karyawan/${id_karyawan}` , {
         headers: {
           Authorization: `Bearer ${token}`,
       },

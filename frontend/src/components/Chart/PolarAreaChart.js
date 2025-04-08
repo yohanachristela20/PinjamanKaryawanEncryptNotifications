@@ -32,7 +32,7 @@ const PolarAreaComponent = ({chartData}) => {
   
 
   return (
-    <div className="chart-container" style={{ margin: '0 auto'  }}>
+    <div className="chart-container" style={{ margin: '0 auto', width: '330px'  }}>
         <PolarArea data={data} />
     </div>
     );

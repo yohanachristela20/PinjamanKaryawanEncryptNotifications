@@ -20,7 +20,7 @@ const ImportUser = ({showImportModal, setShowImportModal, onSuccess}) => {
     const formData = new FormData();
     formData.append("csvfile", file);
 
-    fetch("http://10.70.10.110:5000/user/import-csv", {
+    fetch("http://10.70.10.119:5000/user/import-csv", {
       method: "POST",
       body: formData,
       headers: {
@@ -90,16 +90,18 @@ const ImportUser = ({showImportModal, setShowImportModal, onSuccess}) => {
         </Button>
       <p>Pilih file CSV yang akan diimport. </p>
         <input type="file" accept=".csv" onChange={handleFileChange}/>
-        <Button
-          className="btn-fill pull-right"
-          type="button"
-          variant="info"
-          onClick={handleFileImport}
-          disabled={!file}
-        >
-          <FaFileImport style={{ marginRight: "8px" }} />
-          Import Data
-        </Button>
+        <div className="d-grid d-flex justify-content-end">
+          <Button
+            className="btn-fill pull-right mt-2 mb-2"
+            type="button"
+            variant="info"
+            onClick={handleFileImport}
+            disabled={!file}
+          >
+            <FaFileImport style={{ marginRight: "8px" }} />
+            Import Data
+          </Button>
+        </div>
       </div>
     </Modal.Body>
     </Modal>

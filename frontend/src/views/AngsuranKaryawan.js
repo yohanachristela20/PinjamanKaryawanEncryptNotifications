@@ -63,7 +63,7 @@ function AngsuranKaryawan() {
     try {
       if (!token || !username) return;
 
-      const response = await axios.get(`http://10.70.10.110:5000/user-details/${username}`, {
+      const response = await axios.get(`http://10.70.10.119:5000/user-details/${username}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -83,7 +83,7 @@ function AngsuranKaryawan() {
 
   const getAngsuran = async () => {
     try {
-      const response = await axios.get('http://10.70.10.110:5000/angsuran', {
+      const response = await axios.get('http://10.70.10.119:5000/angsuran', {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -139,7 +139,7 @@ function AngsuranKaryawan() {
     const token = localStorage.getItem('token'); // Ambil token dari localStorage
   
     try {
-      const response = await axios.get("http://10.70.10.110:5000/karyawan-data", {
+      const response = await axios.get("http://10.70.10.119:5000/karyawan-data", {
         headers: {
           Authorization: `Bearer ${token}`, 
         },

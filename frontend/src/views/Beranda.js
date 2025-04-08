@@ -131,14 +131,14 @@ function Beranda() {
     fetchAntrean(); 
     // fetchPlafondAngsuran();
 
-    setTimeout(() => setLoading(false), 1000)
+    setTimeout(() => setLoading(false), 3000)
   }, []);
 
 
   const getPinjaman = async () =>{
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.110:5000/pinjaman", {
+      const response = await axios.get("http://10.70.10.119:5000/pinjaman", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -157,7 +157,7 @@ function Beranda() {
   const getPinjamanData = async () =>{
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.110:5000/pinjaman-data", {
+      const response = await axios.get("http://10.70.10.119:5000/pinjaman-data", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -177,7 +177,7 @@ function Beranda() {
   const getAntrean = async () => {
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.110:5000/antrean-pengajuan", {
+      const response = await axios.get("http://10.70.10.119:5000/antrean-pengajuan", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -194,7 +194,7 @@ function Beranda() {
 
   const fetchAntrean = async () => {
     try {
-      const response = await axios.get("http://10.70.10.110:5000/antrean-pengajuan", {
+      const response = await axios.get("http://10.70.10.119:5000/antrean-pengajuan", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -226,7 +226,7 @@ function Beranda() {
   useEffect(() => {
     const fetchYears = async () => {
       try {
-        const response = await axios.get("http://10.70.10.110:5000/filter-piutang", {
+        const response = await axios.get("http://10.70.10.119:5000/filter-piutang", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -251,7 +251,7 @@ function Beranda() {
   
       try {
         const response = await axios.get(
-          `http://10.70.10.110:5000/user-details/${username}`,
+          `http://10.70.10.119:5000/user-details/${username}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -273,16 +273,16 @@ function Beranda() {
     const fetchSummaryData = async () => {
           try {
             const [responseTotalPinjaman, responseTotalPeminjam, responseTotalDibayar, responsePlafond] = await Promise.all([
-              axios.get("http://10.70.10.110:5000/total-pinjaman-keseluruhan", {
+              axios.get("http://10.70.10.119:5000/total-pinjaman-keseluruhan", {
                 headers: { Authorization: `Bearer ${token}` },
               }),
-              axios.get("http://10.70.10.110:5000/total-peminjam", {
+              axios.get("http://10.70.10.119:5000/total-peminjam", {
                 headers: { Authorization: `Bearer ${token}` },
               }),
-              axios.get("http://10.70.10.110:5000/total-dibayar", {
+              axios.get("http://10.70.10.119:5000/total-dibayar", {
                 headers: { Authorization: `Bearer ${token}` },
               }),
-              axios.get("http://10.70.10.110:5000/latest-plafond-saat-ini", {
+              axios.get("http://10.70.10.119:5000/latest-plafond-saat-ini", {
                 headers: { Authorization: `Bearer ${token}` },
               }),
             ]);
@@ -308,11 +308,13 @@ function Beranda() {
   const totalPinjaman = parseFloat(totalPinjamanKeseluruhan);
   const plafondTerakhir = parseFloat(latestPlafond);
   const total = totalPinjaman + plafondTerakhir;
-  const usedPercentage =  total > 0 ? ((totalPinjaman / total) * 100).toFixed(1) : "0";
+  const persentaseJumlahPinjaman =  total > 0 ? ((totalPinjaman / total) * 100).toFixed(2) : "0";
+  const usedPercentage = (persentaseJumlahPinjaman > 0? (100 - persentaseJumlahPinjaman) : "0");
+  // const usedPercentage = ( (total > 0 ? ((totalPinjaman / total) * 100).toFixed(2) : "0")) ; 
   console.log("usedPercentage: ", usedPercentage);
 
   const data_plafond = {
-    labels: ['Digunakan', 'Tersedia'],
+    // labels: ['Digunakan', 'Tersedia'],
     datasets: [
       {
         label: 'Pinjaman Overview',
@@ -349,7 +351,7 @@ function Beranda() {
       const ctx = chart.ctx;
       ctx.restore();
       const fontSize = (height / 100).toFixed(2);
-      ctx.font = `bold ${fontSize*8}px Arial`;
+      ctx.font = `${fontSize*8}px Nunito`;
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
   
@@ -413,7 +415,7 @@ function Beranda() {
 
       // console.log("Payload yang dikirim ke server:", payload);
 
-      const response = await axios.put(`http://10.70.10.110:5000/pengajuan/${pinjaman.id_pinjaman}`, {
+      const response = await axios.put(`http://10.70.10.119:5000/pengajuan/${pinjaman.id_pinjaman}`, {
         status_pengajuan: "Diterima",
 
       }, {
@@ -577,7 +579,7 @@ function Beranda() {
 
   const dataPinjaman = async (selectedYear) => {
     try {
-      const response = await axios.get("http://10.70.10.110:5000/data-pinjaman", {
+      const response = await axios.get("http://10.70.10.119:5000/data-pinjaman", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -621,7 +623,7 @@ const dataPerDivisi = async (selectedDepartemen, selectedMonth = "", selectedYea
 
         // console.log("Params:", { departemen: selectedDepartemen, bulan, tahun });
 
-        const response = await axios.get("http://10.70.10.110:5000/data-divisi", {
+        const response = await axios.get("http://10.70.10.119:5000/data-divisi", {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
@@ -669,7 +671,7 @@ const dataPeminjamPerDivisi = async (selectedDepartemenPeminjam, selectedMonthPe
       const tahun = selectedYear || new Date().getFullYear();
       const bulan = selectedMonthPeminjam === "" ? undefined : selectedMonthPeminjam.padStart(2, '0');
 
-      const response = await axios.get("http://10.70.10.110:5000/data-peminjam-per-divisi", {
+      const response = await axios.get("http://10.70.10.119:5000/data-peminjam-per-divisi", {
           headers: {
               Authorization: `Bearer ${token}`,
           },
@@ -762,96 +764,7 @@ const dataPeminjamPerDivisi = async (selectedDepartemenPeminjam, selectedMonthPe
           </Row>
 
           <Row>
-            <Col md="4">
-              <Card>
-                <Card.Header>
-                  <Card.Title as="h4">Jumlah Peminjam Bulanan</Card.Title>
-                </Card.Header>
-                <Card.Body className="mt-2">
-                <div>
-                  <div>
-                    <label htmlFor="yearSelect">Tahun:</label>
-                    <span className="year-label ml-2" onClick={() => {
-                      const currentYear = new Date().getFullYear();
-                      setSelectedYear(currentYear);
-                      dataPeminjamPerDivisi(selectedDepartemenPeminjam, selectedMonthPeminjam, currentYear);
-                    }}>
-                      {new Date().getFullYear()}
-                    </span>
-                  </div>
-
-                  <div>
-                  <select
-                    id="monthSelect"
-                    value={selectedMonthPeminjam}
-                    onChange={(e) => {
-                      setSelectedMonthPeminjam(e.target.value);
-                      dataPeminjamPerDivisi(selectedDepartemen, e.target.value, selectedYear);
-                    }}
-                    className="mb-2"
-                  >
-                    <option value="">Semua Bulan</option>
-                    {getMonths().map((month) => (
-                      <option key={month.value} value={month.value}>
-                        {month.label}
-                    </option>
-                    ))}
-                  </select>
-                  </div>
-
-                  <div>
-                    <select
-                      id="departemenSelect"
-                      value={selectedDepartemenPeminjam}
-                      onChange={(e) => {
-                        setSelectedDepartemenPeminjam(e.target.value);
-                        dataPeminjamPerDivisi(e.target.value); 
-                      }}
-                    >
-                      <option value="">Semua Departemen</option>
-                      <option value="Direksi">Direksi</option>
-                      <option value="Finance & Administration">Finance & Administration</option>
-                      <option value="Production">Production</option>
-                      <option value="Sales & Distribution">Sales & Distribution</option>
-                      <option value="General">General</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <PolarAreaComponent chartData={chartDataPeminjamBulanan}/>
-                  </div>
-                </div>
-                </Card.Body>
-              </Card>
-            </Col>
-            <Col md="4" className="mt-2 mt-lg-0 mb-5 mb-lg-3">
-              <Calendar onChange={setDate} value={date}></Calendar>
-            </Col>
-            <Col md="4">
-              <Card>
-                <Card.Header>
-                  <Card.Title as="h4">Ketersediaan Plafond</Card.Title>
-                </Card.Header>
-                <Card.Body className="mt-2">
-                <div>
-                  <Doughnut data={data_plafond} options={{plugins: {centerText: {usedPercentage}}}} plugins={[centerTextPlugin]}/>
-                </div>
-
-                  <div className="legend">
-                    <i className="fas fa-circle" style={{ color: "#FF6384" }}></i>
-                    Digunakan 
-                    <i className="fas fa-circle ml-3" style={{ color: "#36A2EB" }}></i>
-                    Tersedia 
-                  </div>
-                  <hr></hr>
-                  <p className="card-category">Plafond tersedia saat ini sebesar Rp  {formatRupiah(latestPlafond)}</p>
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md="12">
+            <Col md="8">
               <Card className="mb-2 mb-lg-4">
               <Card.Header>
                 <Card.Title as="h4">Grafik Piutang Bulanan</Card.Title>
@@ -913,6 +826,95 @@ const dataPeminjamPerDivisi = async (selectedDepartemenPeminjam, selectedMonthPe
                 </div>
               </Card.Body>
               </Card>
+            </Col>
+            <Col md="4">
+              <Card>
+                <Card.Header>
+                  <Card.Title as="h4">Ketersediaan Plafond</Card.Title>
+                </Card.Header>
+                <Card.Body className="mt-2">
+                <div>
+                  <Doughnut data={data_plafond} options={{plugins: {centerText: {usedPercentage}}}} plugins={[centerTextPlugin]}/>
+                </div>
+
+                  <div className="legend mt-3">
+                    <i className="fas fa-circle" style={{ color: "#FF6384" }}></i>
+                    Digunakan 
+                    <i className="fas fa-circle ml-3" style={{ color: "#36A2EB" }}></i>
+                    Tersedia 
+                  </div>
+                  <hr></hr>
+                  <p className="card-category">Plafond tersedia saat ini sebesar Rp {formatRupiah(latestPlafond)}</p>
+                </Card.Body>
+              </Card>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md="5">
+              <Card>
+                <Card.Header>
+                  <Card.Title as="h4">Jumlah Peminjam Bulanan</Card.Title>
+                </Card.Header>
+                <Card.Body className="mt-2">
+                <div>
+                  <div>
+                    <label htmlFor="yearSelect">Tahun:</label>
+                    <span className="year-label ml-2" onClick={() => {
+                      const currentYear = new Date().getFullYear();
+                      setSelectedYear(currentYear);
+                      dataPeminjamPerDivisi(selectedDepartemenPeminjam, selectedMonthPeminjam, currentYear);
+                    }}>
+                      {new Date().getFullYear()}
+                    </span>
+                  </div>
+
+                  <div>
+                  <select
+                    id="monthSelect"
+                    value={selectedMonthPeminjam}
+                    onChange={(e) => {
+                      setSelectedMonthPeminjam(e.target.value);
+                      dataPeminjamPerDivisi(selectedDepartemen, e.target.value, selectedYear);
+                    }}
+                    className="mb-2"
+                  >
+                    <option value="">Semua Bulan</option>
+                    {getMonths().map((month) => (
+                      <option key={month.value} value={month.value}>
+                        {month.label}
+                    </option>
+                    ))}
+                  </select>
+                  </div>
+
+                  <div>
+                    <select
+                      id="departemenSelect"
+                      value={selectedDepartemenPeminjam}
+                      onChange={(e) => {
+                        setSelectedDepartemenPeminjam(e.target.value);
+                        dataPeminjamPerDivisi(e.target.value); 
+                      }}
+                    >
+                      <option value="">Semua Departemen</option>
+                      <option value="Direksi">Direksi</option>
+                      <option value="Finance & Administration">Finance & Administration</option>
+                      <option value="Production">Production</option>
+                      <option value="Sales & Distribution">Sales & Distribution</option>
+                      <option value="General">General</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <PolarAreaComponent chartData={chartDataPeminjamBulanan}/>
+                  </div>
+                </div>
+                </Card.Body>
+              </Card>
+            </Col>
+            <Col md="7" className="mt-2 mt-lg-0 mb-5 mb-lg-3">
+              <Calendar onChange={setDate} value={date}></Calendar>
             </Col>
           </Row>
 

@@ -21,7 +21,7 @@ const ImportAntreanPengajuan = ({showImportModal, setShowImportModal, onSuccess}
     const formData = new FormData();
     formData.append("csvfile", file);
 
-    fetch("http://10.70.10.110:5000/pengajuan/import-csv", {
+    fetch("http://10.70.10.119:5000/pengajuan/import-csv", {
       method: "POST",
       body: formData,
       headers: {
@@ -90,7 +90,7 @@ const ImportAntreanPengajuan = ({showImportModal, setShowImportModal, onSuccess}
       <span className="text-danger required-select">*Gunakan format CSV di bawah ini untuk mengimpor data pinjaman.</span>
       <p>Unduh format CSV disini.</p>
        <Button
-        className="btn-fill pull-right"
+        className="btn-fill pull-right mb-4"
         type="button"
         variant="warning"
         onClick={() => downloadCSV()}>
@@ -100,16 +100,18 @@ const ImportAntreanPengajuan = ({showImportModal, setShowImportModal, onSuccess}
 
       <p>Pilih file CSV yang akan diimport. </p>
         <input type="file" accept=".csv" onChange={handleFileChange} />
-        <Button
-          className="btn-fill pull-right"
-          type="button"
-          variant="info"
-          onClick={handleFileImport}
-          disabled={!file}
-        >
-          <FaFileImport style={{ marginRight: "8px" }} />
-          Import Data
-        </Button>
+        <div className="d-grid d-flex justify-content-end">
+          <Button
+            className="btn-fill pull-right mt-2 mb-2"
+            type="button"
+            variant="info"
+            onClick={handleFileImport}
+            disabled={!file}
+          >
+            <FaFileImport style={{ marginRight: "8px" }} />
+            Import Data
+          </Button>
+        </div>
       </div>
     </Modal.Body>
     </Modal>

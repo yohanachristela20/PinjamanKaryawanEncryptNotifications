@@ -18,7 +18,7 @@ import ReactLoading from "react-loading";
 import "../assets/scss/lbd/_loading.scss";
 
 
-const BASE_URL = 'http://10.70.10.110:5000';
+const BASE_URL = 'http://10.70.10.119:5000';
 import {
   Card,
   Table,
@@ -109,7 +109,7 @@ function DashboardKaryawan() {
     
         // console.log("User token: ", token, "User role:", role);
         try {
-          const response = await axios.get(`http://10.70.10.110:5000/user-details/${username}`, {
+          const response = await axios.get(`http://10.70.10.119:5000/user-details/${username}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
     
@@ -142,7 +142,7 @@ useEffect(() => {
 
 const getNomorAntrean = async() => {
     try {
-      const antreanResponse = await axios.get(`http://10.70.10.110:5000/antrean/${id_pinjaman}`, {
+      const antreanResponse = await axios.get(`http://10.70.10.119:5000/antrean/${id_pinjaman}`, {
         headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -179,7 +179,7 @@ useEffect(() => {
     try {
       setLoadingPlafond(true);
 
-      const response = await axios.get("http://10.70.10.110:5000/angsuran-berikutnya", {
+      const response = await axios.get("http://10.70.10.119:5000/angsuran-berikutnya", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -277,7 +277,7 @@ useEffect(() => {
   const fetchData = async () => {
     try {
       const responsePlafond = await axios.get(
-        `http://10.70.10.110:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`,
+        `http://10.70.10.119:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -310,12 +310,12 @@ useEffect(() => {
           responseTotalDibayar, 
           responseTotalPinjaman,
         ] = await Promise.all([
-            axios.get(`http://10.70.10.110:5000/angsuran/total-sudah-dibayar/${selectedPinjaman?.id_peminjam}`, {
+            axios.get(`http://10.70.10.119:5000/angsuran/total-sudah-dibayar/${selectedPinjaman?.id_peminjam}`, {
                 headers: {
                   Authorization: `Bearer ${token}`,
               },
             }),
-            axios.get(`http://10.70.10.110:5000/pinjaman/total-pinjaman/${selectedPinjaman?.id_peminjam}`, {
+            axios.get(`http://10.70.10.119:5000/pinjaman/total-pinjaman/${selectedPinjaman?.id_peminjam}`, {
                 headers: {
                   Authorization: `Bearer ${token}`,
               },
@@ -356,7 +356,7 @@ useEffect(() => {
           });
     
           const karyawanData = responseKaryawan.data;
-          const pinjamanResponse = await axios.get(`http://10.70.10.110:5000/pinjaman/total-pinjaman/${karyawanData.id_karyawan}`, {
+          const pinjamanResponse = await axios.get(`http://10.70.10.119:5000/pinjaman/total-pinjaman/${karyawanData.id_karyawan}`, {
             headers: {
               Authorization: `Bearer ${token}`,
             },
@@ -408,7 +408,7 @@ useEffect(() => {
 
   const getPinjaman = async () =>{
     try {
-      const response = await axios.get("http://10.70.10.110:5000/pinjaman", {
+      const response = await axios.get("http://10.70.10.119:5000/pinjaman", {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -424,7 +424,7 @@ useEffect(() => {
   
   const getAntrean = async () => {
     try {
-      const response = await axios.get("http://10.70.10.110:5000/antrean-pengajuan", {
+      const response = await axios.get("http://10.70.10.119:5000/antrean-pengajuan", {
         headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -635,7 +635,7 @@ useEffect(() => {
     try {
       // console.log("Saving pengajuan with id_pinjaman: ", id_pinjaman);
       setLoadingPlafond(true);
-        await axios.post("http://10.70.10.110:5000/pinjaman", {
+        await axios.post("http://10.70.10.119:5000/pinjaman", {
             id_pinjaman,
             tanggal_pengajuan,
             jumlah_pinjaman,

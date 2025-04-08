@@ -85,69 +85,12 @@ router.post('/change-password', async (req, res) => {
 
       res.status(200).json({ message: "Password berhasil diperbarui." });
 
-      // localStorage.removeItem("token"); 
-      // localStorage.removeItem("role"); 
-
       // history.push("/login"); 
   } catch (error) {
       console.error("Error saat mengganti password:", error.message);
       res.status(500).json({ message: "Terjadi kesalahan server.", error: error.message });
   }
 });
-
-// router.post('/change-password', async (req, res) => {
-//   const { username, role, oldPassword, newPassword } = req.body;
-//   let token = req.body;
-//   token = req.headers.authorization?.split(" ")[1];
-
-
-//   if (!token) {
-//     return res.status(401).json({ message: "Token tidak ditemukan." });
-//   }
-
-//   // Validasi input
-//   if (!username || !role || !oldPassword || !newPassword) {
-//       return res.status(400).json({ message: "Semua field harus diisi!" });
-//   }
-
-//   try {
-//       // Cari user berdasarkan username dan role
-//       const user = await User.findOne({ where: { username, role } });
-
-//       if (!user) {
-//           return res.status(404).json({ message: "User tidak ditemukan." });
-//       }
-
-//       // Validasi password lama
-//       const isPasswordValid = await bcrypt.compare(oldPassword, user.password);
-//       if (!isPasswordValid) {
-//           return res.status(400).json({ message: "Password lama salah." });
-//       }
-
-//       // Hash password baru
-//       const hashedNewPassword = await bcrypt.hash(newPassword, 10);
-
-//       // Update password
-//       await User.update({ password: hashedNewPassword }, { where: { username, role } });
-
-//       res.status(200).json({ message: "Password berhasil diperbarui." });
-
-//       const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-//       const userId = decoded?.id_user;
-
-//       clearUserSession(userId);
-//       console.log(`Sesi pengguna ${userId} telah dihapus.`);
-
-//       // localStorage.removeItem("token"); 
-//       // localStorage.removeItem("role"); 
-
-//       // history.push("/login"); 
-//   } catch (error) {
-//       console.error("Error saat mengganti password:", error.message);
-//       res.status(500).json({ message: "Terjadi kesalahan server.", error: error.message });
-//   }
-// });
-
 
 router.post('/user/import-csv', upload.single("csvfile"), (req,res) => {
         if (!req.file) {
@@ -158,7 +101,6 @@ router.post('/user/import-csv', upload.single("csvfile"), (req,res) => {
         const data_user = [];
         const defaultPassword = "campina123"; 
         
-        // res.send(`File uploaded successfully: ${filePath}`);
         if (!fs.existsSync('./uploads/user')) {
                 fs.mkdirSync('./uploads/user');
         }    
@@ -237,21 +179,15 @@ router.post('/user-login', async (req, res) => {
             return res.status(500).json({ message: "JWT Secret key belum diatur di .env file." });
         }
 
-        //Generate token
-        // token JWT: JSON Web Token - u/ otorisasi user
         const token = jwt.sign(
             { id: user.id_user, role: user.role },
             jwtSecret, 
-            // { expiresIn: '180s' } // 3 menit\
         );
 
         console.log("Token berhasil dibuat:", token);
     
         res.status(200).json({ token, role, username });
         console.log("User login: ", token, role);
-        // activeUsers[user.id_user] = new Date().toISOString();
-
-
  
     } catch (error) {
         console.error("Login Error:", error);
@@ -332,11 +268,5 @@ router.post('/logout', (req, res) => {
   }
 
 })
-
-
-
-
-
-
 
 export default router;

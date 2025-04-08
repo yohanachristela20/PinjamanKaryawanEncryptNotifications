@@ -16,7 +16,6 @@ const Angsuran = db.define('angsuran', {
     status: DataTypes.STRING,
     sudah_dibayar: DataTypes.DECIMAL(19,2),
     belum_dibayar: DataTypes.DECIMAL(19,2),
-    // rasio_angsuran: DataTypes.DECIMAL(19,2),
     sudah_dihitung: DataTypes.BOOLEAN, 
     id_peminjam: {
         type: DataTypes.INTEGER,

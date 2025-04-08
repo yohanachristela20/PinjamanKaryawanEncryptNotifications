@@ -60,7 +60,14 @@ import {
       (pinjaman?.Peminjam?.departemen && String(pinjaman.Peminjam.departemen).toLowerCase().includes(searchQuery)) ||
       (pinjaman?.Peminjam?.divisi && String(pinjaman.Peminjam.divisi).toLowerCase().includes(searchQuery)) ||
       (pinjaman.tanggal_pengajuan && String(pinjaman.tanggal_pengajuan).toLowerCase().includes(searchQuery)) ||
-      (pinjaman.status_pelunasan && String(pinjaman.status_pelunasan).toLowerCase().includes(searchQuery))
+      (pinjaman.status_pelunasan && String(pinjaman.status_pelunasan).toLowerCase().includes(searchQuery)) ||
+      (pinjaman.jumlah_pinjaman && String(pinjaman.jumlah_pinjaman).toLowerCase().includes(searchQuery)) ||
+      (pinjaman.jumlah_angsuran && String(pinjaman.jumlah_angsuran).toLowerCase().includes(searchQuery)) || 
+      (pinjaman.pinjaman_setelah_pembulatan && String(pinjaman.pinjaman_setelah_pembulatan).toLowerCase().includes(searchQuery)) ||
+      (pinjaman.rasio_angsuran && String(pinjaman.rasio_angsuran).toLowerCase().includes(searchQuery)) || 
+      (pinjaman.sudah_dibayar && String(pinjaman.sudah_dibayar).toLowerCase().includes(searchQuery)) ||
+      (pinjaman.belum_dibayar && String(pinjaman.belum_dibayar).toLowerCase().includes(searchQuery)) 
+
     );
   });
 
@@ -96,16 +103,16 @@ import {
          responseTotalDibayar,
          responsePlafond,
        ] = await Promise.all([
-         axios.get("http://10.70.10.110:5000/total-pinjaman-keseluruhan", {
+         axios.get("http://10.70.10.119:5000/total-pinjaman-keseluruhan", {
            headers: { Authorization: `Bearer ${token}` },
          }),
-         axios.get("http://10.70.10.110:5000/total-peminjam", {
+         axios.get("http://10.70.10.119:5000/total-peminjam", {
            headers: { Authorization: `Bearer ${token}` },
          }),
-         axios.get("http://10.70.10.110:5000/total-dibayar", {
+         axios.get("http://10.70.10.119:5000/total-dibayar", {
            headers: { Authorization: `Bearer ${token}` },
          }),
-         axios.get("http://10.70.10.110:5000/latest-plafond-saat-ini", {
+         axios.get("http://10.70.10.119:5000/latest-plafond-saat-ini", {
            headers: { Authorization: `Bearer ${token}` },
          }),
        ]);
@@ -136,7 +143,7 @@ import {
   const getPinjaman = async () =>{
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.110:5000/pinjaman", {
+      const response = await axios.get("http://10.70.10.119:5000/pinjaman", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -152,7 +159,7 @@ import {
   const getPinjamanData = async (req, res) =>{
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.110:5000/pinjaman-data", {
+      const response = await axios.get("http://10.70.10.119:5000/pinjaman-data", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -168,7 +175,7 @@ import {
   const getPlafond = async () =>{
     try {
       // setLoading(true);
-      const response = await axios.get("http://10.70.10.110:5000/jumlah-plafond", {
+      const response = await axios.get("http://10.70.10.119:5000/jumlah-plafond", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -187,7 +194,7 @@ import {
     getPlafond();
     // fetchData();
 
-    setTimeout(() => setLoading(false), 1000)
+    setTimeout(() => setLoading(false), 3000)
   }, []);
 
 
@@ -614,7 +621,7 @@ import {
                         </thead>
                         <tbody className="scroll scroller-tbody">
                           {currentItems
-                          .filter((item) => item.status_pengajuan !== "Ditunda" && item.status_transfer !== "Belum Ditransfer" && item.status_pengajuan !== "Dibatalkan" && item.status_transfer !== "Dibatalkan")
+                          .filter((item) => item.status_pengajuan === "Diterima" && item.status_transfer === "Selesai" && item.status_pengajuan !== "Dibatalkan" && item.status_transfer !== "Dibatalkan")
                           .map((pinjaman) => {
                             const totalSudahDibayar = pinjaman.SudahDibayar
                             ? pinjaman.SudahDibayar.reduce((total, angsuran) => {
@@ -668,7 +675,7 @@ import {
               <Pagination
                     activePage={currentPage}
                     itemsCountPerPage={itemsPerPage}
-                    totalItemsCount={filteredLaporanPiutang.length}
+                    totalItemsCount={filteredLaporanPiutang.length && pinjaman.status_pengajuan !== "Ditunda" && pinjaman.status_transfer !== "Belum Ditransfer"}
                     pageRangeDisplayed={5}
                     onChange={handlePageChange}
                     itemClass="page-item"

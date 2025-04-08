@@ -55,8 +55,6 @@ router.put('/angsuran/:id_angsuran', async (req,res) => {
         }
 }); 
 
-
-
 // Total sudah dibayar untuk screening
 router.get("/angsuran/total-sudah-dibayar/:id_peminjam", async (req, res) => {
         const { id_peminjam } = req.params; 
@@ -78,7 +76,6 @@ router.get("/angsuran/total-sudah-dibayar/:id_peminjam", async (req, res) => {
                 res.status(500).send("Internal server error"); 
         }
 }); 
-
 
 //total sudah dibayar untuk card plafond - laporan piutang
 router.get("/total-dibayar", async (req, res) => {

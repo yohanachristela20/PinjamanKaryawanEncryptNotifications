@@ -64,17 +64,12 @@ router.get("/total-pinjaman-keseluruhan", async (req, res) => {
             },
           })) || 0;
       
-          // console.log("Total Pinjaman Keseluruhan:", totalPinjamanKeseluruhan);
-      
           res.status(200).json({ totalPinjamanKeseluruhan });
         } catch (error) {
           console.error("Error fetching total pinjaman:", error.message);
           res.status(500).json({ message: "Internal server error" });
         }
       });
-
-
-      
 
 router.get("/total-peminjam", async (req, res) => {
         try {
@@ -87,14 +82,12 @@ router.get("/total-peminjam", async (req, res) => {
                 }
 
             }); 
-            // console.log("Total peminjam: ", totalPeminjam); 
             
             if (totalPeminjam === null || totalPeminjam === undefined) {
                 return res.status(404).json({ message: "No peminjam data found" });
             } 
 
-            const total_peminjam = totalPeminjam || 0;
-            // console.log("Total Peminjam: ", total_peminjam); 
+            const total_peminjam = totalPeminjam || 0; 
 
             res.status(200).json({ totalPeminjam: total_peminjam});
         } catch (error) {
@@ -177,7 +170,6 @@ router.get("/plafond-tersisa", async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 });
-
 
 
 // Untuk Dashboard User
@@ -396,8 +388,6 @@ router.get("/latest-plafond-saat-ini", async (req, res) => {
   }
 });
 
-
-
 // Untuk Beranda Admin
 router.get("/plafond-angsuran", async (req, res) => {
   try {
@@ -530,7 +520,7 @@ const sendEmailNotification = async(pinjaman) => {
       ID Peminjam: ${pinjaman.id_peminjam}\n
       Jumlah: ${formatRupiah(pinjaman.jumlah_pinjaman)}\n
       Keperluan: ${pinjaman.keperluan}\n
-      Transfer pinjaman dan lakukan konfirmasi di http://10.70.10.110:3000\n\n
+      Transfer pinjaman dan lakukan konfirmasi di http://10.70.10.119:3000\n\n
       Regards,\n
       Campina Dev Team.
       `, 
