@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {FaFileCsv, FaFileImport, FaFilePdf, FaPlusCircle, FaRegEdit, FaTrashAlt, FaUserLock} from 'react-icons/fa'; 
+import {FaFileCsv, FaFileImport, FaFilePdf, FaPlusCircle, FaRegEdit, FaTrashAlt, FaTrashRestore, FaUserLock} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import axios from "axios";
 import AddUser from "components/ModalForm/AddUser.js";
@@ -13,9 +13,11 @@ import Pagination from "react-js-pagination";
 import "../assets/scss/lbd/_pagination.scss";
 import cardBeranda from "../assets/img/beranda3.png";
 import "../assets/scss/lbd/_table-header.scss";
+import { stopInactivityTimer } from "views/Heartbeat";
+import { useLocation, useHistory } from "react-router-dom";
 
 // react-bootstrap components
-import {Button, Container, Row, Col, Card, Table, Spinner} from "react-bootstrap";
+import {Button, Container, Row, Col, Card, Table, Spinner, Badge} from "react-bootstrap";
 
 function MasterUser() {
   const [showAddModal, setShowAddModal] = React.useState(false);
@@ -28,6 +30,8 @@ function MasterUser() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
+  const history = useHistory();
 
   const filteredUser = user.filter((user) =>
     (user.id_user && String(user.id_user).toLowerCase().includes(searchQuery)) ||
@@ -64,6 +68,7 @@ function MasterUser() {
       setLoading(false);
     }
   };
+  
 
   const deleteUser = async(id_user) =>{
     try {
@@ -234,7 +239,34 @@ function MasterUser() {
           });
     }
 
-};
+  };
+
+  const deleteSession = async (id_user, user_active) => {
+    try {
+        await axios.patch(`http://10.70.10.119:5000/delete-session/${id_user}`, {
+            id_user,
+            user_active
+        }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        toast.success("Session user berhasil dihapus.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: true,
+        });
+
+    } catch (error) {
+        console.log(error.message);
+        toast.error('Gagal menghapus session user.', {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: true,
+          });
+    }
+  };
+  
   
   return (
     <>
@@ -267,10 +299,10 @@ function MasterUser() {
             <AddUser showAddModal={showAddModal} setShowAddModal={setShowAddModal} onSuccess={handleAddSuccess} />
 
             <EditUser
-                        showEditModal={showEditModal}
-                        setShowEditModal={setShowEditModal}
-                        user={selectedUser}
-                        onSuccess={handleEditSuccess}
+                showEditModal={showEditModal}
+                setShowEditModal={setShowEditModal}
+                user={selectedUser}
+                onSuccess={handleEditSuccess}
             />
           </div>
 
@@ -326,6 +358,7 @@ function MasterUser() {
                         <th>ID User</th>
                         <th className="border-0">Username</th>
                         <th className="border-0">Role</th>
+                        <th className="border-0">Status</th>
                         <th className="border-0">Aksi</th>
                       </tr>
                       </thead>
@@ -336,9 +369,20 @@ function MasterUser() {
                           <td className="text-center">{user.username}</td>
                           <td className="text-center">{user.role}</td>
                           <td className="text-center">
+                              {user.user_active === true ? (
+                                <Badge pill bg="success p-2" style={{ color: 'white'}} >
+                                  Aktif
+                                </Badge >
+                                ) : (
+                                <Badge pill bg="secondary p-2" style={{ color: 'white'}} >
+                                  Tidak Aktif
+                                </Badge >
+                              )}
+                            </td>
+                          <td className="text-center">
                           <Button
-                            className="btn-fill pull-right warning"
-                            variant="warning"
+                            className="btn-fill pull-right info"
+                            variant="info"
                             onClick={() => {
                               setShowEditModal(true);
                               setSelectedUser(user);
@@ -368,6 +412,19 @@ function MasterUser() {
                           </Button>
                           <Button
                             className="btn-fill pull-right warning mt-2"
+                            variant="warning"
+                            onClick={() => deleteSession(user.id_user)}
+                            style={{
+                              width: 150,
+                              //103
+                              fontSize: 13,
+                              float: "left",
+                            }}>
+                            <FaTrashRestore style={{ marginRight: '8px' }} />
+                            Hapus Session
+                          </Button>
+                          <Button
+                            className="btn-fill pull-right warning mt-2"
                             variant="danger"
                             onClick={() => deleteUser(user.id_user)}
                             style={{
@@ -379,6 +436,7 @@ function MasterUser() {
                             <FaTrashAlt style={{ marginRight: '8px' }} />
                             Hapus
                           </Button>
+                          
                           
                           </td>
                         </tr>

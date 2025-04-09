@@ -149,24 +149,29 @@ router.post('/user/import-csv', upload.single("csvfile"), (req,res) => {
 });
 
 router.post('/user-login', async (req, res) => {
-    const { username, password, role } = req.body;
+    const { username, password, role, user_active} = req.body;
 
-    console.log("Received login request with:", { username, role });
+    console.log("Received login request with:", { username, role, user_active});
 
     if (!username || !password || !role) {
         return res.status(400).json({ message: "Semua field harus diisi!" });
     }
-
 
     try {
         const user = await User.findOne({
             where: {username, role}
         }); 
 
+        if (user.user_active === true) {
+          console.log("User sudah login");
+          return res.status(400).json({message: "User sudah login di perangkat lain. Mohon logout terlebih dahulu"}); 
+        }
+
         if (!user) {
           console.log("User not found for username:", username, "and role:", role);
           return res.status(400).json({message: "User tidak ditemukan."}); 
         }
+
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
@@ -185,8 +190,15 @@ router.post('/user-login', async (req, res) => {
         );
 
         console.log("Token berhasil dibuat:", token);
+
+        await User.update(
+          {user_active: true},
+          { 
+            where: {id_user: user.id_user},
+          }
+        );
     
-        res.status(200).json({ token, role, username });
+        res.status(200).json({ token, role, username, user_active});
         console.log("User login: ", token, role);
  
     } catch (error) {
@@ -238,7 +250,7 @@ router.post('/heartbeat', (req, res) => {
     const currentTime = new Date();
     activeUsers[userId] = currentTime;
 
-    console.log(`Aktivitas terbaru pengguna ${userId}: ${currentTime}`); 
+    // console.log(`Aktivitas terbaru pengguna ${userId}: ${currentTime}`); 
     res.status(200).json({ message: 'Heartbeat diterima' }); 
   } catch (error) {
     console.error("Token error: ", error.message); 
@@ -247,26 +259,64 @@ router.post('/heartbeat', (req, res) => {
   }
 });
 
-router.post('/logout', (req, res) => {
+router.post('/logout', async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ message: "Token tidak ditemukan." });
   }
 
+  const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
+  const userId = decoded?.id;
+  // const idUser = decoded?.id;
+
+  console.log("userId: ", userId);
+
+  await User.update(
+    {user_active: false}, 
+    {
+      where: {id_user: userId},
+    }
+  )
+
+  clearUserSession(userId);
+  console.log(`Sesi pengguna ${userId} telah dihapus.`);
+
+  return res.status(200).json({ message: "Logout berhasil" });
+
+});
+
+router.patch('/delete-session/:id_user', async (req, res) => {
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY);
-    const userId = decoded?.id_user;
+      const { id_user } = req.params;
 
-    clearUserSession(userId);
-    console.log(`Sesi pengguna ${userId} telah dihapus.`);
+      const user = await User.findOne({ where: { id_user } });
 
-    return res.status(200).json({ message: "Logout berhasil" });
+      if (!user) {
+          return res.status(404).json({ msg: "User tidak ditemukan." });
+      }
+
+      await User.update(
+        {user_active: false}, 
+        {
+          where: {id_user: id_user}
+        }
+      );
+
+      clearUserSession(id_user);
+      console.log(`Sesi pengguna ${id_user} telah dihapus.`);
+      
+      // window.location.href = 'http://10.70.10.119:3000/login';
+      res.status(200).json({ msg: "Session user berhasil dihapus." });
+      // return res.redirect('http://10.70.10.119:5000/login');
+
+      // return res.status(301).json({ redirect: '/login', message: 'Sesi Anda telah berakhir. Silakan login kembali.' });
+
+      
   } catch (error) {
-    console.error("Token error saat logout:", error.message);
-    return res.status(401).json({ redirect: '/login', message: "Token tidak valid atau sudah kedaluwarsa." });
+      console.error("Error saat menghapus session user:", error.message);
+      res.status(500).json({ message: "Gagal menghapus session user." });
   }
-
-})
+});
 
 export default router;

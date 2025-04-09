@@ -48,7 +48,7 @@ const checkSessionTimeout = (req, res, next) => {
     }
 };
 
-export const clearUserSession = (userId) => {
+export const clearUserSession = (userId, res) => {
     if (activeUsers[userId]) {
         clearInterval(activeUsers[userId].heartbeatInterval);
         delete activeUsers[userId];

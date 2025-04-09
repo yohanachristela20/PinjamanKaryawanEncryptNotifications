@@ -11,6 +11,7 @@ function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("");
+  const [user_active, setUserActive] = useState(false);
   const history = useHistory();
   const [redirecting, setRedirecting] = useState(false); 
   const [logoutTimer, setLogoutTimer] = useState(null);
@@ -28,6 +29,7 @@ function Login() {
           username: username,
           password: password,
           role: role,
+          user_active: true,
       });
 
       // console.log("Login response:", response);
@@ -37,6 +39,7 @@ function Login() {
         localStorage.setItem('token', response.data.token); 
         localStorage.setItem('role', response.data.role);
         localStorage.setItem('username', response.data.username); 
+        localStorage.setItem('user_active', response.data.user_active);
         // console.log('Login Sukses');
   
         alert(`Login sukses sebagai ${role}`);
@@ -59,6 +62,9 @@ function Login() {
     }
   };
 
+
+
+  
   const handleUsername = (value) => {
     const numericValue = value.replace(/\D/g, "");
     setUsername(numericValue);

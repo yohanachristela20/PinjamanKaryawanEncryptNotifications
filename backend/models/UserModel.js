@@ -26,6 +26,10 @@ const User = db.define('user', {
         type: DataTypes.STRING, 
         allowNull: false,
     },
+    user_active: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+    },
 }, {
     freezeTableName: true,
     timestamps: true,
