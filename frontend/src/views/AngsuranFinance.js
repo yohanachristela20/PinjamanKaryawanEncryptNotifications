@@ -73,7 +73,7 @@ function AngsuranFinance() {
       try {
         if (!token || !username) return;
 
-        const response = await axios.get(`http://10.70.10.119:5000/user-details/${username}`, {
+        const response = await axios.get(`http://10.70.10.139:5000/user-details/${username}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -104,7 +104,7 @@ function AngsuranFinance() {
     const getAngsuran = async () => {
       try {
         // setLoading(true);
-        const response = await axios.get('http://10.70.10.119:5000/angsuran', {
+        const response = await axios.get('http://10.70.10.139:5000/angsuran', {
           headers: {
             Authorization: `Bearer ${token}`,
         },
@@ -128,7 +128,7 @@ function AngsuranFinance() {
       try {
         // setLoading(true);
         const response = await axios.put(
-          `http://10.70.10.119:5000/status-update`,
+          `http://10.70.10.139:5000/status-update`,
           {},
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -163,7 +163,7 @@ function AngsuranFinance() {
     
       try {
         // setLoading(true);
-        const response = await axios.get("http://10.70.10.119:5000/karyawan-data", {
+        const response = await axios.get("http://10.70.10.139:5000/karyawan-data", {
           headers: {
             Authorization: `Bearer ${token}`, // Kirim token dalam header Authorization
           },
@@ -381,7 +381,7 @@ const downloadPDF = (data) => {
                   </div>
                 ) : ( */}
                 <Table className="table-hover table-striped">
-                  <div className="table-scroll" style={{ height: 'auto' }}>
+                  <div className="table-scroll" style={{ height: '500px' }}>
                     <table className="flex-table table table-striped table-hover">
                       <thead>
                       <tr>

@@ -11,7 +11,7 @@ import ReactLoading from "react-loading";
 import "../assets/scss/lbd/_loading.scss";
 
 
-const BASE_URL = 'http://10.70.10.119:5000';
+const BASE_URL = 'http://10.70.10.139:5000';
 export const fetchHistoryPinjaman = async (idPeminjam) => {
   return axios.get(`${BASE_URL}/history-pinjaman/${idPeminjam}`, {
     headers: {
@@ -65,7 +65,7 @@ function ScreeningPinjamanKaryawan2() {
     try {
       if (!token || !username) return;
 
-      const response = await axios.get(`http://10.70.10.119:5000/user-details/${username}`, {
+      const response = await axios.get(`http://10.70.10.139:5000/user-details/${username}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -101,22 +101,22 @@ function ScreeningPinjamanKaryawan2() {
           responseTotalJumlahPinjaman,
           responsePlafond,
         ] = await Promise.all([
-          axios.get(`http://10.70.10.119:5000/angsuran/total-sudah-dibayar/${selectedPinjaman?.id_peminjam}`, {
+          axios.get(`http://10.70.10.139:5000/angsuran/total-sudah-dibayar/${selectedPinjaman?.id_peminjam}`, {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          axios.get(`http://10.70.10.119:5000/pinjaman/total-pinjaman/${selectedPinjaman?.id_peminjam}`, {
+          axios.get(`http://10.70.10.139:5000/pinjaman/total-pinjaman/${selectedPinjaman?.id_peminjam}`, {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          axios.get("http://10.70.10.119:5000/total-pinjaman-keseluruhan", {
+          axios.get("http://10.70.10.139:5000/total-pinjaman-keseluruhan", {
             headers: {
               Authorization: `Bearer ${token}`,
           },
           }),
-          axios.get(`http://10.70.10.119:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`, {
+          axios.get(`http://10.70.10.139:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`, {
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
@@ -155,7 +155,7 @@ function ScreeningPinjamanKaryawan2() {
         });
   
         const karyawanData = responseKaryawan.data;
-        const plafondResponse = await axios.get(`http://10.70.10.119:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`, {
+        const plafondResponse = await axios.get(`http://10.70.10.139:5000/plafond-saat-ini?jumlah_pinjaman=${jumlah_pinjaman || 0}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -164,7 +164,7 @@ function ScreeningPinjamanKaryawan2() {
         const plafondTersedia = plafondResponse.data.plafondSaatIni || null;
         setPlafondTersedia(plafondTersedia);
   
-        const pinjamanResponse = await axios.get(`http://10.70.10.119:5000/pinjaman/total-pinjaman/${karyawanData.id_karyawan}`, {
+        const pinjamanResponse = await axios.get(`http://10.70.10.139:5000/pinjaman/total-pinjaman/${karyawanData.id_karyawan}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -392,7 +392,7 @@ let totalPinjamanDapatDiambil = plafondTersediaFloat;
 
 const calculateNextPlafond = async () => {
   try {
-    const response = await axios.get('http://10.70.10.119:5000/angsuran-berikutnya', {
+    const response = await axios.get('http://10.70.10.139:5000/angsuran-berikutnya', {
       headers: { Authorization: `Bearer ${token}` },
     });
 

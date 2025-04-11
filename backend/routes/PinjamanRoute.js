@@ -520,7 +520,7 @@ const sendEmailNotification = async(pinjaman) => {
       ID Peminjam: ${pinjaman.id_peminjam}\n
       Jumlah: ${formatRupiah(pinjaman.jumlah_pinjaman)}\n
       Keperluan: ${pinjaman.keperluan}\n
-      Transfer pinjaman dan lakukan konfirmasi di http://10.70.10.119:3000\n\n
+      Transfer pinjaman dan lakukan konfirmasi di http://10.70.10.139:3000\n\n
       Regards,\n
       Campina Dev Team.
       `, 

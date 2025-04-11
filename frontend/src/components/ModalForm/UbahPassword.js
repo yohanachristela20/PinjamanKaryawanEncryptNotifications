@@ -4,12 +4,14 @@ import { useParams, useHistory } from "react-router-dom";
 import axios from "axios";
 import { toast } from 'react-toastify';
 import { stopInactivityTimer } from "views/Heartbeat";
+import PasswordChecklist from "react-password-checklist";
 
 function UbahPassword({ show, onHide }) {
     const [username, setUsername] = useState("");
     const [role, setRole] = useState("");
     const [oldPassword, setOldPassword] = useState("");
     const [newPassword, setNewPassword] = useState("");
+    const [newRePassword, setNewRePassword] = useState("");
 
     const history = useHistory();
 
@@ -30,7 +32,7 @@ function UbahPassword({ show, onHide }) {
         }
 
         try {
-            const response = await axios.post("http://10.70.10.119:5000/change-password", {
+            const response = await axios.post("http://10.70.10.139:5000/change-password", {
                 username,
                 role,
                 oldPassword,
@@ -40,7 +42,7 @@ function UbahPassword({ show, onHide }) {
             alert(response.data.message); 
             
 
-            axios.post("http://10.70.10.119:5000/logout", {}, {
+            axios.post("http://10.70.10.139:5000/logout", {}, {
                   headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
                 }).finally(() => {
                   stopInactivityTimer();
@@ -57,7 +59,7 @@ function UbahPassword({ show, onHide }) {
 
     return (
         <Modal show={show} onHide={onHide} centered>
-            <Modal.Header>
+            <Modal.Header className="py-0">
                 <Modal.Title>Form Ubah Password</Modal.Title>
                 <Button
                     variant="close"
@@ -74,8 +76,8 @@ function UbahPassword({ show, onHide }) {
                     &times;
                 </Button>
             </Modal.Header>
-
-            <Modal.Body>
+            <Modal.Body className="pt-0">
+            <hr className="mt-0" />
                 <Form onSubmit={handleChangePassword}>
                 <span className="text-danger required-select">(*) Wajib diisi.</span>
                     <Form.Group className="mb-3">
@@ -123,7 +125,35 @@ function UbahPassword({ show, onHide }) {
                             placeholder="Masukkan Password Baru"
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
+                            // pattern={'(?=^.{9,}$)(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).*'}
                             required
+                        />
+                    </Form.Group>
+
+                    <Form.Group className="mb-3">
+                    <span className="text-danger">*</span>
+                        <Form.Label>Konfirmasi Password</Form.Label>
+                        <Form.Control
+                            type="password"
+                            placeholder="Ulangi Password Baru"
+                            value={newRePassword}
+                            onChange={(e) => setNewRePassword(e.target.value)}
+                            // pattern={'(?=^.{9,}$)(?=.*[0-9])(?=.*[A-Z])(?=.*[a-z])(?=.*[^A-Za-z0-9]).*'}
+                            required
+                        />
+                        <PasswordChecklist 
+                            className="mt-3"
+                            rules={["minLength", "specialChar", "number", "capital", "match"]}
+                            minLength={8}
+                            value={newPassword}
+                            valueAgain={newRePassword}
+                            messages={{
+                                minLength: "Password harus lebih dari 8 karakter.",
+                                specialChar: "Password harus terdiri dari spesial karakter (simbol).",
+                                number: "Password harus terdiri dari angka.",
+                                capital: "Password setidaknya terdiri dari 1 huruf kapital.",
+                                match: "Password Baru dan Konfirmasi Password harus sesuai."
+                            }}
                         />
                     </Form.Group>
 

@@ -21,7 +21,7 @@ const ImportAngsuran = ({showImportModal, setShowImportModal, onSuccess}) => {
     const formData = new FormData();
     formData.append("csvfile", file);
 
-    fetch("http://10.70.10.119:5000/angsuran/import-csv", {
+    fetch("http://10.70.10.139:5000/angsuran/import-csv", {
       method: "POST",
       body: formData,
       headers: {
@@ -77,7 +77,7 @@ const ImportAngsuran = ({showImportModal, setShowImportModal, onSuccess}) => {
       <h3 className="mt-2 mb-0">Import Angsuran</h3>
     </Modal.Header>
     <Modal.Body className="text-left">
-      <hr />
+      <hr className="my-0" />
       <div>
       <span className="text-danger required-select">*Gunakan format CSV di bawah ini untuk mengimpor data angsuran.</span>
       <p>Unduh format CSV disini.</p>

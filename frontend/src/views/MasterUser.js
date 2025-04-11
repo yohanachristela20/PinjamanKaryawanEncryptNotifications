@@ -24,6 +24,7 @@ function MasterUser() {
   const [showEditModal, setShowEditModal] = React.useState(false);
   const [showImportModal, setShowImportModal] = useState(false); 
   const [user, setUser] = useState([]); 
+  const [user_active, setUserActive] = useState();
   const [selectedUser, setSelectedUser] = useState(null); 
   const [searchQuery, setSearchQuery] = useState("");
   const [userData, setUserData] = useState({id_karyawan: "", nama: "", divisi: ""}); 
@@ -36,7 +37,8 @@ function MasterUser() {
   const filteredUser = user.filter((user) =>
     (user.id_user && String(user.id_user).toLowerCase().includes(searchQuery)) ||
     (user.username && String(user.username).toLowerCase().includes(searchQuery)) ||
-    (user.role && String(user.role).toLowerCase().includes(searchQuery))
+    (user.role && String(user.role).toLowerCase().includes(searchQuery)) ||
+    (user.user_active && String(user.user_active).toLowerCase().includes(searchQuery)) //search berdasarkan boolean
   );
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -56,7 +58,7 @@ function MasterUser() {
 
   const getUser = async () =>{
     try {
-      const response = await axios.get("http://10.70.10.119:5000/user", {
+      const response = await axios.get("http://10.70.10.139:5000/user", {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -72,7 +74,7 @@ function MasterUser() {
 
   const deleteUser = async(id_user) =>{
     try {
-      await axios.delete(`http://10.70.10.119:5000/user/${id_user}` , {
+      await axios.delete(`http://10.70.10.139:5000/user/${id_user}` , {
         headers: {
           Authorization: `Bearer ${token}`,
       },
@@ -95,7 +97,7 @@ function MasterUser() {
 
     try {
       const response = await axios.get(
-        `http://10.70.10.119:5000/user-details/${username}`,
+        `http://10.70.10.139:5000/user-details/${username}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -217,7 +219,7 @@ function MasterUser() {
   const setPassword = async(id_user) => {
     try {
 
-        await axios.put(`http://10.70.10.119:5000/user/${id_user}`, {
+        await axios.put(`http://10.70.10.139:5000/user/${id_user}`, {
         }, {
             headers: {
                 Authorization: `Bearer ${token}`,
@@ -243,7 +245,7 @@ function MasterUser() {
 
   const deleteSession = async (id_user, user_active) => {
     try {
-        await axios.patch(`http://10.70.10.119:5000/delete-session/${id_user}`, {
+        await axios.post(`http://10.70.10.139:5000/logout-user/${id_user}`, {
             id_user,
             user_active
         }, {
@@ -256,6 +258,7 @@ function MasterUser() {
           autoClose: 5000,
           hideProgressBar: true,
         });
+        getUser();
 
     } catch (error) {
         console.log(error.message);
@@ -381,7 +384,7 @@ function MasterUser() {
                             </td>
                           <td className="text-center">
                           <Button
-                            className="btn-fill pull-right info"
+                            className="btn-fill pull-right info mb-md-2"
                             variant="info"
                             onClick={() => {
                               setShowEditModal(true);
@@ -397,7 +400,7 @@ function MasterUser() {
                             Ubah
                           </Button>
                           <Button
-                            className="btn-fill pull-right primary mt-2"
+                            className="btn-fill pull-right primary mt-xl-0 mb-md-2"
                             variant="primary"
                             onClick={() => {
                               setPassword(user.id_user)

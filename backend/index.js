@@ -35,7 +35,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://10.70.10.119:3000",
+        origin: "http://10.70.10.139:3000",
         methods: ["GET", "POST"], 
         credentials: true,
     }
@@ -54,7 +54,7 @@ app.set("io", io);
 
 
 app.use(bodyParser.json());
-app.use(cors({origin: "http://10.70.10.119:3000", credentials: true}));
+app.use(cors({origin: "http://10.70.10.139:3000", credentials: true}));
 app.use(express.json());
 
 app.use(UserRoute); // Rute user untuk login, tanpa middleware otentikasi

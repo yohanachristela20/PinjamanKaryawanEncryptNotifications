@@ -1,10 +1,10 @@
-// body{
-//   background-color: white;
-//   margin: 0;
-// }
+.body{
+  background-color: #f1faff;
+  //#f1faff
+  margin: 0;
+}
 
 .login-container {
-  height: 60vh; 
   display: flex;
   align-items: center; 
   justify-content: center; 
@@ -17,7 +17,7 @@
 .login-row {
   width: 80%;
   max-width: 1000px;
-  // height: 80%;
+  height: 100%;
   // max-height: 550px;
   border-radius: 15px;
   overflow: hidden;
@@ -26,7 +26,7 @@
 }
 
 .element {
-  box-shadow: 4px 4px 10px rgba(#a5abbd, 0.5); 
+  box-shadow: 4px 4px 10px rgba(#8f95a5, 0.5); 
   
 }
 
@@ -42,17 +42,18 @@
 
 .login-illustration {
   width: 100%;
-  height: 70%;
+  height: 60%;
   // max-height: 300px;
-  margin-top: 70px;
+  margin-top: 100px;
   // object-fit: contain;
   // object-fit: cover;
 }
 
 .form-container {
-  padding: 1rem;
+  padding: 1.5rem;
   // background: #ffffff;
   background: #bed7fc;
+  // font-size: 15px;
 }
 
 .form-opening {
@@ -83,6 +84,45 @@
   font-weight: 400;
 }
 
+.sign-in__wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  background-position: center center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  position: relative;
+}
+
+.sign-in__backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.sign-in__wrapper .container-fluid {
+  max-width: 90%;
+  z-index: 1;
+  animation: showSignInForm 1s;
+}
+
+@keyframes showSignInForm {
+  0%,
+  30% {
+    transform: translate(0, -150%);
+  }
+  70%,
+  90% {
+    transform: translate(0, 1rem);
+  }
+  80%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
 
 @media (max-width: 640px) {
   .form-opening {

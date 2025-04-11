@@ -99,7 +99,7 @@ router.post('/user/import-csv', upload.single("csvfile"), (req,res) => {
         
         const filePath = req.file.path;
         const data_user = [];
-        const defaultPassword = "campina123"; 
+        const defaultPassword = process.env.DEFAULT_PASS; 
         
         if (!fs.existsSync('./uploads/user')) {
                 fs.mkdirSync('./uploads/user');
@@ -209,7 +209,7 @@ router.post('/user-login', async (req, res) => {
 
 router.put('/user/:id_user', async (req, res) => {
   const { id_user } = req.params;
-  const defaultPassword = "campina123"; 
+  const defaultPassword = process.env.DEFAULT_PASS; 
   let { password } = req.body;
 
   console.log("Data yang diterima di server:", req.body); 
@@ -305,18 +305,48 @@ router.patch('/delete-session/:id_user', async (req, res) => {
 
       clearUserSession(id_user);
       console.log(`Sesi pengguna ${id_user} telah dihapus.`);
-      
-      // window.location.href = 'http://10.70.10.119:3000/login';
-      res.status(200).json({ msg: "Session user berhasil dihapus." });
-      // return res.redirect('http://10.70.10.119:5000/login');
 
-      // return res.status(301).json({ redirect: '/login', message: 'Sesi Anda telah berakhir. Silakan login kembali.' });
-
+      res.status(200).json({ 
+        msg: "Session user berhasil dihapus.",
+        redirect: "/login" });
       
   } catch (error) {
       console.error("Error saat menghapus session user:", error.message);
       res.status(500).json({ message: "Gagal menghapus session user." });
   }
+});
+
+router.post('/logout-user/:id_user', async(req,res) => {
+  try {
+    const { id_user } = req.params;
+
+    const user = await User.findOne({ where: { id_user } });
+
+    if (!user) {
+        return res.status(404).json({ msg: "User tidak ditemukan." });
+    }
+
+    await User.update(
+      {user_active: false}, 
+      {
+        where: {id_user: id_user}
+      }
+    );
+
+    clearUserSession(id_user);
+    console.log(`Sesi pengguna ${id_user} telah dihapus.`);
+
+    res.status(200).json({ 
+    msg: "Session user berhasil dihapus."});
+
+    // console.log("user active:", user.user_active);
+
+    // res.redirect('/');
+    
+} catch (error) {
+    console.error("Error saat menghapus session user:", error.message);
+    res.status(500).json({ message: "Gagal menghapus session user." });
+}
 });
 
 export default router;

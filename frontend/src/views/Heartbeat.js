@@ -17,7 +17,7 @@ import axios from "axios";
 //     const sendHeartbeat = () => {
 //       axios
 //         .post(
-//           "http://10.70.10.119:5000/heartbeat",
+//           "http://10.70.10.139:5000/heartbeat",
 //           { lastActivityTime: new Date().toISOString() },
 //           {
 //             headers: {
@@ -135,7 +135,7 @@ const sendHeartbeat = () => {
 
   axios
     .post(
-      "http://10.70.10.119:5000/heartbeat",
+      "http://10.70.10.139:5000/heartbeat",
       { lastActivityTime: new Date().toISOString() },
       {
         headers: { Authorization: `Bearer ${token}` },
@@ -177,12 +177,12 @@ const startInactivityTimer = () => {
 
 
 
-const handleSessionExpiry = () => {
+export const handleSessionExpiry = () => {
   localStorage.setItem("lastRoute", window.location.pathname);
   // localStorage.removeItem("token");
   stopInactivityTimer();
 
-  axios.post("http://10.70.10.119:5000/logout", {}, {
+  axios.post("http://10.70.10.139:5000/logout", {}, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
       })
       .then(() => {
