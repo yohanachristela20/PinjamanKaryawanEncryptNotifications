@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {FaFileCsv, FaFileImport, FaFilePdf, FaPlusCircle, FaRegEdit, FaTrashAlt, FaTrashRestore, FaUserLock} from 'react-icons/fa'; 
+import {FaFileCsv, FaFileImport, FaFilePdf, FaPlusCircle, FaRegEdit, FaTrashAlt, FaTrashRestore, FaUserLock, FaSortUp, FaSortDown} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import axios from "axios";
 import AddUser from "components/ModalForm/AddUser.js";
@@ -34,6 +34,10 @@ function MasterUser() {
   const location = useLocation();
   const history = useHistory();
 
+  const [sortBy, setSortBy] = useState("id_user");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("asc");
+
   const filteredUser = user.filter((user) =>
     (user.id_user && String(user.id_user).toLowerCase().includes(searchQuery)) ||
     (user.username && String(user.username).toLowerCase().includes(searchQuery)) ||
@@ -41,9 +45,33 @@ function MasterUser() {
     (user.user_active && String(user.user_active).toLowerCase().includes(searchQuery)) //search berdasarkan boolean
   );
 
+  
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrderDibayar(sortOrderDibayar === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(key);
+      setSortOrder("asc");
+      setSortOrderDibayar("asc");
+    }
+  }
+
+  const sortedUser = filteredUser.sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    }
+
+  });
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredUser.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = sortedUser.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber); 
@@ -358,9 +386,9 @@ function MasterUser() {
                     <table className="flex-table table table-striped table-hover">
                       <thead>
                       <tr>
-                        <th>ID User</th>
-                        <th className="border-0">Username</th>
-                        <th className="border-0">Role</th>
+                        <th onClick={() => handleSort("id_user")}>ID User {sortBy==="id_user" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("username")}>Username {sortBy==="username" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("role")}>Role {sortBy==="role" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                         <th className="border-0">Status</th>
                         <th className="border-0">Aksi</th>
                       </tr>

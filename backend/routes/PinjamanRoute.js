@@ -437,7 +437,7 @@ router.get("/plafond-angsuran", async (req, res) => {
 
 router.put('/pinjaman/:id_pinjaman', async (req, res) => {
         const { id_pinjaman } = req.params;
-        let { status_pengajuan, status_transfer, id_asesor } = req.body;
+        let { status_transfer, id_asesor } = req.body;
       
         console.log("Data yang diterima di server:", req.body);
       
@@ -458,9 +458,13 @@ router.put('/pinjaman/:id_pinjaman', async (req, res) => {
           if (!pinjaman) {
             return res.status(404).json({ message: 'Pinjaman tidak ditemukan' });
           }
+
+          let formattedToday = new Date().toISOString().split("T")[0];
       
           pinjaman.id_asesor = id_asesor;
           pinjaman.status_transfer = status_transfer;
+          pinjaman.tanggal_penerimaan = formattedToday;
+
           await pinjaman.save();
       
           res.status(200).json({ message: 'Konfirmasi transfer pinjaman selesai.', pinjaman });
@@ -659,6 +663,7 @@ router.post('/pengajuan/import-csv', upload.single("csvfile"), async (req,res) =
     data_pengajuan.push({
       id_pinjaman: row.id_pinjaman,
       tanggal_pengajuan: new Date(row.tanggal_pengajuan),
+      tanggal_penerimaan: new Date(row.tanggal_penerimaan),
       jumlah_pinjaman: parseInt(row.jumlah_pinjaman),
       jumlah_angsuran: parseInt(row.jumlah_angsuran),
       pinjaman_setelah_pembulatan: parseFloat(row.pinjaman_setelah_pembulatan),

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {FaFileCsv, FaFilePdf, FaCheckSquare} from 'react-icons/fa'; 
+import {FaFileCsv, FaFilePdf, FaCheckSquare, FaSortUp, FaSortDown} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import ImportAntreanPengajuan from "components/ModalForm/ImportAntreanPengajuan.js";
 import ChartComponent from "components/Chart/BarChart.js";
@@ -73,6 +73,10 @@ function BerandaFinance() {
   const [loading, setLoading] = useState(true);
 
   const [date, setDate] = useState(new Date());
+  
+  const [sortBy, setSortBy] = useState("id_pinjaman");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("asc");
 
   const findNomorAntrean = (idPinjaman) => {
     const antreanItem = antrean.find(item => item.id_pinjaman === idPinjaman);
@@ -103,7 +107,28 @@ function BerandaFinance() {
     ...pinjaman,
     nomor_antrean: findNomorAntrean(pinjaman.id_pinjaman),
   }))
-  .sort((a, b) => a.nomor_antrean - b.nomor_antrean);
+  .sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    }
+
+  });
+
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc"); 
+      setSortOrderDibayar(sortOrderDibayar === "asc" ? "desc" : "asc"); 
+    } else {
+      setSortBy(key);
+      setSortOrder("asc");
+      setSortOrderDibayar("asc");
+    }
+  }
 
   const currentItems = filteredAndSortedPinjaman.slice(indexOfFirstItem, indexOfLastItem);
 
@@ -237,7 +262,7 @@ function BerandaFinance() {
   const plafondTerakhir = parseFloat(latestPlafond);
   const total = totalPinjaman + plafondTerakhir;
   const persentaseJumlahPinjaman =  total > 0 ? ((totalPinjaman / total) * 100).toFixed(2) : "0";
-  const usedPercentage = (persentaseJumlahPinjaman > 0? (100 - persentaseJumlahPinjaman) : "0");
+  const usedPercentage = (persentaseJumlahPinjaman > 0? (100 - persentaseJumlahPinjaman).toFixed(2) : "0");
   console.log("usedPercentage: ", usedPercentage);
 
   const data_plafond = {
@@ -262,7 +287,7 @@ function BerandaFinance() {
       const ctx = chart.ctx;
       ctx.restore();
       const fontSize = (height / 100).toFixed(2);
-      ctx.font = `${fontSize*8}px Nunito`;
+      ctx.font = `${fontSize*7}px Nunito`;
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
   
@@ -937,14 +962,14 @@ function BerandaFinance() {
                     <table className="flex-table table table-striped table-hover">
                       <thead>
                       <tr>
-                        <th className="border-0">ID Pinjaman</th>
-                        <th className="border-0">Tanggal Pengajuan</th>
-                        <th className="border-0">Nomor Antrean</th>
-                        <th className="border-0">ID Karyawan</th>
+                        <th className="border-0" onClick={() => handleSort("id_pinjaman")}>ID Pinjaman {sortBy==="id_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("tanggal_pengajuan")}>Tanggal Pengajuan {sortBy==="tanggal_pengajuan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("nomor_antrean")}>Nomor Antrean {sortBy==="nomor_antrean" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("id_peminjam")}>ID Karyawan {sortBy==="id_peminjam" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                         <th className="border-0 center">Nama Lengkap</th>
-                        <th className="border-0">Jumlah Pinjaman</th>
-                        <th className="border-0">Jumlah Angsuran</th>
-                        <th className="border-0">Jumlah Pinjaman Setelah Pembulatan</th>
+                        <th className="border-0" onClick={() => handleSort("jumlah_pinjaman")}>Jumlah Pinjaman {sortBy==="jumlah_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("jumlah_angsuran")}>Jumlah Angsuran {sortBy==="jumlah_angsuran" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("pinjaman_setelah_pembulatan")}>Jumlah Pinjaman Setelah Pembulatan{sortBy==="pinjaman_setelah_pembulatan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                         <th className="border-0">Keperluan</th>
                         <th className="border-0">Status Pengajuan</th>
                         <th className="border-0">Status Transfer</th>

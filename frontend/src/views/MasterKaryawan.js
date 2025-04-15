@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaFileCsv, FaFileImport, FaFilePdf, FaPlusCircle, FaRegEdit, FaTrashAlt} from 'react-icons/fa'; 
+import { FaFileCsv, FaFileImport, FaFilePdf, FaPlusCircle, FaRegEdit, FaTrashAlt, FaSortUp, FaSortDown} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import axios from "axios";
 import AddKaryawan from "components/ModalForm/AddKaryawan.js";
@@ -31,6 +31,10 @@ function MasterKaryawan() {
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
+  const [sortBy, setSortBy] = useState("id_karyawan");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("asc");
+
   const filteredKaryawan = karyawan.filter((karyawan) =>
     (karyawan.id_karyawan && String(karyawan.id_karyawan).toLowerCase().includes(searchQuery)) ||
     (karyawan.nama && String(karyawan.nama).toLowerCase().includes(searchQuery)) ||
@@ -42,9 +46,32 @@ function MasterKaryawan() {
     (karyawan.gaji_pokok && String(karyawan.gaji_pokok).toLowerCase().includes(searchQuery)) 
   );
 
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrderDibayar(sortOrderDibayar === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(key);
+      setSortOrder("asc");
+      setSortOrderDibayar("asc");
+    }
+  }
+
+  const sortedPlafond = filteredKaryawan.sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    }
+
+  });
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredKaryawan.slice(indexOfFirstItem, indexOfLastItem);
+  const currentItems = sortedPlafond.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -309,18 +336,18 @@ function MasterKaryawan() {
                   </div>
                 ) : (
                   <Table className="table-striped table-hover">
-                  <div className="table-scroll" style={{ height: 'auto' }}>
+                  <div className="table-scroll" style={{ height: '600px' }}>
                      <table className="flex-table table table-striped table-hover">
                      <thead >
                      <tr>
-                       <th>ID Karyawan</th>
+                       <th onClick={() => handleSort("id_karyawan")}>ID Karyawan {sortBy==="id_karyawan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                        <th className="border-0 text-wrap">Nama Lengkap</th>
-                       <th className="border-0 text-wrap">Jenis Kelamin</th>
-                       <th className="border-0 text-wrap">Departemen</th>
-                       <th className="border-0 text-wrap">Divisi</th>
-                       <th className="border-0 text-wrap">Tanggal Lahir</th>
-                       <th className="border-0 text-wrap">Tanggal Masuk</th>
-                       <th className="border-0 text-wrap">Gaji Pokok</th>
+                       <th className="border-0 text-wrap" onClick={() => handleSort("jenis_kelamin")}>Jenis Kelamin {sortBy==="jenis_kelamin" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                       <th className="border-0 text-wrap" onClick={() => handleSort("departemen")}>Departemen {sortBy==="departemen" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                       <th className="border-0 text-wrap" onClick={() => handleSort("divisi")}>Divisi {sortBy==="divisi" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                       <th className="border-0 text-wrap" onClick={() => handleSort("tanggal_lahir")}>Tanggal Lahir {sortBy==="tanggal_lahir" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                       <th className="border-0 text-wrap" onClick={() => handleSort("tanggal_masuk")}>Tanggal Masuk {sortBy==="tanggal_masuk" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                       <th className="border-0 text-wrap" onClick={() => handleSort("gaji_pokok")}>Gaji Pokok {sortBy==="gaji_pokok" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                        <th className="border-0 text-wrap">Aksi</th>
                      </tr>
                    </thead>

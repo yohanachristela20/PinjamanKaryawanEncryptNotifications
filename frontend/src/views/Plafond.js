@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {FaFileCsv, FaFileImport, FaFilePdf, FaPlusCircle} from 'react-icons/fa'; 
+import {FaFileCsv, FaFileImport, FaFilePdf, FaPlusCircle, FaSortDown, FaSortUp} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import axios from "axios";
 import AddPlafond from "components/ModalForm/AddPlafond.js";
@@ -37,19 +37,48 @@ function Plafond() {
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
+  const [sortBy, setSortBy] = useState("id_plafond");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("asc");
+
   const filteredPlafond = plafond.filter((plafond) =>
     (plafond.id_plafond && String(plafond.id_plafond).toLowerCase().includes(searchQuery)) ||
     (plafond.tanggal_penetapan && String(plafond.tanggal_penetapan).toLowerCase().includes(searchQuery)) ||
-    (plafond.keterangan && (plafond.keterangan).toLowerCase().includes(searchQuery))
+    (plafond.keterangan && (plafond.keterangan).toLowerCase().includes(searchQuery)) ||
+    (plafond.jumlah_plafond && (plafond.jumlah_plafond).includes(searchQuery))
   );
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredPlafond.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   }
+
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrderDibayar(sortOrderDibayar === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(key);
+      setSortOrder("asc");
+      setSortOrderDibayar("asc");
+    }
+  }
+
+  
+  const sortedPlafond = filteredPlafond.sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    }
+
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedPlafond.slice(indexOfFirstItem, indexOfLastItem);
 
   const token = localStorage.getItem("token");
 
@@ -271,9 +300,9 @@ const downloadPDF = (data) => {
                         <table className="flex-table table table-striped table-hover">
                           <thead>
                         <tr>
-                          <th>ID Plafond</th>
-                          <th className="border-0">Tanggal Penetapan</th>
-                          <th className="border-0">Jumlah Plafond</th>
+                          <th onClick={() => handleSort("id_plafond")}>ID Plafond {sortBy==="id_plafond" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                          <th className="border-0" onClick={() => handleSort("tanggal_penetapan")}>Tanggal Penetapan {sortBy==="tanggal_penetapan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                          <th className="border-0" onClick={() => handleSort("jumlah_plafond")}>Jumlah Plafond {sortBy==="jumlah_plafond" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                           <th className="border-0">Keterangan</th>
                           <th className="border-0">Terakhir Dibuat</th>
                           <th className="border-0">Terakhir Update</th>

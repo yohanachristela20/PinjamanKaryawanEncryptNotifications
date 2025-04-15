@@ -256,8 +256,8 @@ import {
       }, 0)
     : 0;
 
-    const belumDibayar = item.AngsuranPinjaman?.[0]?.belum_dibayar ?? "N/A";
-    const bulanAngsuran = item.AngsuranPinjaman?.[0]?.bulan_angsuran ?? "N/A";
+    const belumDibayar = item.AngsuranPinjaman?.[0]?.belum_dibayar ?? item.pinjaman_setelah_pembulatan;
+    const bulanAngsuran = item.AngsuranPinjaman?.[0]?.bulan_angsuran ?? 0;
     const status =
       item.AngsuranPinjaman &&
       item.AngsuranPinjaman[0] &&
@@ -344,7 +344,7 @@ import {
       "Jumlah Angsuran", 
       "Pinjaman Setelah Pembulatan", 
       "Rasio Angsuran",
-      "Keperluan",
+      // "Keperluan",
       "Total Sudah Dibayar", 
       "Belum Dibayar", 
       "Bulan Angsuran", 
@@ -380,7 +380,7 @@ import {
         12: { cellWidth: 'auto' }, 
         13: { cellWidth: 'auto' }, 
         14: { cellWidth: 'auto' }, 
-        15: { cellWidth: 'auto' }, 
+        // 15: { cellWidth: 'auto' }, 
       },
       tableWidth: 'auto',
   

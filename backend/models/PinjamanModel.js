@@ -1,4 +1,4 @@
-import { Sequelize } from "sequelize";
+import { DATEONLY, Sequelize } from "sequelize";
 import db from "../config/database.js";
 import Karyawan from "./KaryawanModel.js";
 
@@ -10,6 +10,10 @@ const Pinjaman = db.define('pinjaman', {
         primaryKey: true,
     }, 
     tanggal_pengajuan: DataTypes.DATEONLY,
+    tanggal_penerimaan:{
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+    },
     jumlah_pinjaman: DataTypes.DECIMAL(19,2), 
     jumlah_angsuran: DataTypes.DECIMAL(19,2),
     pinjaman_setelah_pembulatan: DataTypes.DECIMAL(19,2),

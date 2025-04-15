@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {FaPlusCircle, FaRegTimesCircle} from 'react-icons/fa'; 
+import {FaPlusCircle, FaRegTimesCircle, FaSortUp, FaSortDown} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import AddPengajuan from "components/ModalForm/AddPengajuan.js";
 import axios from "axios";
@@ -51,6 +51,10 @@ function RiwayatPengajuanKaryawan() {
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
+  const [sortBy, setSortBy] = useState("id_pinjaman");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("asc");
+
   const filteredPinjamanFinal = pinjaman
   .filter((item) => item.id_peminjam === userData.id_karyawan)
   .filter((pinjaman) => 
@@ -60,20 +64,42 @@ function RiwayatPengajuanKaryawan() {
     (pinjaman.keperluan && String(pinjaman.keperluan).toLowerCase().includes(searchQuery)) ||
     (pinjaman.status_pengajuan && String(pinjaman.status_pengajuan).toLowerCase().includes(searchQuery)) ||
     (pinjaman.status_transfer && String(pinjaman.status_transfer).toLowerCase().includes(searchQuery))
-  
   )
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value.toLowerCase());
   };
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredPinjamanFinal.slice(indexOfFirstItem, indexOfLastItem);
-
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   }
+
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrderDibayar(sortOrderDibayar === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(key);
+      setSortOrder("asc");
+      setSortOrderDibayar("asc");
+    }
+  }
+
+  const sortedPengajuan = filteredPinjamanFinal.sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    }
+
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedPengajuan.slice(indexOfFirstItem, indexOfLastItem);
 
   const token = localStorage.getItem("token");
 
@@ -422,12 +448,12 @@ const findNomorAntrean = (id_pinjaman) => {
                     <table className="flex-table table table-striped table-hover">
                       <thead>
                       <tr>
-                        <th className="border-0">ID Pinjaman</th>
-                        <th className="border-0">Tanggal Pengajuan</th>
-                        <th className="border-0">Jumlah Pinjaman</th>
-                        <th className="border-0">Jumlah Angsuran</th>
-                        <th className="border-0">Jumlah Pinjaman Setelah Pembulatan</th>
-                        <th className="border-0">Nomor Antrean</th>
+                        <th className="border-0" onClick={() => handleSort("id_pinjaman")}>ID Pinjaman {sortBy==="id_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("tanggal_pengajuan")}>Tanggal Pengajuan{sortBy==="tanggal_pengajuan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("jumlah_pinjaman")}>Jumlah Pinjaman{sortBy==="jumlah_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("jumlah_angsuran")}>Jumlah Angsuran{sortBy==="jumlah_angsuran" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("pinjaman_setelah_pembulatan")}>Jumlah Pinjaman Setelah Pembulatan{sortBy==="pinjaman_setelah_pembulatan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("id_pinjaman")}>ID Pinjaman {sortBy==="id_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                         <th className="border-0">Ditransfer Oleh</th>
                         <th className="border-0">Keperluan</th>
                         <th className="border-0">Tanggal Plafond Tersedia</th>
@@ -442,7 +468,7 @@ const findNomorAntrean = (id_pinjaman) => {
                           ...pinjaman,
                           nomor_antrean: findNomorAntrean(pinjaman.id_pinjaman),
                         }))
-                        .sort((a, b) => a.nomor_antrean - b.nomor_antrean)
+                        // .sort((a, b) => a.nomor_antrean - b.nomor_antrean)
                         .map((pinjaman) => (
                           <tr key={pinjaman.id_pinjaman}>
                           <td className="text-center">{pinjaman.id_pinjaman}</td>

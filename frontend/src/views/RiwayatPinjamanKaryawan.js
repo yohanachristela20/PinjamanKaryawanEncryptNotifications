@@ -12,6 +12,7 @@ import "../assets/scss/lbd/_pagination.scss";
 import "../assets/scss/lbd/_table-header.scss";
 import ReactLoading from "react-loading";
 import "../assets/scss/lbd/_loading.scss";
+import {FaSortUp, FaSortDown} from 'react-icons/fa'; 
 
 import {
   Badge,
@@ -44,6 +45,10 @@ function RiwayatPinjamanKaryawan() {
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
+  const [sortBy, setSortBy] = useState("id_pinjaman");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("asc");
+
   const filteredPinjamanFinal = pinjaman
   .filter((item) => item.id_peminjam === userData.id_karyawan)
   .filter((pinjaman) => 
@@ -54,13 +59,36 @@ function RiwayatPinjamanKaryawan() {
     (pinjaman.status_pelunasan && String(pinjaman.status_pelunasan).toLowerCase().includes(searchQuery)))
   .filter((item) => item.status_pengajuan !== "Ditunda" && item.status_transfer !== "Belum Ditransfer" && item.status_pengajuan !== "Dibatalkan" && item.status_transfer !== "Dibatalkan");
 
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredPinjamanFinal.slice(indexOfFirstItem, indexOfLastItem);
-
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber); 
   }
+
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrderDibayar(sortOrderDibayar === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(key);
+      setSortOrder("asc");
+      setSortOrderDibayar("asc");
+    }
+  }
+
+  const sortedPinjaman = filteredPinjamanFinal.sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    }
+
+  });
+
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = sortedPinjaman.slice(indexOfFirstItem, indexOfLastItem);
 
   const token = localStorage.getItem("token");
 
@@ -373,11 +401,11 @@ function RiwayatPinjamanKaryawan() {
                         <table className="flex-table table table-striped table-hover">
                           <thead>
                           <tr>
-                            <th className="border-0">ID Pinjaman</th>
-                            <th className="border-0">Tanggal Pengajuan</th>
-                            <th className="border-0">Jumlah Pinjaman</th>
-                            <th className="border-0">Jumlah Angsuran</th>
-                            <th className="border-0">Jumlah Pinjaman Setelah Pembulatan</th>
+                            <th className="border-0" onClick={() => handleSort("id_pinjaman")}>ID Pinjaman {sortBy==="id_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                            <th className="border-0" onClick={() => handleSort("tanggal_pengajuan")}>Tanggal Pengajuan{sortBy==="tanggal_pengajuan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                            <th className="border-0" onClick={() => handleSort("jumlah_pinjaman")}>Jumlah Pinjaman{sortBy==="jumlah_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                            <th className="border-0" onClick={() => handleSort("jumlah_angsuran")}>Jumlah Angsuran{sortBy==="jumlah_angsuran" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                            <th className="border-0" onClick={() => handleSort("pinjaman_setelah_pembulatan")}>Jumlah Pinjaman Setelah Pembulatan{sortBy==="pinjaman_setelah_pembulatan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                             <th className="border-0">Keperluan</th>
                             <th className="border-0">Ditransfer Oleh</th>
                             <th className="border-0">Sisa Angsuran (Bulan)</th>

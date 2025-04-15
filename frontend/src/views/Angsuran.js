@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {FaCoins, FaFileCsv, FaFileImport, FaFilePdf} from 'react-icons/fa'; 
+import {FaCoins, FaFileCsv, FaFileImport, FaFilePdf, FaSortDown, FaSortUp} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import axios from "axios";
 import Pelunasan from "components/ModalForm/Pelunasan.js";
@@ -36,19 +36,68 @@ function Angsuran() {
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
+  const [sortBy, setSortBy] = useState("id_angsuran");
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("desc");
+
   const filteredAngsuran = karyawanData.filter((angsuran) =>
     (angsuran.id_angsuran && String(angsuran.id_angsuran).toLowerCase().includes(searchQuery)) ||
     (angsuran.tanggal_angsuran && String(angsuran.tanggal_angsuran).toLowerCase().includes(searchQuery)) ||
     (angsuran.id_peminjam && String(angsuran.id_peminjam).toLowerCase().includes(searchQuery)) ||
     (angsuran?.KaryawanPeminjam?.nama && String(angsuran.KaryawanPeminjam.nama).toLowerCase().includes(searchQuery)) ||
+    (angsuran.sudah_dibayar && (angsuran.sudah_dibayar).includes(searchQuery)) ||
+    (angsuran.belum_dibayar && (angsuran.belum_dibayar).includes(searchQuery)) ||
+    (angsuran.bulan_angsuran && String(angsuran.bulan_angsuran).toLowerCase().includes(searchQuery)) ||
     (angsuran.id_pinjaman && String(angsuran.id_pinjaman).toLowerCase().includes(searchQuery)) ||
-    (angsuran.status && String(angsuran.status).toLowerCase().includes(searchQuery))
+    (angsuran.status && String(angsuran.status).toLowerCase().includes(searchQuery)) || 
+    (angsuran.keterangan && String(angsuran.keterangan).toLowerCase().includes(searchQuery))
   );
 
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "desc" ? "asc" : "desc");
+      setSortOrderDibayar(sortOrderDibayar === "desc" ? "asc" : "desc");
+    } else {
+      setSortBy(key);
+      setSortOrder("desc");
+      setSortOrderDibayar("desc");
+    }
+  }
+
+  // const sortedAngsuran = filteredAngsuran.sort((a, b) => {
+  //   const aNumeric = parseInt(a.id_angsuran.replace(/[^\d]/g, ''), 10);
+  //   const bNumeric = parseInt(b.id_angsuran.replace(/[^\d]/g, ''), 10);
+  //   return bNumeric - aNumeric;
+  // });
+
   const sortedAngsuran = filteredAngsuran.sort((a, b) => {
-    const aNumeric = parseInt(a.id_angsuran.replace(/[^\d]/g, ''), 10);
-    const bNumeric = parseInt(b.id_angsuran.replace(/[^\d]/g, ''), 10);
-    return bNumeric - aNumeric;
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "desc") {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    } else {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    }
+
+    // const aNumeric = parseInt(a.id_angsuran.replace(/[^\d]/g, ''), 10);
+    // const bNumeric = parseInt(b.id_angsuran.replace(/[^\d]/g, ''), 10);
+    // return bNumeric - aNumeric;
+  });
+
+  const sorted= filteredAngsuran.sort((a, b) => {
+    const aValue = parseInt(a[sortBy]);
+    const bValue = parseInt(b[sortBy]);
+
+    if (sortOrderDibayar === "desc") {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    } else {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    }
+
+    // const aNumeric = parseInt(a.id_angsuran.replace(/[^\d]/g, ''), 10);
+    // const bNumeric = parseInt(b.id_angsuran.replace(/[^\d]/g, ''), 10);
+    // return bNumeric - aNumeric;
   });
 
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -335,6 +384,8 @@ const downloadPDF = (data) => {
   doc.save("laporan angsuran.pdf");
 };
 
+
+
   return (
     <>
       {loading === false ? 
@@ -403,14 +454,14 @@ const downloadPDF = (data) => {
                         <table className="flex-table table table-striped table-hover">
                           <thead>
                           <tr>
-                            <th className="border-0 text-wrap">ID Angsuran</th>
-                            <th className="border-0 text-wrap">Tanggal Angsuran</th>
-                            <th className="border-0 text-wrap">ID Karyawan</th>
+                            <th className="border-0 text-wrap" onClick={() => handleSort("id_angsuran")}>ID Angsuran {sortBy==="id_angsuran" && (sortOrder === "desc" ? <FaSortDown/> : <FaSortUp/>)}</th>
+                            <th className="border-0 text-wrap"onClick={() => handleSort("tanggal_angsuran")}>Tanggal Angsuran {sortBy==="tanggal_angsuran" && (sortOrder === "desc" ? <FaSortDown/> : <FaSortUp/>)}</th>
+                            <th className="border-0 text-wrap" onClick={() => handleSort("id_peminjam")}>ID Karyawan {sortBy==="id_peminjam" && (sortOrder === "desc" ? <FaSortDown/> : <FaSortUp/>)}</th>
                             <th className="border-0 text-wrap">Nama Karyawan</th>
-                            <th className="border-0 text-wrap">ID Pinjaman</th>
-                            <th className="border-0 text-wrap">Dibayar</th>
-                            <th className="border-0 text-wrap">Belum Dibayar</th>
-                            <th className="border-0 text-wrap">Angsuran ke- (Bulan)</th>
+                            <th className="border-0 text-wrap" onClick={() => handleSort("id_pinjaman")}>ID Pinjaman {sortBy==="id_pinjaman" && (sortOrder === "desc" ? <FaSortDown/> : <FaSortUp/>)}</th>
+                            <th className="border-0 text-wrap" onClick={() => handleSort("sudah_dibayar")}>Dibayar {sortBy=== "sudah_dibayar" && (sortOrderDibayar === "desc" ? <FaSortDown/> : <FaSortUp/>)}</th>
+                            <th className="border-0 text-wrap" onClick={() => handleSort("belum_dibayar")}>Dibayar {sortBy=== "belum_dibayar" && (sortOrderDibayar === "desc" ? <FaSortDown/> : <FaSortUp/>)}</th>
+                            <th className="border-0 text-wrap" onClick={() => handleSort("bulan_angsuran")}>Angsuran ke-(Bulan) {sortBy==="bulan_angsuran" && (sortOrder === "desc" ? <FaSortDown/> : <FaSortUp/>)}</th>
                             {/* <th className="border-0">Status</th> */}
                             <th className="border-0 text-wrap">Keterangan</th>
                             <th className="border-0 text-wrap" hidden={role === "Finance"}>Aksi</th>

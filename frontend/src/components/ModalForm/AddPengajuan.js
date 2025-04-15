@@ -6,6 +6,7 @@ import { toast } from 'react-toastify';
 const AddPengajuan = ({ showAddModal, setShowAddModal, onSuccess }) => {
     const [id_pinjaman, setIdPinjaman] = useState("");
     const [tanggal_pengajuan, setTanggalPengajuan] = useState("");
+    const [tanggal_penerimaan, setTanggalPenerimaan] = useState("");
     const [jumlah_pinjaman, setJumlahPinjaman] = useState("");
     const [jumlah_angsuran, setJumlahAngsuran] = useState("");
     const [pinjaman_setelah_pembulatan, setJumlahPinjamanSetelahPembulatan] = useState("");
@@ -127,6 +128,8 @@ const AddPengajuan = ({ showAddModal, setShowAddModal, onSuccess }) => {
 
         const today = new Date().toISOString().split("T")[0];
         setTanggalPengajuan(today); 
+        // setTanggalPenerimaan("0000-00-00")
+        
     }, []);
 
     const savePengajuan = async (e) => {
@@ -135,6 +138,7 @@ const AddPengajuan = ({ showAddModal, setShowAddModal, onSuccess }) => {
             await axios.post('http://10.70.10.139:5000/pinjaman', {
                 id_pinjaman,
                 tanggal_pengajuan,
+                tanggal_penerimaan,
                 jumlah_pinjaman,
                 jumlah_angsuran,
                 pinjaman_setelah_pembulatan,

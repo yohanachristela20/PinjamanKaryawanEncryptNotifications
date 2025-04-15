@@ -22,30 +22,30 @@ const updateAngsuranOtomatis = async () => {
 
         const existingPinjamanToday = await Pinjaman.findOne({    
             where: {
-                tanggal_pengajuan: formattedToday,
+                tanggal_penerimaan: formattedToday,
             },
         });
 
         if (existingPinjamanToday) {
-            console.log("Ada pinjaman yang diajukan pada tanggal ini. Angsuran otomatis tidak dibuat.");
+            console.log("Ada pinjaman yang diterima pada tanggal ini. Angsuran otomatis tidak dibuat.");
             return;
         }
 
         const excludedPinjamanIds = await Pinjaman.findAll({
             where: {
-                tanggal_pengajuan: {
+                tanggal_penerimaan: {
                     [Op.gte]: thisMonthStart,
                     [Op.lt]: nextMonthStart,
                 },
-                [Op.and]: Sequelize.where(
-                    Sequelize.fn("DAY", Sequelize.col("tanggal_pengajuan")),
-                    dayOfMonth
-                ),
+                // [Op.and]: Sequelize.where(
+                //     Sequelize.fn("DAY", Sequelize.col("tanggal_pengajuan")),
+                //     dayOfMonth
+                // ),
             },
             attributes: ["id_pinjaman"],
         }).then((data) => data.map((item) => item.id_pinjaman));
 
-        console.log("Pinjaman yang diajukan pada tanggal ini (tidak diproses bulan ini):", excludedPinjamanIds);
+        console.log("Pinjaman yang diterima pada bulan ini (tidak diproses bulan ini):", excludedPinjamanIds);
 
         const existingUpdate = await Angsuran.findOne({
             where: {
@@ -178,6 +178,7 @@ const updateAngsuranOtomatis = async () => {
                 status_transfer: {
                     [Op.notIn]: ['Belum Ditransfer', 'Dibatalkan'],
                 },
+                id_pinjaman: { [Op.notIn]: excludedPinjamanIds }, 
             },
             attributes: ['id_pinjaman', 'jumlah_angsuran', 'pinjaman_setelah_pembulatan', 'id_peminjam', 'jumlah_pinjaman'],
         });

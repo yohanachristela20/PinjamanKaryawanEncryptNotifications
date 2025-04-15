@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {FaFilePdf, FaSave, FaUpload} from 'react-icons/fa'; 
+import {FaFilePdf, FaSave, FaUpload, FaSortUp, FaSortDown} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
@@ -36,17 +36,63 @@ function AngsuranKaryawan() {
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
+  const [sortBy, setSortBy] = useState("id_angsuran");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("asc");
+
   const filteredAngsuranFinal = karyawanData
   .filter((item) => item.id_peminjam === userData.id_karyawan)
   .filter((angsuran) =>
     (angsuran.id_angsuran && String(angsuran.id_angsuran).toLowerCase().includes(searchQuery)) ||
     (angsuran.tanggal_angsuran && String(angsuran.tanggal_angsuran).toLowerCase().includes(searchQuery)) ||
-    (angsuran.id_pinjaman && String(angsuran.id_pinjaman).toLowerCase().includes(searchQuery)) 
+    (angsuran.id_pinjaman && String(angsuran.id_pinjaman).toLowerCase().includes(searchQuery)) ||
+    (angsuran.sudah_dibayar && (angsuran.sudah_dibayar).includes(searchQuery)) ||
+    (angsuran.belum_dibayar && (angsuran.belum_dibayar).includes(searchQuery)) || 
+    (angsuran.bulan_angsuran && String(angsuran.bulan_angsuran).toLowerCase().includes(searchQuery)) 
+
   );
+
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrderDibayar(sortOrderDibayar === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(key);
+      setSortOrder("asc");
+      setSortOrderDibayar("asc");
+    }
+  }
+
+  const sortedAngsuran = filteredAngsuranFinal.sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    }
+
+  });
+
+  const sorted= filteredAngsuranFinal.sort((a, b) => {
+    const aValue = parseInt(a[sortBy]);
+    const bValue = parseInt(b[sortBy]);
+
+    if (sortOrderDibayar === "desc") {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    } else {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0; 
+    }
+
+    // const aNumeric = parseInt(a.id_angsuran.replace(/[^\d]/g, ''), 10);
+    // const bNumeric = parseInt(b.id_angsuran.replace(/[^\d]/g, ''), 10);
+    // return bNumeric - aNumeric;
+  });
 
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredAngsuranFinal.slice(indexOfFirstItem, indexOfLastItem); 
+  const currentItems = sortedAngsuran.slice(indexOfFirstItem, indexOfLastItem); 
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -275,12 +321,12 @@ const downloadPDF = (data) => {
                     <table className="flex-table table table-striped table-hover">
                       <thead>
                       <tr>
-                        <th>ID Angsuran</th>
-                        <th className="border-0">Tanggal Angsuran</th>
-                        <th className="border-0">ID Pinjaman</th>
-                        <th className="border-0">Sudah Dibayar</th>
-                        <th className="border-0">Belum Dibayar</th>
-                        <th className="border-0">Angsuran ke- (Bulan)</th>
+                        <th className="border-0" onClick={() => handleSort("id_angsuran")}>ID Angsuran {sortBy==="id_angsuran" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("tanggal_angsuran")}>Tanggal Angsuran {sortBy==="tanggal_angsuran" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("id_pinjaman")}>ID Pinjaman {sortBy==="id_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("sudah_dibayar")}>Sudah Dibayar{sortBy==="sudah_dibayar" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("belum_dibayar")}>Belum Dibayar{sortBy==="belum_dibayar" && (sortOrderDibayar === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0" onClick={() => handleSort("bulan_angsuran")}>Angsuran ke- (Bulan){sortBy==="bulan_angsuran" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                         <th className="border-0">Keterangan</th>
                       </tr>
                       </thead>

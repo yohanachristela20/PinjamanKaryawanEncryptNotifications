@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {FaCheckSquare, FaFileCsv, FaFileImport, FaFilePdf, FaUserCheck} from 'react-icons/fa'; 
+import {FaCheckSquare, FaFileCsv, FaFileImport, FaFilePdf, FaUserCheck, FaSortDown, FaSortUp} from 'react-icons/fa'; 
 import SearchBar from "components/Search/SearchBar.js";
 import ChartComponent from "components/Chart/BarChart.js";
 import LineComponent from "components/Chart/LineChart";
@@ -73,6 +73,10 @@ function Beranda() {
   const [itemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
+  const [sortBy, setSortBy] = useState("id_pinjaman");
+  const [sortOrder, setSortOrder] = useState("asc");
+  const [sortOrderDibayar, setSortOrderDibayar] = useState("asc");
+
   const [date, setDate] = useState(new Date());
 
   const findNomorAntrean = (idPinjaman) => {
@@ -93,6 +97,29 @@ function Beranda() {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
 
+  // const filteredAndSortedPinjaman = pinjaman 
+  // .filter(
+  //   (pinjaman) =>
+  //     (pinjaman.id_pinjaman && String(pinjaman.id_pinjaman).toLowerCase().includes(searchQuery)) ||
+  //     (pinjaman.tanggal_pengajuan && String(pinjaman.tanggal_pengajuan).toLowerCase().includes(searchQuery)) ||
+  //     (pinjaman.nomor_antrean && pinjaman.nomor_antrean.toLowerCase().includes(searchQuery)) ||
+  //     (pinjaman.id_peminjam && String(pinjaman.id_peminjam).toLowerCase().includes(searchQuery)) ||
+  //     (pinjaman?.Peminjam?.nama && String(pinjaman.Peminjam.nama).toLowerCase().includes(searchQuery)) ||
+  //     (pinjaman.keperluan && String(pinjaman.keperluan).toLowerCase().includes(searchQuery)) ||
+  //     (pinjaman.status_pengajuan && String(pinjaman.status_pengajuan).toLowerCase().includes(searchQuery))
+  // ) 
+  // .filter(
+  //   (item) => 
+  //     item.status_transfer !== "Selesai" &&
+  //     item.status_pengajuan !== "Dibatalkan" && 
+  //     item.status_transfer !== "Dibatalkan"
+  // )
+  // .map((pinjaman) => ({
+  //   ...pinjaman,
+  //   nomor_antrean: findNomorAntrean(pinjaman.id_pinjaman),
+  // }))
+  // .sort((a, b) => a.nomor_antrean - b.nomor_antrean);
+
   const filteredAndSortedPinjaman = pinjaman 
   .filter(
     (pinjaman) =>
@@ -102,7 +129,12 @@ function Beranda() {
       (pinjaman.id_peminjam && String(pinjaman.id_peminjam).toLowerCase().includes(searchQuery)) ||
       (pinjaman?.Peminjam?.nama && String(pinjaman.Peminjam.nama).toLowerCase().includes(searchQuery)) ||
       (pinjaman.keperluan && String(pinjaman.keperluan).toLowerCase().includes(searchQuery)) ||
-      (pinjaman.status_pengajuan && String(pinjaman.status_pengajuan).toLowerCase().includes(searchQuery))
+      (pinjaman.status_pengajuan && String(pinjaman.status_pengajuan).toLowerCase().includes(searchQuery)) ||
+      (pinjaman.jumlah_pinjaman && String(pinjaman.jumlah_pinjaman).toLowerCase().includes(searchQuery)) ||
+      (pinjaman.jumlah_angsuran && String(pinjaman.jumlah_angsuran).toLowerCase().includes(searchQuery)) ||
+      (pinjaman.rasio_angsuran && String(pinjaman.rasio_angsuran).toLowerCase().includes(searchQuery)) ||
+      (pinjaman?.UpdatePinjamanPlafond?.tanggal_plafond_tersedia && String(pinjaman.UpdatePinjamanPlafond.tanggal_plafond_tersedia).toLowerCase().includes(searchQuery))
+
   ) 
   .filter(
     (item) => 
@@ -114,12 +146,33 @@ function Beranda() {
     ...pinjaman,
     nomor_antrean: findNomorAntrean(pinjaman.id_pinjaman),
   }))
-  .sort((a, b) => a.nomor_antrean - b.nomor_antrean);
+  .sort((a, b) => {
+    const aValue = a[sortBy];
+    const bValue = b[sortBy];
+
+    if (sortOrder === "asc") {
+      return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+    } else {
+      return bValue < aValue ? -1 : bValue > aValue ? 1 : 0; 
+    }
+
+  });
 
   const currentItems = filteredAndSortedPinjaman.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
+  }
+
+  const handleSort = (key) => {
+    if (sortBy === key) {
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+      setSortOrderDibayar(sortOrderDibayar === "asc" ? "desc" : "asc");
+    } else {
+      setSortBy(key);
+      setSortOrder("asc");
+      setSortOrderDibayar("asc");
+    }
   }
 
   const token = localStorage.getItem("token");
@@ -309,7 +362,7 @@ function Beranda() {
   const plafondTerakhir = parseFloat(latestPlafond);
   const total = totalPinjaman + plafondTerakhir;
   const persentaseJumlahPinjaman =  total > 0 ? ((totalPinjaman / total) * 100).toFixed(2) : "0";
-  const usedPercentage = (persentaseJumlahPinjaman > 0? (100 - persentaseJumlahPinjaman) : "0");
+  const usedPercentage = (persentaseJumlahPinjaman > 0? (100 - persentaseJumlahPinjaman).toFixed(2) : "0");
   // const usedPercentage = ( (total > 0 ? ((totalPinjaman / total) * 100).toFixed(2) : "0")) ; 
   console.log("usedPercentage: ", usedPercentage);
 
@@ -351,7 +404,7 @@ function Beranda() {
       const ctx = chart.ctx;
       ctx.restore();
       const fontSize = (height / 100).toFixed(2);
-      ctx.font = `${fontSize*8}px Nunito`;
+      ctx.font = `${fontSize*7}px Nunito`;
       ctx.textBaseline = 'middle';
       ctx.textAlign = 'center';
   
@@ -965,15 +1018,15 @@ const dataPeminjamPerDivisi = async (selectedDepartemenPeminjam, selectedMonthPe
                     <table className="flex-table table table-striped table-hover">
                       <thead>
                       <tr>
-                        <th className="border-0 text-wrap center">ID Pinjaman</th>
-                        <th className="border-0 text-wrap">Tanggal Pengajuan</th>
-                        <th className="border-0 text-wrap">Nomor Antrean</th>
-                        <th className="border-0 text-wrap">ID Karyawan</th>
+                        <th className="border-0 text-wrap center" onClick={() => handleSort("id_pinjaman")}>ID Pinjaman {sortBy==="id_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0 text-wrap" onClick={() => handleSort("tanggal_pengajuan")}>Tanggal Pengajuan {sortBy==="tanggal_pengajuan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0 text-wrap" onClick={() => handleSort("id_pinjaman")}>Nomor Antrean {sortBy==="id_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0 text-wrap" onClick={() => handleSort("id_peminjam")}>ID Karyawan{sortBy==="id_peminjam" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                         <th className="border-0 text-wrap">Nama Lengkap</th>
-                        <th className="border-0 text-wrap">Jumlah Pinjaman</th>
-                        <th className="border-0 text-wrap">Jumlah Angsuran</th>
-                        <th className="border-0 text-wrap">Jumlah Pinjaman Setelah Pembulatan</th>
-                        <th className="border-0 text-wrap">Rasio Angsuran</th>
+                        <th className="border-0 text-wrap" onClick={() => handleSort("jumlah_pinjaman")}>Jumlah Pinjaman {sortBy==="jumlah_pinjaman" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0 text-wrap" onClick={() => handleSort("jumlah_angsuran")}>Jumlah Angsuran {sortBy==="jumlah_angsuran" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0 text-wrap" onClick={() => handleSort("pinjaman_setelah_pembulatan")}>Jumlah Pinjaman Setelah Pembulatan {sortBy==="pinjaman_setelah_pembulatan" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
+                        <th className="border-0 text-wrap" onClick={() => handleSort("rasio_angsuran")}>Rasio Angsuran {sortBy==="rasio_angsuran" && (sortOrder === "asc" ? <FaSortUp/> : <FaSortDown/>)}</th>
                         <th className="border-0 text-wrap">Keperluan</th>
                         <th className="border-0 text-wrap">Tanggal Plafond Tersedia</th>
                         <th className="border-0 text-wrap">Status Pengajuan</th>
