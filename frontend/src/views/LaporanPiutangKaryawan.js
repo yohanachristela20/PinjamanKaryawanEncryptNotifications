@@ -222,6 +222,9 @@ import {
     
     const handleImportSuccess = () => {
       getPinjaman();
+      getPinjamanData();
+      getPlafond();
+      window.location.reload();
       // getAntrean();
       // toast.success("Data Pinjaman berhasil diimport!", {
       //     position: "top-right",
@@ -233,7 +236,7 @@ import {
   
 
   const downloadCSV = (data) => {
-  const header = ["id_pinjaman", "tanggal_pengajuan", "jumlah_pinjaman", "jumlah_angsuran", "pinjaman_setelah_pembulatan", "rasio_angsuran", "keperluan", "id_peminjam", "id_asesor", "sudah_dibayar", "belum_dibayar", "bulan_angsuran", "status"];
+  const header = ["id_pinjaman", "tanggal_pengajuan", "tanggal_penerimaan", "jumlah_pinjaman", "jumlah_angsuran", "pinjaman_setelah_pembulatan", "rasio_angsuran", "keperluan", "id_peminjam", "id_asesor", "sudah_dibayar", "belum_dibayar", "bulan_angsuran", "status"];
 
   if (!Array.isArray(data) || data.length === 0) {
     console.error("Data untuk CSV tidak valid atau kosong.");
@@ -268,6 +271,7 @@ import {
     return [
       item.id_pinjaman ?? "N/A",
       item.tanggal_pengajuan ?? "N/A",
+      item.tanggal_penerimaan ?? "N/A",
       item.jumlah_pinjaman ?? "N/A",
       item.jumlah_angsuran ?? "N/A",
       item.pinjaman_setelah_pembulatan ?? "N/A",
@@ -339,6 +343,7 @@ import {
       "Departemen", 
       "Divisi", 
       "Tanggal Pengajuan", 
+      "Tanggal Penerimaan", 
       "Jumlah Pinjaman", 
       "Nama Asesor", 
       "Jumlah Angsuran", 
@@ -380,7 +385,7 @@ import {
         12: { cellWidth: 'auto' }, 
         13: { cellWidth: 'auto' }, 
         14: { cellWidth: 'auto' }, 
-        // 15: { cellWidth: 'auto' }, 
+        15: { cellWidth: 'auto' }, 
       },
       tableWidth: 'auto',
   
@@ -608,6 +613,7 @@ import {
                           <th className="border-0 center">Departemen</th>
                           <th className="border-0 center">Divisi</th>
                           <th className="border-0 center">Tanggal Pengajuan</th>
+                          <th className="border-0 center">Tanggal Penerimaan</th>
                           <th className="border-0 center">Jumlah Pinjaman</th>
                           <th className="border-0 center">Ditransfer Oleh</th>
                           <th className="border-0 center">Jumlah Angsuran</th>
@@ -639,6 +645,7 @@ import {
                               <td className="text-center">{pinjaman.Peminjam ? pinjaman.Peminjam.departemen: 'N/A'}</td>
                               <td className="text-center">{pinjaman.Peminjam ? pinjaman.Peminjam.divisi: 'N/A'}</td>
                               <td className="text-center">{pinjaman.tanggal_pengajuan}</td>
+                              <td className="text-center">{pinjaman.tanggal_penerimaan}</td>
                               <td className="text-right">{formatRupiah(pinjaman.jumlah_pinjaman)}</td>
                               <td className="text-center">{pinjaman.Asesor ? pinjaman.Asesor.nama: 'N/A'}</td>
                               <td className="text-right">{formatRupiah(pinjaman.jumlah_angsuran)}</td>

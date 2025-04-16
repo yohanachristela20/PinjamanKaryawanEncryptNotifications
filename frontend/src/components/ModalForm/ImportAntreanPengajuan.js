@@ -52,7 +52,7 @@ const ImportAntreanPengajuan = ({showImportModal, setShowImportModal, onSuccess}
   };
 
   const downloadCSV = (data) => {
-    const header = ["id_pinjaman", "tanggal_pengajuan", "jumlah_pinjaman", "jumlah_angsuran", "pinjaman_setelah_pembulatan", "rasio_angsuran", "keperluan", "id_peminjam", "id_asesor"];
+    const header = ["id_pinjaman", "tanggal_pengajuan", "tanggal_penerimaan", "jumlah_pinjaman", "jumlah_angsuran", "pinjaman_setelah_pembulatan", "rasio_angsuran", "keperluan", "id_peminjam", "id_asesor"];
   
       try {
         const csvContent = [header]
