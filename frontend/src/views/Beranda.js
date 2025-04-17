@@ -360,9 +360,12 @@ function Beranda() {
   
   const totalPinjaman = parseFloat(totalPinjamanKeseluruhan);
   const plafondTerakhir = parseFloat(latestPlafond);
+  // console.log("plafond terakhir: ", plafondTerakhir);
   const total = totalPinjaman + plafondTerakhir;
-  const persentaseJumlahPinjaman =  total > 0 ? ((totalPinjaman / total) * 100).toFixed(2) : "0";
-  const usedPercentage = (persentaseJumlahPinjaman > 0? (100 - persentaseJumlahPinjaman).toFixed(2) : "0");
+  const persentaseJumlahPinjaman =  total > 0 ? ((totalPinjaman / total) * 100).toFixed(2) : "";
+  const percentage = plafondTerakhir > 0? 100 : "0";
+  // console.log("Percentage: ", percentage);
+  const usedPercentage = (persentaseJumlahPinjaman > 0? (100 - persentaseJumlahPinjaman).toFixed(2) : percentage);
   // const usedPercentage = ( (total > 0 ? ((totalPinjaman / total) * 100).toFixed(2) : "0")) ; 
   console.log("usedPercentage: ", usedPercentage);
 
@@ -412,7 +415,7 @@ function Beranda() {
       const y = height / 2;
   
       ctx.fillStyle = '#333'; // Text color
-      const text = options.plugins.centerText?.usedPercentage || "0.0%";
+      const text = options.plugins.centerText?.usedPercentage || "";
       ctx.fillText(`${text}%`, x, y);
       ctx.save();
     },
